@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <!-- bootstrap -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+   <link rel="stylesheet" type="text/css" href="css/orderS.css">
+   <link rel="stylesheet" type="text/css" href="css/main.css">
+   <title>Option Chain</title>
+</head>
+
+<body class="crypt-dark">
+   <section class="dashboard-design">
+      <header>
+         <div class="container-full-width">
+            <div class="crypt-header">
+               <div class="row">
+                  <div class="col-md-2">
+                     <span class="dot"></span>
+                  </div>
+                  <div class="col-md-3">
+                     <div class="web-seach">
+                        <input type="text" name="search" id="search" class="form-control" oninput="search()"
+                           placeholder="Search">
+                        <ul id="searchList"></ul>
+                     </div>
+                  </div>
+                  <div class="col-md-7 d-none d-md-block d-lg-block">
+                     <ul class="crypt-heading-menu fright">
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                        <li><a href="positions.html">Positions</a></li>
+                        <li><a href="indices.html">Indices</a></li>
+                        <li><a href="oc.html">Option Chain </a></li>
+                        <li><a href="holdings.html">Holdings</a></li>
+                        <li class="order-no"><a href="orders.html">Orders</a>
+                           <div class="right-accept d-none">
+                              <span id="completed">0</span>
+                           </div>
+                           <div class="left-reject d-none">
+                              <span id="rejected">0</span>
+                           </div>
+                        </li>
+                        <li><a href="strat.html">Strategy Builder</a></li>
+                        <li><a href="limits.html">Limits</a></li>
+                        <li class="crypt-box-menu menu-green"><a href="#" onclick="logout()">Logout</a></li>
+                     </ul>
+                  </div>
+                  <i class="menu-toggle pe-7s-menu d-xs-block d-sm-block d-md-none d-sm-none"></i>
+               </div>
+            </div>
+         </div>
+         <div class="crypt-mobile-menu">
+            <ul class="crypt-heading-menu">
+               <li><a href="dashboard.html">Dashboard</a></li>
+               <li><a href="positions.html">Positions</a></li>
+               <li><a href="indices.html">Indices</a></li>
+               <li><a href="oc.html">Option Chain </a></li>
+               <li><a href="holdings.html">Holdings</a></li>
+               <li class="order-no"><a href="orders.html">Orders</a>
+                  <div class="right-accept d-none">
+                     <span id="completed">0</span>
+                  </div>
+                  <div class="left-reject d-none">
+                     <span id="rejected">0</span>
+                  </div>
+               </li>
+               <li><a href="limits.html">Limits</a></li>
+               <li class="crypt-box-menu menu-green"><a href="#" onclick="logout()">logout</a></li>
+            </ul>
+         </div>
+      </header>
+   </section>
+   <section class="space oi-fixed">
+      <div class="container-fluid">
+         <div class="row">
+            <div class="col-md-4">
+               <div class="oi-click-button">
+                  <a onclick="changeDiv(event)" href="#">OI Graph</a>
+               </div>
+            </div>
+            <div class="col-md-4">
+               <div class="oi-click-button">
+                  <a onclick="changeDiv(event)" href="#">Decay Strangle</a>
+               </div>
+            </div>
+            <div class="col-md-4">
+               <div class="oi-click-button">
+                  <a onclick="changeDiv(event)" href="#">Table</a>
+               </div>
+            </div>
+         </div>
+         <div class="row oichart">
+            <div class="col-md-10" id="OIGraph" class="d-none">
+               <h3>Oi Chart</h3>
+               <div id="OI"></div>
+            </div>
+            <!--                <div class="col-md-12">
+                  <div id="IV"></div>
+               </div> -->
+            <div id="decayS" class="d-none">
+               <div class="col-md-6">
+                  <h3>Decay</h3>
+                  <div id="decay" class="chart"></div>
+               </div>
+               <div class="col-md-6">
+                  <h3>Straddle</h3>
+                  <div id="straddle" class="chart"></div>
+               </div>
+            </div>
+         </div>
+         <!-- open interest -->
+         <div class="row" style="margin-top: 20px;">
+            <div class="col-md-3">
+               <div class="oi-head">
+                  <h4>CALLS</h4>
+               </div>
+            </div>
+            <div class="col-md-4">
+               <div class="scipt-name oc-select">
+                  <div class="oi-head">
+                     <h4><span id="name"></span> <span class="token"></span></h4>
+                  </div>
+               </div>
+            </div>
+            <div class="col-md-2">
+               <div class="oi-head">
+                  <h4>PUTS</h4>
+               </div>
+            </div>
+            <div class="col-md-2">
+               <div class="expiry oc-select">
+                  <select class="input-group form-control" id="exp" onchange="changeExp()">
+                  </select>
+               </div>
+            </div>
+            <div class="col-md-1">
+               <div class="expiry oc-select oi-ranger">
+                  <input type="number" step="1" min="1" max="40" value="30" id="strikeC" onchange="changeExp()">
+               </div>
+            </div>
+            <!-- open interest -->
+            <div class="col-md-12" style="padding: 0px">
+               <div class="tab-content">
+                  <!---->
+                  <br>
+                  <table class="table table-striped" id="mainTable">
+                     <thead class="oi-heads">
+                        <tr>
+                           <th>CE Delta</th>
+                           <th>CE Theta</th>
+                           <th>CE OI Chg</th>
+                           <th>CE OI</th>
+                           <th>CE CL OI</th>
+                           <th>CE PRV CL</th>
+                           <th>CE LTP</th>
+                           <th>Strike</th>
+                           <th>PE LTP</th>
+                           <th>PE PRV CL</th>
+                           <th>PE CL OI</th>
+                           <th>PE OI</th>
+                           <th>PE OI Chg</th>
+                           <th>PETheta</th>
+                           <th>PE Delta</th>
+                           <th>IV</th>
+                           <th>Straddle</th>
+                           <th>PCR</th>
+                        </tr>
+                     </thead>
+                     <tbody id="ocBody">
+                     </tbody>
+                     <tfoot id="ocFoot"></tfoot>
+                  </table>
+                  <table id="tableOI" class="d-none">
+                     <thead></thead>
+                     <tbody>
+                     </tbody>
+                  </table>
+                  <table id="tableIV" class="d-none">
+                     <thead></thead>
+                     <tbody>
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+         </div>
+      </div>
+
+   </section>
+   <!-- oc buy and sell -->
+   <!-- <div class="buttons dc-buttons d-none" style="position: absolute;" id="buttons">
+      <button id="b" onclick="b(event)">B</button>&emsp;
+      <button id="s" onclick="s(event)">S</button>
+   </div> -->
+   <!-- oc buy and sell -->
+   <!-- position -->
+   <!-- <div class="exit-panel d-none oi-panel" id="exitP">
+      <div class="row">
+         <div class="col-md-3 position-panel">
+            <div class="row">
+               <div class="col-md-6" id="tsym"></div>
+               <div class="col-md-3" id="exch"></div>
+               <div class="col-md-3" id="prdtype">MKT</div>
+            </div>
+            <div class="row" style="display:flex; justify-content:center;">
+               <div class="col-md-3">
+                  <select class="input-group mb-3 form-control" id="prd">
+                     <option>NRML</option>
+                     <option>MIS</option>
+                  </select>
+               </div>
+               <div class="col-md-4">
+                  <input type="number" class="input-group mb-3 form-control" id="qtyB">
+               </div>
+               <div class="col-md-4">
+                  <button class="exit-panel-button" onclick="exitB()">Place</button>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div> -->
+   <!-- alert -->
+   <div class="d-none noti-set mn-noti" id="alert">
+      <span class="fas fa-exclamation-circle"></span>
+      <span id="msg">Warning: This is a warning alert!</span>
+      <div class="close-btn">
+         <span class="fas fa-times"></span>
+      </div>
+      <audio id="myAudio">
+         <source src="noti.mp3" type="audio/mp3">
+      </audio>
+   </div>
+   <!-- alert -->
+   <!-- js -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+   <script src="js/main.js"></script>
+   <script src="js/gaussian.js"></script>
+   <script src="js/urls.js"></script>
+   <script src="js/websocket.js"></script>
+   <script src="https://code.highcharts.com/highcharts.js"></script>
+   <script src="https://code.highcharts.com/modules/data.js"></script>
+   <script src="https://code.highcharts.com/modules/exporting.js"></script>
+   <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+   <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+
+</body>
+
+</html>

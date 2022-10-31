@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <!-- bootstrap -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+   <link rel="stylesheet" href="css/orderS.css">
+   <link rel="stylesheet" href="css/main.css">
+   <title>Strategy Builder</title>
+</head>
+
+<body class="crypt-dark">
+   <section class="dashboard-design">
+      <header>
+         <div class="container-full-width">
+            <div class="crypt-header">
+               <div class="row">
+                  <div class="col-md-2">
+                     <span class="dot"></span>
+                  </div>
+                  <div class="col-md-3">
+                     <div class="web-seach">
+                        <input type="text" name="search" id="search" class="form-control" oninput="search()"
+                           placeholder="Search">
+                        <ul id="searchList"></ul>
+                     </div>
+                  </div>
+                  <div class="col-md-7 d-none d-md-block d-lg-block">
+                     <ul class="crypt-heading-menu fright">
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                        <li><a href="positions.html">Positions</a></li>
+                        <li><a href="indices.html">Indices</a></li>
+                        <li><a href="oc.html">Option Chain </a></li>
+                        <li><a href="holdings.html">Holdings</a></li>
+                        <li class="order-no"><a href="orders.html">Orders</a>
+                           <div class="right-accept d-none">
+                              <span id="completed">0</span>
+                           </div>
+                           <div class="left-reject d-none">
+                              <span id="rejected">0</span>
+                           </div>
+                        </li>
+                        <li><a href="strat.html">Strategy Builder</a></li>
+                        <li><a href="limits.html">Limits</a></li>
+                        <li class="crypt-box-menu menu-green"><a href="#" onclick="logout()">Logout</a></li>
+                     </ul>
+                  </div>
+                  <i class="menu-toggle pe-7s-menu d-xs-block d-sm-block d-md-none d-sm-none"></i>
+               </div>
+            </div>
+         </div>
+         <div class="crypt-mobile-menu">
+            <ul class="crypt-heading-menu">
+               <li><a href="dashboard.html">Dashboard</a></li>
+               <li><a href="positions.html">Positions</a></li>
+               <li><a href="indices.html">Indices</a></li>
+               <li><a href="oc.html">Option Chain </a></li>
+               <li><a href="holdings.html">Holdings</a></li>
+               <li class="order-no"><a href="orders.html">Orders</a>
+                  <div class="right-accept d-none">
+                     <span id="completed">0</span>
+                  </div>
+                  <div class="left-reject d-none">
+                     <span id="rejected">0</span>
+                  </div>
+               </li>
+               <li><a href="strat.html">Strategy Builder</a></li>
+               <li><a href="limits.html">Limits</a></li>
+               <li class="crypt-box-menu menu-green"><a href="#" onclick="logout()">logout</a></li>
+            </ul>
+         </div>
+      </header>
+   </section>
+   <!-- panel -->
+   <section class="panel space">
+      <div class="container">
+         <div class="row">
+            <div class="">
+               <div class="row" style="display: flex; justify-content: center;">
+                  <div class="col-md-3 chart-name">
+                     <span class="chart-name"><span id="name"></span> <span class="token"></span></span>
+                  </div>
+                  <div class="col-md-3 chart-name">
+                     Strike Gap : <span id="diff" class=""></span>
+                  </div>
+                  <div class="col-md-3 chart-name">
+                     <span id="strikeP" class="d-none"></span>
+                     Lot Size : <span id="ls" class=""></span>
+                  </div>
+                  <div class="col-md-3">
+                     <div class="strat-expiry">
+                        <select class="input-group form-control" id="exp">
+                        </select>
+                     </div>
+                  </div>
+               </div>
+               <div class="row">
+                  <div class="strat-details">
+                     <div class="col-md-12" style="padding: 0px">
+                        <div class="tab-content">
+                           <table class="table table-striped">
+                              <thead class="oi-heads">
+                                 <tr>
+                                    <th></th>
+                                    <th>B/S</th>
+                                    <th>Expiry</th>
+                                    <th>Strike</th>
+                                    <th>CE/PE</th>
+                                    <th>QTY</th>
+                                    <th>Price</th>
+                                    <th>N/M</th>
+                                    <th>Delta</th>
+                                    <th>Theta</th>
+                                    <th>Gamma</th>
+                                    <th>Vega</th>
+                                    <th>IV</th>
+                                    <th>del</th>
+                                 </tr>
+                              </thead>
+                              <tbody id="stratBody">
+                              </tbody>
+                              <tfoot id="stratFoot">
+                                 <tr>
+                                    <td>0</td>
+                                    <td>1</td>
+                                    <td>2</td>
+                                    <td>3</td>
+                                    <td>4</td>
+                                    <td>net c</td>
+                                    <td id="net">5</td>
+                                    <td id="inRs">7</td>
+                                    <td id="delta">delta</td>
+                                    <td id="theta">9</td>
+                                    <td id="gamma">10</td>
+                                    <td id="vega">11</td>
+                                    <td>12</td>
+                                    <td>13</td>
+                                 </tr>
+                              </tfoot>
+                           </table>
+                        </div>
+                     </div>
+                  </div>
+                  <!-- end strat detail -->
+                  <div class="row">
+                     <div class="col-md-4">
+                        <div class="strat-button">
+                           <button class="crypt-button-green-full" disabled id="trA">Trade All</button>
+                        </div>
+                     </div>
+                     <div class="col-md-5">
+                        <div class="strat-button">
+                           <button class="crypt-button-green-full" disabled id="trS" onclick="tradeS()">Trade
+                              Selected</button>
+                        </div>
+                     </div>
+                     <div class="col-md-3">
+                        <div class="strat-button">
+                           <button class="crypt-button-green-full" onclick="addLeg()" disabled id="add">Add</button>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <!-- chart strat -->
+         </div>
+         <div class="row">
+            <div class="col-md-12">
+               <br>
+               <br>
+               <div class="col-mid-6">
+                  <div class="row main-max">
+                     <!--<div class="col-md-4">-->
+                     <!--   <div class="row">-->
+                     <!--      <div class="col-md-6">-->
+                     <!--         <div class="max-profit">-->
+                     <!--            <h4>Max profit</h4>-->
+                     <!--         </div>-->
+                     <!--      </div>-->
+                     <!--      <div class="col-md-6">-->
+                     <!--         <div class="max-profit max-amount">-->
+                     <!--            <h4 class="green">2,085</h4>-->
+                     <!--         </div>-->
+                     <!--      </div>-->
+                     <!--   </div>-->
+                     <!--   <hr class="white">-->
+                     <!--   <div class="row">-->
+                     <!--      <div class="col-md-6">-->
+                     <!--         <div class="max-profit">-->
+                     <!--            <h4>Max loss</h4>-->
+                     <!--         </div>-->
+                     <!--      </div>-->
+                     <!--      <div class="col-md-6">-->
+                     <!--         <div class="max-profit max-amount">-->
+                     <!--            <h4 class="red">2,085</h4>-->
+                     <!--         </div>-->
+                     <!--      </div>-->
+                     <!--   </div>-->
+                     <!--   <hr class="white">-->
+                     <!--   <div class="row">-->
+                     <!--      <div class="col-md-6">-->
+                     <!--         <div class="max-profit">-->
+                     <!--            <h4>Risk / Reward</h4>-->
+                     <!--         </div>-->
+                     <!--      </div>-->
+                     <!--      <div class="col-md-6">-->
+                     <!--         <div class="max-profit max-amount">-->
+                     <!--            <h4>1.4</h4>-->
+                     <!--         </div>-->
+                     <!--      </div>-->
+                     <!--   </div>-->
+                     <!--</div>-->
+                     <!--<div class="col-md-4">-->
+                     <!--   <div class="row">-->
+                     <!--      <div class="col-md-6">-->
+                     <!--         <div class="max-profit">-->
+                     <!--            <h4>Breakeven</h4>-->
+                     <!--         </div>-->
+                     <!--      </div>-->
+                     <!--      <div class="col-md-6">-->
+                     <!--         <div class="max-profit max-amount">-->
+                     <!--            <h4>17108.3(0.03%)</h4>-->
+                     <!--         </div>-->
+                     <!--      </div>-->
+                     <!--   </div>-->
+                     <!--   <hr class="white">-->
+                     <!--   <div class="row">-->
+                     <!--      <div class="col-md-6">-->
+                     <!--         <div class="max-profit">-->
+                     <!--            <h4>POP</h4>-->
+                     <!--         </div>-->
+                     <!--      </div>-->
+                     <!--      <div class="col-md-6">-->
+                     <!--         <div class="max-profit max-amount">-->
+                     <!--            <h4>50%</h4>-->
+                     <!--         </div>-->
+                     <!--      </div>-->
+                     <!--   </div>-->
+                     <!--   <hr class="white">-->
+                     <!--   <div class="row">-->
+                     <!--      <div class="col-md-6">-->
+                     <!--         <div class="max-profit">-->
+                     <!--            <h4>Projected return</h4>-->
+                     <!--         </div>-->
+                     <!--      </div>-->
+                     <!--      <div class="col-md-6">-->
+                     <!--         <div class="max-profit max-amount">-->
+                     <!--            <h4>--</h4>-->
+                     <!--         </div>-->
+                     <!--      </div>-->
+                     <!--   </div>-->
+                     <!--</div>-->
+                     <div class="col-md-12">
+                        <div class="row">
+                           <div class="col-md-6">
+                              <div class="max-profit">
+                                 <h4>Required margin</h4>
+                              </div>
+                           </div>
+                           <div class="col-md-6">
+                              <div class="max-profit max-amount">
+                                 <h4 id="funds">--</h4>
+                              </div>
+                           </div>
+                        </div>
+                        <hr class="white">
+                        <div class="row">
+                           <div class="col-md-6">
+                              <div class="max-profit">
+                                 <h4>Final Margin</h4>
+                              </div>
+                           </div>
+                           <div class="col-md-6">
+                              <div class="max-profit max-amount">
+                                 <h4 id="margin">--</h4>
+                              </div>
+                           </div>
+                        </div>
+                        <hr class="white">
+                        <div class="row">
+                           <div class="col-md-6">
+                              <div class="max-profit">
+                                 <h4>Funds Avaliable</h4>
+                              </div>
+                           </div>
+                           <div class="col-md-6">
+                              <div class="max-profit max-amount">
+                                 <h4 id="t">--</h4>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <!-- chart strat -->
+                  <!--<div class="col-mid-6">-->
+                  <!--   <div class="row">-->
+                  <!--      <div class="navtab">-->
+                  <!--         <div class="w3-bar w3-black">-->
+                  <!--            <button class="w3-bar-item w3-button" onclick="openCity('London')">Graph</button>-->
+                  <!--            <button class="w3-bar-item w3-button" onclick="openCity('Paris')">P&l Table</button>-->
+                  <!--            <button class="w3-bar-item w3-button" onclick="openCity('Tokyo')">Greeks</button>-->
+                  <!--         </div>-->
+                  <!--         <div id="London" class="city">-->
+                  <!--            <div class="strat-image">-->
+                  <!-- <img src="chart.png" alt=""> -->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!--         <div id="Paris" class="city" style="display:none">-->
+                  <!--            <div class="tab-content strat-table">-->
+                  <!--               <table class="table table-striped">-->
+                  <!--                  <thead class="oi-heads">-->
+                  <!--                     <tr>-->
+                  <!--                        <th>Instrument</th>-->
+                  <!--                        <th>Target P&L </th>-->
+                  <!--                        <th>Target Price</th>-->
+                  <!--                        <th>Entry Price</th>-->
+                  <!--                        <th>LTP</th>-->
+                  <!--                     </tr>-->
+                  <!--                  </thead>-->
+                  <!--                  <tbody id="ocBody">-->
+                  <!--                     <tr>-->
+                  <!--                        <td>-->
+                  <!--                           <div class="strat-chart-head">-->
+                  <!--                              <h4><span class="badge bg-secondary">B</span> 1x 05 MAY 17050 CE</h4>-->
+                  <!--                           </div>-->
+                  <!--                        </td>-->
+                  <!--                        <td>-->
+                  <!--                           <div class="strat-chart-head">-->
+                  <!--                              <h4>-1,975</h4>-->
+                  <!--                           </div>-->
+                  <!--                        </td>-->
+                  <!--                        <td>-->
+                  <!--                           <div class="strat-chart-head">-->
+                  <!--                              <h4>6875</h4>-->
+                  <!--                           </div>-->
+                  <!--                        </td>-->
+                  <!--                        <td>-->
+                  <!--                           <div class="strat-chart-head">-->
+                  <!--                              <h4>8850</h4>-->
+                  <!--                           </div>-->
+                  <!--                        </td>-->
+                  <!--                        <td>-->
+                  <!--                           <div class="strat-chart-head">-->
+                  <!--                              <h4>8850</h4>-->
+                  <!--                           </div>-->
+                  <!--                        </td>-->
+                  <!--                     </tr>-->
+                  <!--                  </tbody>-->
+                  <!--                  <tfoot id="ocFoot"></tfoot>-->
+                  <!--               </table>-->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!--         <div id="Tokyo" class="city" style="display:none">-->
+                  <!--            <div class="tab-content strat-table">-->
+                  <!--               <table class="table table-striped">-->
+                  <!--                  <thead class="oi-heads">-->
+                  <!--                     <tr>-->
+                  <!--                        <th>Instrument</th>-->
+                  <!--                        <th>Delta</th>-->
+                  <!--                        <th>Theta</th>-->
+                  <!--                        <th>Decay</th>-->
+                  <!--                        <th>Gamma</th>-->
+                  <!--                        <th>Vega</th>-->
+                  <!--                     </tr>-->
+                  <!--                  </thead>-->
+                  <!--                  <tbody id="ocBody">-->
+                  <!--                     <tr>-->
+                  <!--                        <td>-->
+                  <!--                           <div class="strat-chart-head">-->
+                  <!--                              <h4><span class="badge bg-secondary">B</span> 1x 05 MAY 17050 CE</h4>-->
+                  <!--                           </div>-->
+                  <!--                        </td>-->
+                  <!--                        <td>-->
+                  <!--                           <div class="strat-chart-head">-->
+                  <!--                              <h4>29</h4>-->
+                  <!--                           </div>-->
+                  <!--                        </td>-->
+                  <!--                        <td>-->
+                  <!--                           <div class="strat-chart-head">-->
+                  <!--                              <h4>-842</h4>-->
+                  <!--                           </div>-->
+                  <!--                        </td>-->
+                  <!--                        <td>-->
+                  <!--                           <div class="strat-chart-head">-->
+                  <!--                              <h4>-1942</h4>-->
+                  <!--                           </div>-->
+                  <!--                        </td>-->
+                  <!--                        <td>-->
+                  <!--                           <div class="strat-chart-head">-->
+                  <!--                              <h4>0.073</h4>-->
+                  <!--                           </div>-->
+                  <!--                        </td>-->
+                  <!--                        <td>-->
+                  <!--                           <div class="strat-chart-head">-->
+                  <!--                              <h4>307</h4>-->
+                  <!--                           </div>-->
+                  <!--                        </td>-->
+                  <!--                     </tr>-->
+                  <!--                  </tbody>-->
+                  <!--                  <tfoot id="ocFoot"></tfoot>-->
+                  <!--               </table>-->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!--      </div>-->
+                  <!--      <div class="row">-->
+                  <!--         <div class="col-md-6">-->
+                  <!--            <div class="rangeslider">-->
+                  <!--               <label for="customRange2" class="form-label">Nifty Target</label>-->
+                  <!--               <div class="range-text">-->
+                  <!--                  <div class="value-button" id="decrease" onclick="decreaseValue()"-->
+                  <!--                     value="Decrease Value">--->
+                  <!--                  </div>-->
+                  <!--                  <input type="number" id="number" value="0" />-->
+                  <!--                  <div class="value-button" id="increase" onclick="increaseValue()"-->
+                  <!--                     value="Increase Value">+-->
+                  <!--                  </div>-->
+                  <!--               </div>-->
+                  <!--               <br>-->
+                  <!--               <span class="red">Reset</span>-->
+                  <!--               <input type="range" class="form-range" min="0" max="5" id="customRange2">-->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!--         <div class="col-md-6">-->
+                  <!--            <div class="rangeslider">-->
+                  <!--               <label for="customRange2" class="form-label">Target Date:3Dto expiry</label>-->
+                  <!--               <br>-->
+                  <!--               <span class="red">Reset</span>-->
+                  <!--               <input type="range" class="form-range" min="0" max="5" id="customRange2">-->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!--      </div>-->
+                  <!--   </div>-->
+                  <!--</div>-->
+                  <!--<div>-->
+                  <!-- delta etc -->
+                  <!--   <div class="row main-max">-->
+                  <!--      <div class="col-md-4">-->
+                  <!--         <div class="row">-->
+                  <!-- head -->
+                  <!--            <div class="row">-->
+                  <!--               <div class="st-head">-->
+                  <!--                  <h5>Strikewise IVs</h5>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--            <div class="col-md-6">-->
+                  <!--               <div class="max-profit">-->
+                  <!--                  <h4>Offset</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--            <div class="col-md-6">-->
+                  <!--               <div class="strat-inner strat-input  sp-rm-1">-->
+                  <!--                  <input type="text" class="form-control">-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!--         <hr class="white">-->
+                  <!--         <div class="row">-->
+                  <!--            <div class="col-md-6">-->
+                  <!--               <div class="max-profit">-->
+                  <!--                  <h4>17050 <span>05 May</span></h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--            <div class="col-md-6">-->
+                  <!--               <div class="strat-inner strat-input  sp-rm-1">-->
+                  <!--                  <input type="text" class="form-control">-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!--         <hr class="white">-->
+                  <!--         <div class="row">-->
+                  <!--            <div class="col-md-6">-->
+                  <!--               <div class="max-profit">-->
+                  <!--                  <h4>17050 <span>05 May</span></h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--            <div class="col-md-6">-->
+                  <!--               <div class="strat-inner strat-input  sp-rm-1">-->
+                  <!--                  <input type="text" class="form-control">-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!--      </div>-->
+                  <!--      <div class="col-md-4">-->
+                  <!-- head -->
+                  <!--         <div class="row">-->
+                  <!--            <div class="st-head">-->
+                  <!--               <h5>Greeks</h5>-->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!-- head -->
+                  <!--         <div class="row">-->
+                  <!--            <div class="col-md-6">-->
+                  <!--               <div class="max-profit">-->
+                  <!--                  <h4>Delta</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--            <div class="col-md-6">-->
+                  <!--               <div class="max-profit max-amount">-->
+                  <!--                  <h4>17108.3(0.03%)</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!--         <hr class="white">-->
+                  <!--         <div class="row">-->
+                  <!--            <div class="col-md-6">-->
+                  <!--               <div class="max-profit">-->
+                  <!--                  <h4>Theta</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--            <div class="col-md-6">-->
+                  <!--               <div class="max-profit max-amount">-->
+                  <!--                  <h4>50%</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!--         <hr class="white">-->
+                  <!--         <div class="row">-->
+                  <!--            <div class="col-md-6">-->
+                  <!--               <div class="max-profit">-->
+                  <!--                  <h4>Decay</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--            <div class="col-md-6">-->
+                  <!--               <div class="max-profit max-amount">-->
+                  <!--                  <h4>--</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!--         <hr class="white">-->
+                  <!--         <div class="row">-->
+                  <!--            <div class="col-md-6">-->
+                  <!--               <div class="max-profit">-->
+                  <!--                  <h4>Gamma</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--            <div class="col-md-6">-->
+                  <!--               <div class="max-profit max-amount">-->
+                  <!--                  <h4>--</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!--         <hr class="white">-->
+                  <!--         <div class="row">-->
+                  <!--            <div class="col-md-6">-->
+                  <!--               <div class="max-profit">-->
+                  <!--                  <h4>Vega</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--            <div class="col-md-6">-->
+                  <!--               <div class="max-profit max-amount">-->
+                  <!--                  <h4>--</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!--      </div>-->
+                  <!--      <div class="col-md-4">-->
+                  <!-- head -->
+                  <!--         <div class="row">-->
+                  <!--            <div class="st-head">-->
+                  <!--               <h5>SD</h5>-->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!-- head -->
+                  <!--         <div class="row">-->
+                  <!--            <div class="col-md-4">-->
+                  <!--               <div class="max-profit st-head">-->
+                  <!--                  <h4>SD</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--            <div class="col-md-4">-->
+                  <!--               <div class="max-profit st-head">-->
+                  <!--                  <h4>Points</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--            <div class="col-md-4">-->
+                  <!--               <div class="max-profit st-head">-->
+                  <!--                  <h4>Price</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!--         <hr class="white">-->
+                  <!--         <div class="row">-->
+                  <!--            <div class="col-md-3">-->
+                  <!--               <div class="max-profit">-->
+                  <!--                  <h4>1 SD</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--            <div class="col-md-5">-->
+                  <!--               <div class="max-profit max-amount">-->
+                  <!--                  <h4>398.8 (2.3%)</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--            <div class="col-md-4">-->
+                  <!--               <div class="max-profit max-amount">-->
+                  <!--                  <h4>17106.75</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!--         <hr class="white">-->
+                  <!--         <div class="row">-->
+                  <!--            <div class="col-md-3">-->
+                  <!--               <div class="max-profit">-->
+                  <!--                  <h4>1 SD</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--            <div class="col-md-5">-->
+                  <!--               <div class="max-profit max-amount">-->
+                  <!--                  <h4>398.8 (2.3%)</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--            <div class="col-md-4">-->
+                  <!--               <div class="max-profit max-amount">-->
+                  <!--                  <h4>17106.75</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!--         <hr class="white">-->
+                  <!--         <div class="row">-->
+                  <!--            <div class="col-md-3">-->
+                  <!--               <div class="max-profit">-->
+                  <!--                  <h4>1 SD</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--            <div class="col-md-5">-->
+                  <!--               <div class="max-profit max-amount">-->
+                  <!--                  <h4>398.8 (2.3%)</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--            <div class="col-md-4">-->
+                  <!--               <div class="max-profit max-amount">-->
+                  <!--                  <h4>17106.75</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!--         <hr class="white">-->
+                  <!--         <div class="row">-->
+                  <!--            <div class="col-md-3">-->
+                  <!--               <div class="max-profit">-->
+                  <!--                  <h4>1 SD</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--            <div class="col-md-5">-->
+                  <!--               <div class="max-profit max-amount">-->
+                  <!--                  <h4>398.8 (2.3%)</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--            <div class="col-md-4">-->
+                  <!--               <div class="max-profit max-amount">-->
+                  <!--                  <h4>17106.75</h4>-->
+                  <!--               </div>-->
+                  <!--            </div>-->
+                  <!--         </div>-->
+                  <!--      </div>-->
+                  <!--   </div>-->
+                  <!--</div>-->
+               </div>
+            </div>
+            <!-- chart strat -->
+         </div>
+      </div>
+   </section>
+   <!-- alert -->
+   <div class="d-none noti-set mn-noti" id="alert">
+      <span class="fas fa-exclamation-circle"></span>
+      <span id="msg">Warning: This is a warning alert!</span>
+      <div class="close-btn">
+         <span class="fas fa-times"></span>
+      </div>
+      <audio id="myAudio">
+         <source src="noti.mp3" type="audio/mp3">
+      </audio>
+   </div>
+   <!-- alert -->
+   <!-- js -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+   <script src="js/main.js"></script>
+   <script type="text/javascript" src="js/gaussian.js"></script>
+   <script src="js/urls.js"></script>
+   <script src="js/websocket.js"></script>
+</body>
+
+</html>

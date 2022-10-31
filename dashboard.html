@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head class="crypt-dark">
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>Dashboard</title>
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+   <link rel="stylesheet" href="css/orderS.css">
+   <link rel="stylesheet" href="css/main.css">
+   <!-- fonts -->
+   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&display=swap" rel="stylesheet">
+
+</head>
+
+<body class="crypt-dark">
+   <section class="dashboard-design">
+      <header>
+         <div class="container-full-width">
+            <div class="crypt-header">
+               <div class="row">
+                  <div class="col-md-2">
+                     <span class="dot"></span>
+                  </div>
+                  <div class="col-md-3">
+                     <div class="web-seach">
+                        <input type="text" name="search" id="search" class="form-control" oninput="search()"
+                           placeholder="Search">
+                        <ul id="searchList"></ul>
+                     </div>
+                  </div>
+                  <div class="col-md-7 d-none d-md-block d-lg-block">
+                     <ul class="crypt-heading-menu fright">
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                        <li><a href="positions.html">Positions</a></li>
+                        <li><a href="indices.html">Indices</a></li>
+                        <li><a href="oc.html">Option Chain </a></li>
+                        <li><a href="holdings.html">Holdings</a></li>
+                        <li class="order-no"><a href="orders.html">Orders</a>
+                           <div class="right-accept d-none">
+                              <span id="completed">0</span>
+                           </div>
+                           <div class="left-reject d-none">
+                              <span id="rejected">0</span>
+                           </div>
+                        </li>
+                        <li><a href="strat.html">Strategy Builder</a></li>
+                        <li><a href="limits.html">Limits</a></li>
+                        <li class="crypt-box-menu menu-green"><a href="#" onclick="logout()">Logout</a></li>
+                     </ul>
+                  </div>
+                  <i class="menu-toggle pe-7s-menu d-xs-block d-sm-block d-md-none d-sm-none"></i>
+               </div>
+            </div>
+         </div>
+         <div class="crypt-mobile-menu">
+            <ul class="crypt-heading-menu">
+               <li><a href="dashboard.html">Dashboard</a></li>
+               <li><a href="positions.html">Positions</a></li>
+               <li><a href="indices.html">Indices</a></li>
+               <li><a href="oc.html">Option Chain </a></li>
+               <li><a href="holdings.html">Holdings</a></li>
+               <li class="order-no"><a href="orders.html">Orders</a>
+                  <div class="right-accept d-none">
+                     <span id="completed">0</span>
+                  </div>
+                  <div class="left-reject d-none">
+                     <span id="rejected">0</span>
+                  </div>
+               </li>
+               <li><a href="limits.html">Limits</a></li>
+               <li class="crypt-box-menu menu-green"><a href="#" onclick="logout()">logout</a></li>
+            </ul>
+         </div>
+      </header>
+   </section>
+   <section id="chartSec">
+      <div class="container-fluid">
+         <div class="row sm-gutters">
+            <div class="col-md-6 col-lg-6 col-xl-7 col-xxl-8">
+               <div class="crypt-gross-market-cap mt-4">
+                  <div class="row">
+                     <div class="col-md-12">
+                        <p class="chart-name"><span id="name"></span> <span class="token"
+                              onmouseover="buttons(event)"></span></p>
+                     </div>
+                     <!-- charts -->
+                     <!-- <div id="chartTop" style="z-index: 20;"> -->
+                     <div>
+                        <div class="row">
+                           <div class="col-md-12">
+                              <div class="chart" id="bchart">
+                              </div>
+                              <div class="legend"></div>
+                              <div class="switcher"></div>
+                              <div class="rTb"></div>
+                           </div>
+                        </div>
+                        <div class="row">
+                           <div class="col-md-12">
+                              <div class="chart" id="schart">
+                              </div>
+                              <div class="legend"></div>
+                              <div class="switcher"></div>
+                              <div class="rTb"></div>
+                           </div>
+                        </div>
+                     </div>
+                     <!-- charts -->
+                  </div>
+               </div>
+            </div>
+            <div class="col-md-6 col-lg-6 col-xl-5 col-xxl-4">
+               <div class="row sm-gutters">
+                  <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+                     <div class="crypt-market-status mt-4 oc-bs">
+                        <div>
+                           <ul class="nav nav-tabs">
+                              <li role="presentation oc-li-width">
+                                 <div class="row">
+                                    <div class="col-md-9 col-no-space">
+                                       <div class="expiry oc-select oi-dash-main">
+                                          <select class="input-group form-control" id="exp" onchange="changeExp()">
+                                          </select>
+                                       </div>
+                                    </div>
+                                    <div class="col-md-3 col-no-space">
+                                       <div class="expiry oc-select oi-ranger oi-dash-second">
+                                          <input type="number" step="1" min="1" max="40" value="30" id="strikeC"
+                                             onchange="changeExp()">
+                                       </div>
+                                    </div>
+                                 </div>
+                              </li>
+                           </ul>
+                           <div class="tab-content">
+                              <div role="tabpanel" class="tab-pane active dash-oc" id="market-trading">
+                                 <table class="table table-striped dashboard-tableoc">
+                                    <thead>
+                                       <tr>
+                                          <th scope="col">CE</th>
+                                          <th scope="col">LTP</th>
+                                          <th scope="col">PE</th>
+                                       </tr>
+                                    </thead>
+                                    <tbody id="ocBody">
+                                    </tbody>
+                                 </table>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-6" style="margin-top:25px;">
+                     <div class="crypt-buy-sell-form">
+                        <p class="crypt-bg-head">Buy <span class="crypt-up" id="btsym"></span>
+                           <span class="req" id="breq"></span>
+                        </p>
+                        <div class="crypt-buy">
+                           <div class="row">
+                              <div class="col-md-6 sp-rm">
+                                 <div class="input-group mb-3">
+                                    <input type="number" class="form-control" placeholder="Price" id="bprice" value="0"
+                                       step="0.05" min="0.05" onchange="getMarginB()" disabled>
+                                 </div>
+                              </div>
+                              <div class="col-md-6 sp-rm">
+                                 <select class="input-group mb-3 form-control" id="bptype" onchange="changeValue()"
+                                    disabled>
+                                    <!-- <option>Price</option> -->
+                                    <option>MKT</option>
+                                    <option>LMT</option>
+                                    <option>SL-LMT</option>
+                                 </select>
+                              </div>
+                           </div>
+                           <div class="row">
+                              <div class="col-md-6 sp-rm">
+                                 <div class="input-group mb-3">
+                                    <input type="number" class="form-control" placeholder="Qty" id="bqty" min="0"
+                                       onchange="getMarginB()" disabled>
+                                 </div>
+                              </div>
+                              <div class="col-md-6 sp-rm">
+                                 <select class="input-group mb-3 form-control" id="bprdt" disabled>
+                                    <!-- <option>Order Type</option> -->
+                                    <option>MIS</option>
+                                    <option>NRML</option>
+                                 </select>
+                              </div>
+                           </div>
+                           <!-- greek table -->
+                           <div class="greek-table">
+                              <table class="table">
+                                 <tbody>
+                                    <tr>
+                                       <td>IV</td>
+                                       <td>Delta</td>
+                                       <td>Gamma</td>
+                                       <td>Theta</td>
+                                    </tr>
+                                    <tr>
+                                       <td>42.3</td>
+                                       <td>-1</td>
+                                       <td>-0.009</td>
+                                       <td>1462</td>
+                                    </tr>
+                                 </tbody>
+                              </table>
+                           </div>
+                           <!-- greek table -->
+                           <button onclick="buy()" id="bbutton" class="crypt-button-green-full" disabled>Buy</button>
+                        </div>
+                     </div>
+                     <div class="crypt-buy-sell-form">
+                        <p class="crypt-bg-head">Sell <span class="crypt-down" id="stsym"></span>
+                           <span id="sreq"></span>
+                        </p>
+                        <div class="crypt-sell">
+                           <div class="row">
+                              <div class="col-md-6 sp-rm">
+                                 <div class="input-group mb-2">
+                                    <input type="number" class="form-control" placeholder="Price" value="0" id="sprice"
+                                       step="0.05" min="0.05" onchange="getMarginS()" disabled>
+                                 </div>
+                              </div>
+                              <div class="col-md-6 sp-rm">
+                                 <select class="input-group mb-3 form-control" id="sptype" onchange="changeValue()"
+                                    disabled>
+                                    <!-- <option>Price</option> -->
+                                    <option>MKT</option>
+                                    <option>LMT</option>
+                                    <option>SL-LMT</option>
+                                 </select>
+                              </div>
+                           </div>
+                           <div class="row">
+                              <div class="col-md-6 sp-rm">
+                                 <div class="input-group mb-3">
+                                    <input type="number" class="form-control" placeholder="Qty" id="sqty" min="0"
+                                       onchange="getMarginS()" disabled>
+                                 </div>
+                              </div>
+                              <div class="col-md-6 sp-rm">
+                                 <select class="input-group mb-3 form-control" id="sprdt" disabled>
+                                    <!-- <option>Order Type</option> -->
+                                    <option>MIS</option>
+                                    <option>NRML</option>
+                                 </select>
+                              </div>
+                           </div>
+                           <!-- greek table -->
+                           <div class="greek-table">
+                              <table class="table">
+                                 <tbody>
+                                    <tr>
+                                       <td>IV</td>
+                                       <td>Delta</td>
+                                       <td>Gamma</td>
+                                       <td>Theta</td>
+                                    </tr>
+                                    <tr>
+                                       <td>42.3</td>
+                                       <td>-1</td>
+                                       <td>-0.009</td>
+                                       <td>1462</td>
+                                    </tr>
+                                 </tbody>
+                              </table>
+                           </div>
+                           <!-- greek table -->
+                           <button class="crypt-button-red-full" onclick="sell()" id="sbutton" disabled>Sell</button>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </section>
+   <!-- oc buy and sell -->
+   <div class="buttons dc-buttons d-none" style="position: absolute;" id="buttons">
+      <button id="b" onclick="b(event)">B</button>&emsp;
+      <button id="s" onclick="s(event)">S</button>
+   </div>
+   <!-- oc buy and sell -->
+   <!-- alert -->
+   <div class="d-none noti-set mn-noti" id="alert">
+      <span id="msg">Warning: This is a warning alert!</span>
+      <div class="close-btn">
+         <button onclick="closeAlert()"><i class="fas fa-times"></i></button>
+      </div>
+      <audio id="myAudio">
+         <source src="noti.mp3" type="audio/mp3">
+      </audio>
+   </div>
+
+   <!-- alert -->
+   <!-- js -->
+   <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+   <script src="https://kit.fontawesome.com/2ac9fdd832.js" crossorigin="anonymous"></script>
+   <script src="js/main.js"></script>
+   <script src="js/urls.js"></script>
+   <script src="js/websocket.js"></script>
+</body>
+
+</html>
