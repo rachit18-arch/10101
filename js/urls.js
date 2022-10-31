@@ -1767,8 +1767,6 @@ async function optionSort(oFOV) {
 				var closest2 = ocV.values.reduce(function (prev, curr) {
 					return (Math.abs(curr.strprc - (target + (target * 1.5 / 100))) < Math.abs(prev.strprc - (target + (target * 1.5 / 100))) ? curr : prev);
 				});
-				console.log(closest.strprc, closest1.strprc, closest2.strprc);
-
 				const chartDiv = document.getElementById(`decay`);
 				chartDiv.innerHTML = "";
 				const chartDiv1 = document.getElementById(`straddle`);
@@ -1928,13 +1926,13 @@ async function optionSort(oFOV) {
 						let candleSeries3 = chart1.addLineSeries({
 							color: randomRgbColor(),
 							lineWidth: 2,
-							title: `${closest}`
+							title: closest.strprc
 						});
 						candleSeries3.setData(straddle);
 						let candleSeries4 = chart1.addLineSeries({
 							color: randomRgbColor(),
 							lineWidth: 2,
-							title: `${closest1} ${closest2}`
+							title: `${closest1.strprc} + ${closest2.strprc}`
 						});
 						candleSeries4.setData(strangle);
 						chart.timeScale().fitContent();
