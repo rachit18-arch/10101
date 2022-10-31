@@ -1638,13 +1638,9 @@ const chartProperties = {
 };
 async function optionSort(oFOV) {
 	let ocE = await oFOV.opt_exp.sort(expSort);
-	setTimeout(() => {
-		console.log(ocE);
-	}, 1000);
 	let futE = await oFOV.fut.sort(expSort);
 	let expLi = document.getElementById("exp");
 	expLi.innerHTML = "";
-	console.log(ocE);
 	ocE.forEach((element) => {
 		let option = document.createElement("option");
 		option.innerHTML = `${element.exd} ${element.tsym}`;
@@ -1733,9 +1729,9 @@ async function optionSort(oFOV) {
 					row.insertCell(3).setAttribute("onchange", "oiUpdate(event)"); //oi
 					let cell5 = row.insertCell(4); //oi cl
 					row.insertCell(5).innerHTML = 0;
-					row.insertCell(6).setAttribute("onmouseenter", "buttons(event)"); // ltp
+					row.insertCell(6); // ltp
 					let cell7 = row.insertCell(7); // strike
-					row.insertCell(8).setAttribute("onmouseenter", "buttons(event)"); // ltp
+					row.insertCell(8); // ltp
 					row.insertCell(9).innerHTML = 0;
 					let cell9 = row.insertCell(10); //oi cl
 					row.insertCell(11).setAttribute("onchange", "oiUpdate(event)"); // oi
@@ -2001,9 +1997,9 @@ async function changeExp() {
 			row.insertCell(3).setAttribute("onchange", "oiUpdate(event)"); //oi
 			let cell5 = row.insertCell(4); //oi cl
 			row.insertCell(5).innerHTML = 0;
-			row.insertCell(6).setAttribute("onmouseenter", "buttons(event)"); // ltp
+			row.insertCell(6); // ltp
 			let cell7 = row.insertCell(7); // strike
-			row.insertCell(8).setAttribute("onmouseenter", "buttons(event)"); // ltp
+			row.insertCell(8); // ltp
 			row.insertCell(9).innerHTML = 0;
 			let cell9 = row.insertCell(10); //oi cl
 			row.insertCell(11).setAttribute("onchange", "oiUpdate(event)"); // oi
