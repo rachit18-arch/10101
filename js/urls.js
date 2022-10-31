@@ -1916,21 +1916,25 @@ async function optionSort(oFOV) {
 						let candleSeries = chart.addLineSeries({
 							color: randomRgbColor(),
 							lineWidth: 2,
+							title: 'CE'
 						});
 						candleSeries.setData(decayArrayCE);
 						let candleSeries1 = chart.addLineSeries({
 							color: randomRgbColor(),
 							lineWidth: 2,
+							title: 'PE'
 						});
 						candleSeries1.setData(decayArrayPE);
 						let candleSeries3 = chart1.addLineSeries({
 							color: randomRgbColor(),
 							lineWidth: 2,
+							title: closest
 						});
 						candleSeries3.setData(straddle);
 						let candleSeries4 = chart1.addLineSeries({
 							color: randomRgbColor(),
 							lineWidth: 2,
+							title: closest1 + ' ' + closest2
 						});
 						candleSeries4.setData(strangle);
 						chart.timeScale().fitContent();
