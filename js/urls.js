@@ -1934,7 +1934,7 @@ async function optionSort(oFOV) {
 						let candleSeries4 = chart1.addLineSeries({
 							color: randomRgbColor(),
 							lineWidth: 2,
-							title: closest1 + ' ' + closest2
+							title: `${closest1} ${closest2}`
 						});
 						candleSeries4.setData(strangle);
 						chart.timeScale().fitContent();
