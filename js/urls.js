@@ -647,14 +647,30 @@ async function pos() {
 		setTimeout(() => {
 			roi();
 			setInterval(() => {
-				if (document.getElementById('sl') != 0) {
-					let total = parseInt(document.getElementById('total'));
-					let sl = parseInt(document.getElementById('sl'));
+				if (parseInt(document.getElementById('sl').value) != 0) {
+					let total = parseInt(document.getElementById('total').value);
+					let sl = parseInt(document.getElementById('sl').value);
 					if (total == sl) {
 						let formdata1 = new FormData();
 						let dated = new Date;
 						let time = {
 							content: dated.toLocaleTimeString() + `SL is hit ${sl}`
+						}
+						time = JSON.stringify(time);
+						formdata1.append("payload_json", time);
+						let requestOptions = {
+							method: 'POST',
+							body: formdata1,
+						};
+						fetch(document.getElementById("webhook").value, requestOptions)
+							.then(response => response.text())
+							.then(result => null)
+							.catch(error => console.log('error', error));
+					} else if (total - sl <= 50) {
+						let formdata1 = new FormData();
+						let dated = new Date;
+						let time = {
+							content: dated.toLocaleTimeString() + ` @everyone SL is near ${sl}`
 						}
 						time = JSON.stringify(time);
 						formdata1.append("payload_json", time);
