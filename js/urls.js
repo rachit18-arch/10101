@@ -647,15 +647,14 @@ async function pos() {
 		setTimeout(() => {
 			roi();
 			setInterval(() => {
-				if (parseInt(document.getElementById('sl').value) != 0) {
-					let total = parseInt(document.getElementById('total').value);
+				if (parseInt(document.getElementById('sl').innerHTML) != 0) {
+					let total = parseInt(document.getElementById('total').innerHTML);
 					let sl = parseInt(document.getElementById('sl').value);
-					console.log(total, sl)
 					if (total == sl) {
 						let formdata1 = new FormData();
 						let dated = new Date;
 						let time = {
-							content: dated.toLocaleTimeString() + `SL is hit ${sl}`
+							content: dated.toLocaleTimeString() + `@everyone SL is hit ${sl}`
 						}
 						time = JSON.stringify(time);
 						formdata1.append("payload_json", time);
