@@ -650,6 +650,7 @@ async function pos() {
 				if (parseInt(document.getElementById('sl').value) != 0) {
 					let total = parseInt(document.getElementById('total').value);
 					let sl = parseInt(document.getElementById('sl').value);
+					console.log(total, sl)
 					if (total == sl) {
 						let formdata1 = new FormData();
 						let dated = new Date;
