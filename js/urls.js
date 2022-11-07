@@ -452,6 +452,9 @@ async function pos() {
 			});
 			return chartdata.reverse();
 		}
+		pos.sort((a, b) => {
+			return a.qty - b.qty;
+		});
 		pos.forEach((element) => {
 			let row = posbody.insertRow(-1);
 			row.classList.add("posTr");
@@ -647,7 +650,7 @@ async function pos() {
 		setTimeout(() => {
 			roi();
 			setInterval(() => {
-				if (parseInt(document.getElementById('sl').innerHTML) != 0) {
+				if (parseInt(document.getElementById('sl').value) != 0) {
 					let total = parseInt(document.getElementById('total').innerHTML);
 					let sl = parseInt(document.getElementById('sl').value);
 					if (total == sl) {
@@ -946,9 +949,9 @@ async function exitS() {
 		}
 	}
 	setTimeout(() => {
-		rows.sort((a, b) => {
-			return a.qty - b.qty;
-		});
+		// rows.sort((a, b) => {
+		// 	return a.qty - b.qty;
+		// });
 		rows.forEach((row, i) => {
 			setTimeout(
 				function () {
