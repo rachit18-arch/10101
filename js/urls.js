@@ -1,4 +1,4 @@
-const url = `https://shoonyatrade.finvasia.com/NorenWClientTP`;
+const url = `https://api.shoonya.com/NorenWClientTP`;
 function getCookie(name) {
 	// Split cookie string and get all individual name=value pairs in an array
 	let cookieArr = document.cookie.split(";");
@@ -376,7 +376,6 @@ function randomRgbColor() {
 }
 //rgb randomizer mixer
 async function pos() {
-
 	let posvalues = {
 		uid: localStorage.getItem("uid"),
 		actid: localStorage.getItem("actid"),

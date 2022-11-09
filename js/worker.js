@@ -2,7 +2,7 @@
 const connectedPorts = [];
 let socket = null;
 function connectSocket(obj) {
-    let url = `wss://shoonyatrade.finvasia.com/NorenWSTP/${obj.susertoken}`;
+    let url = `wss://api.shoonya.com/NorenWSTP/${obj.susertoken}`;
     // Create socket instance.
     socket = new WebSocket(url);
 
