@@ -455,241 +455,243 @@ async function pos() {
 		pos.sort((a, b) => {
 			return a.qty - b.qty;
 		});
-		pos.forEach((element) => {
-			let row = posbody.insertRow(-1);
-			row.classList.add("posTr");
-			element.netqty == 0 ? row.classList.add('fade-pos') : row.classList.remove('fade-pos');
-			// Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
-			row.insertCell(0).innerHTML =
-				element.netqty != 0
-					? `<input type="checkbox" name="click" onclick="show()" class= "cb">`
-					: ""; //check box
-			let cell2 = row.insertCell(1); //product
-			cell2.innerHTML =
-				element.prd == "M" || element.prd == "C" ? "NRML" : "MIS";
-			cell2.classList.add("badge");
-			cell2.classList.add("bg-secondary");
-			row.insertCell(
-				2
-			).innerHTML = `<button class="convert" onclick = "convert(event)"><i class="fa-solid fa-rotate"></i></button> <button class="exit" onclick = "exit(event)"><i class="fa-solid fa-xmark"></i></button>`; //modify
-			row.insertCell(3).innerHTML = element.tsym;
-			row.insertCell(4).innerHTML = element.exch;
-			row.insertCell(5).innerHTML = element.netqty;
-			row.insertCell(6).innerHTML =
-				element.daybuyqty == "0" && element.daysellqty == "0"
-					? element.upldprc
-					: element.netavgprc;
-			row.insertCell(7).setAttribute("id", element.token);
-			let cell12 = row.insertCell(8);
-			cell12.innerHTML = "0.00";
-			cell12.setAttribute("class", "green");
-			let cell10 = row.insertCell(9);
-			let a = 0;
-			if (parseInt(element.cfbuyqty) == 0 && parseInt(element.cfsellqty) == 0)
-				a = parseFloat(element.rpnl);
-			else if (parseInt(element.daybuyqty) > 0 && parseInt(element.daybuyqty) > parseInt(element.daysellqty)) {
-				a = (parseFloat(element.upldprc) - parseFloat(element.daybuyavgprc)) * parseInt(element.cfsellqty);
-				a += (parseFloat(element.daysellavgprc) - parseFloat(element.daybuyavgprc)) * parseInt(element.daysellqty);
-			}
-			else if (parseInt(element.daysellqty) > 0 && parseInt(element.daysellqty) > parseInt(element.daybuyqty)) {
-				console.log('here')
-				a = (parseFloat(element.daysellavgprc) - parseFloat(element.upldprc)) * parseInt(element.cfbuyqty);
-				a += (parseFloat(element.daysellavgprc) - parseFloat(element.daybuyavgprc)) * parseInt(element.daybuyqty);
-			}
-			cell10.innerHTML = a.toFixed(2);
-			parseFloat(cell10.innerHTML) >= 0
-				? cell10.setAttribute("class", "green")
-				: cell10.setAttribute("class", "red");
-			row.insertCell(10).innerHTML = 0;
-			row.insertCell(11).innerHTML = 0;
-			row.insertCell(12).innerHTML = 0;
-			sendMessageToSocket(`{"t":"t","k":"${element.exch}|${element.token}"}`);
-			sendMessageToSocket(`{"t":"d","k":"${element.exch}|${element.token}"}`);
-			setInterval(function () {
-				let rows = document.getElementsByClassName("posTr");
-				let m = 0;
-				let r = 0;
-				for (let i = 0; i < rows.length; i++) {
-					const element = rows[i];
-					m += parseFloat(element.children[8].innerHTML);
-					r += parseFloat(element.children[9].innerHTML);
+		setTimeout(() => {
+			pos.forEach((element) => {
+				let row = posbody.insertRow(-1);
+				row.classList.add("posTr");
+				element.netqty == 0 ? row.classList.add('fade-pos') : row.classList.remove('fade-pos');
+				// Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+				row.insertCell(0).innerHTML =
+					element.netqty != 0
+						? `<input type="checkbox" name="click" onclick="show()" class= "cb">`
+						: ""; //check box
+				let cell2 = row.insertCell(1); //product
+				cell2.innerHTML =
+					element.prd == "M" || element.prd == "C" ? "NRML" : "MIS";
+				cell2.classList.add("badge");
+				cell2.classList.add("bg-secondary");
+				row.insertCell(
+					2
+				).innerHTML = `<button class="convert" onclick = "convert(event)"><i class="fa-solid fa-rotate"></i></button> <button class="exit" onclick = "exit(event)"><i class="fa-solid fa-xmark"></i></button>`; //modify
+				row.insertCell(3).innerHTML = element.tsym;
+				row.insertCell(4).innerHTML = element.exch;
+				row.insertCell(5).innerHTML = element.netqty;
+				row.insertCell(6).innerHTML =
+					element.daybuyqty == "0" && element.daysellqty == "0"
+						? element.upldprc
+						: element.netavgprc;
+				row.insertCell(7).setAttribute("id", element.token);
+				let cell12 = row.insertCell(8);
+				cell12.innerHTML = "0.00";
+				cell12.setAttribute("class", "green");
+				let cell10 = row.insertCell(9);
+				let a = 0;
+				if (parseInt(element.cfbuyqty) == 0 && parseInt(element.cfsellqty) == 0)
+					a = parseFloat(element.rpnl);
+				else if (parseInt(element.daybuyqty) > 0 && parseInt(element.daybuyqty) > parseInt(element.daysellqty)) {
+					a = (parseFloat(element.upldprc) - parseFloat(element.daybuyavgprc)) * parseInt(element.cfsellqty);
+					a += (parseFloat(element.daysellavgprc) - parseFloat(element.daybuyavgprc)) * parseInt(element.daysellqty);
 				}
-				let pp = parseFloat(document.getElementById("prevPnl").value);
-				document.getElementById("total").innerHTML = (m + r + pp).toFixed(2);
-				document.getElementById("mtm").innerHTML = m.toFixed(2);
-				document.getElementById("rpnl").innerHTML = r.toFixed(2);
-				m.toFixed(2) >= 0
-					? document.getElementById("mtm").setAttribute("class", "green")
-					: document.getElementById("mtm").setAttribute("class", "red");
-				r.toFixed(2) >= 0
-					? document.getElementById("rpnl").setAttribute("class", "green")
-					: document.getElementById("rpnl").setAttribute("class", "red");
-				document.getElementById("total").innerHTML >= 0
-					? document.getElementById("total").setAttribute("class", "green")
-					: document.getElementById("total").setAttribute("class", "red");
-				let a = document.getElementById('total').innerHTML
-				b = document.getElementById('margin').innerHTML
-				a = parseFloat(a) / parseFloat(b) * 100;
-				document.getElementById('marginused').innerHTML = a.toFixed(2) + " %";
-			}, 1);
-			if (element.netqty != 0) {
-				async function ab() {
-					chartDiv.classList.remove("d-none");
-					let timeValues = {
-						uid: localStorage.getItem("uid"),
-						exch: element.exch,
-						token: element.token,
-						st: `${Math.round((Date.now() - 3456000000) / 1000)}`,
-						et: `${Math.round(Date.now() / 1000)}`,
-						// intrv: '1'
-					};
-					let barData = await all(timeValues, "TPSeries");
-					let colorS = randomRgbColor();
-					let candleSeries = chart.addLineSeries({
-						color: colorS,
-						lineWidth: 2,
-					});
-					let volSeries = null;
-					if (element.netqty < 0) {
-						volSeries = chart.addLineSeries({
-							color: "black",
+				else if (parseInt(element.daysellqty) > 0 && parseInt(element.daysellqty) > parseInt(element.daybuyqty)) {
+					console.log('here')
+					a = (parseFloat(element.daysellavgprc) - parseFloat(element.upldprc)) * parseInt(element.cfbuyqty);
+					a += (parseFloat(element.daysellavgprc) - parseFloat(element.daybuyavgprc)) * parseInt(element.daybuyqty);
+				}
+				cell10.innerHTML = a.toFixed(2);
+				parseFloat(cell10.innerHTML) >= 0
+					? cell10.setAttribute("class", "green")
+					: cell10.setAttribute("class", "red");
+				row.insertCell(10).innerHTML = 0;
+				row.insertCell(11).innerHTML = 0;
+				row.insertCell(12).innerHTML = 0;
+				sendMessageToSocket(`{"t":"t","k":"${element.exch}|${element.token}"}`);
+				sendMessageToSocket(`{"t":"d","k":"${element.exch}|${element.token}"}`);
+				setInterval(function () {
+					let rows = document.getElementsByClassName("posTr");
+					let m = 0;
+					let r = 0;
+					for (let i = 0; i < rows.length; i++) {
+						const element = rows[i];
+						m += parseFloat(element.children[8].innerHTML);
+						r += parseFloat(element.children[9].innerHTML);
+					}
+					let pp = parseFloat(document.getElementById("prevPnl").value);
+					document.getElementById("total").innerHTML = (m + r + pp).toFixed(2);
+					document.getElementById("mtm").innerHTML = m.toFixed(2);
+					document.getElementById("rpnl").innerHTML = r.toFixed(2);
+					m.toFixed(2) >= 0
+						? document.getElementById("mtm").setAttribute("class", "green")
+						: document.getElementById("mtm").setAttribute("class", "red");
+					r.toFixed(2) >= 0
+						? document.getElementById("rpnl").setAttribute("class", "green")
+						: document.getElementById("rpnl").setAttribute("class", "red");
+					document.getElementById("total").innerHTML >= 0
+						? document.getElementById("total").setAttribute("class", "green")
+						: document.getElementById("total").setAttribute("class", "red");
+					let a = document.getElementById('total').innerHTML
+					b = document.getElementById('margin').innerHTML
+					a = parseFloat(a) / parseFloat(b) * 100;
+					document.getElementById('marginused').innerHTML = a.toFixed(2) + " %";
+				}, 1);
+				if (element.netqty != 0) {
+					async function ab() {
+						chartDiv.classList.remove("d-none");
+						let timeValues = {
+							uid: localStorage.getItem("uid"),
+							exch: element.exch,
+							token: element.token,
+							st: `${Math.round((Date.now() - 3456000000) / 1000)}`,
+							et: `${Math.round(Date.now() / 1000)}`,
+							// intrv: '1'
+						};
+						let barData = await all(timeValues, "TPSeries");
+						let colorS = randomRgbColor();
+						let candleSeries = chart.addLineSeries({
+							color: colorS,
 							lineWidth: 2,
-							priceFormat: {
-								type: "volume",
-							},
-							priceScaleId: "",
-							scaleMargins: {
-								top: 0.8,
-								bottom: 0.015,
-							},
 						});
-						let vdata = await reverseV(barData);
-						volSeries.setData(vdata);
-					}
-					let pdata = await reverseP(barData);
-					candleSeries.setData(pdata);
-					let lastIndex = barData.length - 1;
-					let currentIndex = lastIndex + 1;
-					let currentBar = {
-						value: null,
-						time: Math.round(Date.now() / 1000) + 19800,
-					};
-					let currentVol = {
-						value: null,
-						time: Math.round(Date.now() / 1000) + 19800,
-					};
-					function mergeTickToBar(result) {
-						currentBar.value = result.lp;
-						candleSeries.update(currentBar);
-						if (result.oi && volSeries != null) {
-							currentVol.value = result.oi;
-							volSeries.update(currentVol);
+						let volSeries = null;
+						if (element.netqty < 0) {
+							volSeries = chart.addLineSeries({
+								color: "black",
+								lineWidth: 2,
+								priceFormat: {
+									type: "volume",
+								},
+								priceScaleId: "",
+								scaleMargins: {
+									top: 0.8,
+									bottom: 0.015,
+								},
+							});
+							let vdata = await reverseV(barData);
+							volSeries.setData(vdata);
 						}
-					}
-					let avgPriceLine = {
-						price:
-							element.daybuyqty == "0" && element.daysellqty == "0"
-								? element.upldprc
-								: element.netavgprc,
-						color: colorS,
-						lineWidth: 2,
-						lineStyle: LightweightCharts.LineStyle.Dotted,
-						axisLabelVisible: true,
-						title: element.netqty,
-					};
-					candleSeries.createPriceLine(avgPriceLine);
-					worker.port.addEventListener("message", function (event) {
-						let result = event.data;
-						if (result.tk == element.token) {
-							if (result.lp == undefined) {
-								null;
-							} else {
-								mergeTickToBar(result);
-								if (new Date().getSeconds() == 0) {
-									// move to next bar
-									currentIndex++;
-									let timestamp = Math.round(Date.now() / 1000);
-									currentBar = {
-										value: null,
-										time: timestamp + 19800,
-									};
-									currentVol = {
-										value: null,
-										time: timestamp + 19800,
-									};
-								}
+						let pdata = await reverseP(barData);
+						candleSeries.setData(pdata);
+						let lastIndex = barData.length - 1;
+						let currentIndex = lastIndex + 1;
+						let currentBar = {
+							value: null,
+							time: Math.round(Date.now() / 1000) + 19800,
+						};
+						let currentVol = {
+							value: null,
+							time: Math.round(Date.now() / 1000) + 19800,
+						};
+						function mergeTickToBar(result) {
+							currentBar.value = result.lp;
+							candleSeries.update(currentBar);
+							if (result.oi && volSeries != null) {
+								currentVol.value = result.oi;
+								volSeries.update(currentVol);
 							}
 						}
-					});
-				}
-				ab();
-				const renderOHLC = (d) => {
-					let coloredValues = document.createElement("span");
-					coloredValues.innerHTML = d + " ";
-					legend.appendChild(coloredValues);
-				};
-				chart.subscribeCrosshairMove((param) => {
-					legend.innerHTML = "";
-					param.seriesPrices.forEach((ele) => {
-						renderOHLC(ele);
-					});
-				});
-				let legend = document.getElementById("lengends");
-				legend.className = "three-line-tooltip";
-				legend.style.display = "block";
-				legend.style.color = "black";
-				legend.style.position = "absolute";
-				legend.style.font = "20px";
-				legend.style.left = `${chartDiv.getBoundingClientRect().left + window.scrollX + 20
-					}px`;
-				legend.style.top = `${chartDiv.getBoundingClientRect().top + window.scrollY + 2
-					}px`;
-				legend.style.zIndex = "50";
-			}
-		});
-		setTimeout(() => {
-			roi();
-			setInterval(() => {
-				if (parseInt(document.getElementById('sl').value) != 0) {
-					let total = parseInt(document.getElementById('total').innerHTML);
-					let sl = parseInt(document.getElementById('sl').value);
-					if (total == sl) {
-						let formdata1 = new FormData();
-						let dated = new Date;
-						let time = {
-							content: dated.toLocaleTimeString() + `@everyone SL is hit ${sl}`
-						}
-						time = JSON.stringify(time);
-						formdata1.append("payload_json", time);
-						let requestOptions = {
-							method: 'POST',
-							body: formdata1,
+						let avgPriceLine = {
+							price:
+								element.daybuyqty == "0" && element.daysellqty == "0"
+									? element.upldprc
+									: element.netavgprc,
+							color: colorS,
+							lineWidth: 2,
+							lineStyle: LightweightCharts.LineStyle.Dotted,
+							axisLabelVisible: true,
+							title: element.netqty,
 						};
-						fetch(document.getElementById("webhook").value, requestOptions)
-							.then(response => response.text())
-							.then(result => null)
-							.catch(error => console.log('error', error));
-					} else if (total - sl <= 50) {
-						let formdata1 = new FormData();
-						let dated = new Date;
-						let time = {
-							content: dated.toLocaleTimeString() + ` @everyone SL is near ${sl}`
-						}
-						time = JSON.stringify(time);
-						formdata1.append("payload_json", time);
-						let requestOptions = {
-							method: 'POST',
-							body: formdata1,
-						};
-						fetch(document.getElementById("webhook").value, requestOptions)
-							.then(response => response.text())
-							.then(result => null)
-							.catch(error => console.log('error', error));
+						candleSeries.createPriceLine(avgPriceLine);
+						worker.port.addEventListener("message", function (event) {
+							let result = event.data;
+							if (result.tk == element.token) {
+								if (result.lp == undefined) {
+									null;
+								} else {
+									mergeTickToBar(result);
+									if (new Date().getSeconds() == 0) {
+										// move to next bar
+										currentIndex++;
+										let timestamp = Math.round(Date.now() / 1000);
+										currentBar = {
+											value: null,
+											time: timestamp + 19800,
+										};
+										currentVol = {
+											value: null,
+											time: timestamp + 19800,
+										};
+									}
+								}
+							}
+						});
 					}
+					ab();
+					const renderOHLC = (d) => {
+						let coloredValues = document.createElement("span");
+						coloredValues.innerHTML = d + " ";
+						legend.appendChild(coloredValues);
+					};
+					chart.subscribeCrosshairMove((param) => {
+						legend.innerHTML = "";
+						param.seriesPrices.forEach((ele) => {
+							renderOHLC(ele);
+						});
+					});
+					let legend = document.getElementById("lengends");
+					legend.className = "three-line-tooltip";
+					legend.style.display = "block";
+					legend.style.color = "black";
+					legend.style.position = "absolute";
+					legend.style.font = "20px";
+					legend.style.left = `${chartDiv.getBoundingClientRect().left + window.scrollX + 20
+						}px`;
+					legend.style.top = `${chartDiv.getBoundingClientRect().top + window.scrollY + 2
+						}px`;
+					legend.style.zIndex = "50";
 				}
+			});
+			setTimeout(() => {
 				roi();
-			}, 60000);
-		}, 1000);
+				setInterval(() => {
+					if (parseInt(document.getElementById('sl').value) != 0) {
+						let total = parseInt(document.getElementById('total').innerHTML);
+						let sl = parseInt(document.getElementById('sl').value);
+						if (total == sl) {
+							let formdata1 = new FormData();
+							let dated = new Date;
+							let time = {
+								content: dated.toLocaleTimeString() + `@everyone SL is hit ${sl}`
+							}
+							time = JSON.stringify(time);
+							formdata1.append("payload_json", time);
+							let requestOptions = {
+								method: 'POST',
+								body: formdata1,
+							};
+							fetch(document.getElementById("webhook").value, requestOptions)
+								.then(response => response.text())
+								.then(result => null)
+								.catch(error => console.log('error', error));
+						} else if (total - sl <= 50) {
+							let formdata1 = new FormData();
+							let dated = new Date;
+							let time = {
+								content: dated.toLocaleTimeString() + ` @everyone SL is near ${sl}`
+							}
+							time = JSON.stringify(time);
+							formdata1.append("payload_json", time);
+							let requestOptions = {
+								method: 'POST',
+								body: formdata1,
+							};
+							fetch(document.getElementById("webhook").value, requestOptions)
+								.then(response => response.text())
+								.then(result => null)
+								.catch(error => console.log('error', error));
+						}
+					}
+					roi();
+				}, 60000);
+			}, 1000);
+		}, 500);
 	}
 }
 //positions

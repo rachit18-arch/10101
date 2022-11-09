@@ -13,6 +13,10 @@ worker.port.addEventListener("message", function (event) {
     if (result == 'WS Disconnected') {
         document.getElementsByClassName("dot")[0].style.backgroundColor =
             "#eb6a61";
+        setTimeout(() => {
+            location.reload();
+        }, 3000);
+
     }
     if (result.lp) {
         document.getElementById(`${result.tk}`)
@@ -162,7 +166,7 @@ worker.port.addEventListener("message", function (event) {
         if (document.title == "Positions" || document.title == "Orders") {
             setTimeout(function () {
                 location.reload();
-            }, 1000);
+            }, 10000);
         }
         if (result.status == "REJECTED") {
             rejected += 1;
