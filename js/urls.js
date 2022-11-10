@@ -1320,8 +1320,8 @@ async function getMarginS() {
 let distribution = document.title == 'Option Chain' || document.title == 'Strategy Builder' ? gaussian(0, 1) : null;
 // declaring iv variable factor
 function volFind(row) {
-	let date_expiry = new Date(document.getElementById("exp").value.slice(0, 11));
-	let volt = parseFloat(row.children[15].innerHTML) / 100;
+	let date_expiry = new Date(document.getElementById("exp").value.slice(0, 11).replaceAll('-', '/'));
+	let volt = parseFloat(row.children[15].innerHTML) >= 0 ? parseFloat(row.children[15].innerHTML) / 100 : 50;
 	date_expiry.setHours(23, 59, 0, 0)
 	let date_now = new Date();
 	let int_rate = 10 / 100;
@@ -1340,7 +1340,6 @@ function volFind(row) {
 			(volt * Math.sqrt(delta_t));
 
 	let fv_strike = strike * Math.exp(-1 * int_rate * delta_t);
-
 	//For calculating CDF and PDF using gaussian library
 	//Premium Price
 	let call_premium =
@@ -2004,7 +2003,7 @@ async function optionSort(oFOV) {
 					sendMessageToSocket(`{"t":"t","k":"NFO|${element.token}"}`);
 				});
 			}
-		}, 100);
+		}, 200);
 	}
 }
 async function changeExp() {
@@ -2544,10 +2543,8 @@ async function addLeg() {
 }
 //add leg to strategy builder
 async function findGreek(row) {
-	let date_expiry = new Date(row.children[2].innerHTML);
-	//console.log(date_expiry)
-	let volt = parseFloat(row.children[12].innerHTML) / 100;
-	//console.log(typeof row.children[12].innerHTML)
+	let date_expiry = new Date(document.getElementById("exp").value.slice(0, 11).replaceAll('-', '/'));
+	let volt = parseFloat(row.children[15].innerHTML) >= 0 ? parseFloat(row.children[15].innerHTML) / 100 : 50;
 	if (row.children[12].innerHTML == 'NaN' || row.children[12].innerHTML == 'INFINITY') {
 		volt = 0.5;
 	}
