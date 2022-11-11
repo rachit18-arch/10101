@@ -2543,8 +2543,8 @@ async function addLeg() {
 }
 //add leg to strategy builder
 async function findGreek(row) {
-	let date_expiry = new Date(document.getElementById("exp").value.slice(0, 11).replaceAll('-', '/'));
-	let volt = parseFloat(row.children[15].innerHTML) >= 0 ? parseFloat(row.children[15].innerHTML) / 100 : 50;
+	let date_expiry = new Date(row.children[2].innerHTML.replaceAll('-', '/'));
+	let volt = parseFloat(row.children[12].innerHTML) >= 0 ? parseFloat(row.children[12].innerHTML) / 100 : 50;
 	if (row.children[12].innerHTML == 'NaN' || row.children[12].innerHTML == 'INFINITY') {
 		volt = 0.5;
 	}
