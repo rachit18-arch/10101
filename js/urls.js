@@ -117,8 +117,8 @@ async function chart(element, iT, tex) {
 				secondsVisible: true,
 			},
 			layout: {
-				textColor: "#000000",
-				backgroundColor: "rgba(120, 123, 134, 1)", //, rgba(93, 96, 107, 1)
+				textColor: "#ffffff",
+				backgroundColor: "#000000", //"rgba(120, 123, 134, 1)", rgba(93, 96, 107, 1)
 			},
 			rightPriceScale: {
 				scaleMargins: {
@@ -139,10 +139,10 @@ async function chart(element, iT, tex) {
 			crosshair: {
 				mode: LightweightCharts.CrosshairMode.Normal,
 				vertLine: {
-					color: "#000",
+					color: "#fff",
 				},
 				horzLine: {
-					color: "#000",
+					color: "#fff",
 				},
 			},
 		};
@@ -394,8 +394,8 @@ async function pos() {
 				secondsVisible: true,
 			},
 			layout: {
-				textColor: "#000000",
-				//backgroundColor: "rgba(120, 123, 134, 1)", //, rgba(93, 96, 107, 1)
+				textColor: "#ffffff",
+				backgroundColor: "#000000"//"rgba(120, 123, 134, 1)", //, rgba(93, 96, 107, 1)
 			},
 			rightPriceScale: {
 				scaleMargins: {
@@ -417,10 +417,10 @@ async function pos() {
 			crosshair: {
 				mode: LightweightCharts.CrosshairMode.Normal,
 				vertLine: {
-					color: "#000",
+					color: "#fff",
 				},
 				horzLine: {
-					color: "#000",
+					color: "#fff",
 				},
 			},
 		};
@@ -1648,8 +1648,8 @@ const chartProperties = {
 		secondsVisible: true,
 	},
 	layout: {
-		textColor: "#000000",
-		backgroundColor: "rgba(120, 123, 134, 1)", //, rgba(93, 96, 107, 1)
+		textColor: "#ffffff",
+		backgroundColor: "#000000"//"rgba(120, 123, 134, 1)", //, rgba(93, 96, 107, 1)
 	},
 	rightPriceScale: {
 		scaleMargins: {
@@ -1671,10 +1671,10 @@ const chartProperties = {
 	crosshair: {
 		//	mode: LightweightCharts.CrosshairMode.Normal,
 		vertLine: {
-			color: "#000",
+			color: "#fff",
 		},
 		horzLine: {
-			color: "#000",
+			color: "#fff",
 		},
 	},
 };
