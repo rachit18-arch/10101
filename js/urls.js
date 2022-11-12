@@ -472,7 +472,7 @@ async function pos() {
 				row.insertCell(
 					2
 				).innerHTML = `<button class="convert" onclick = "convert(event)"><i class="fa-solid fa-rotate"></i></button> <button class="exit" onclick = "exit(event)"><i class="fa-solid fa-xmark"></i></button>`; //modify
-				row.insertCell(3).innerHTML = element.tsym;
+				row.insertCell(3).innerHTML = element.dname;
 				row.insertCell(4).innerHTML = element.exch;
 				row.insertCell(5).innerHTML = element.netqty;
 				row.insertCell(6).innerHTML =
@@ -503,6 +503,9 @@ async function pos() {
 				row.insertCell(10).innerHTML = 0;
 				row.insertCell(11).innerHTML = 0;
 				row.insertCell(12).innerHTML = 0;
+				let cell14 = row.insertCell(13);
+				cell14.innerHTML = element.tsym;
+				cell14.setAttribute('class', 'd-none')
 				sendMessageToSocket(`{"t":"t","k":"${element.exch}|${element.token}"}`);
 				sendMessageToSocket(`{"t":"d","k":"${element.exch}|${element.token}"}`);
 				setInterval(function () {
@@ -939,7 +942,6 @@ function checkAll(event) {
 	}
 }
 //check uncheck positions
-
 async function exitS() {
 	let checkboxes = document.getElementsByClassName("cb");
 	let rows = [];
@@ -960,7 +962,7 @@ async function exitS() {
 						uid: localStorage.getItem("uid"),
 						actid: localStorage.getItem("actid"),
 						exch: row.children[4].innerHTML,
-						tsym: row.children[3].innerHTML,
+						tsym: row.children[13].innerHTML,
 						qty: `${Math.abs(row.children[5].innerHTML)}`,
 						prc: "0",
 						prd:
@@ -1007,7 +1009,7 @@ function exit(event) {
 		parseInt(row.children[5].innerHTML) > 0
 			? document.getElementById("qtyB").classList.remove("green")
 			: document.getElementById("qtyB").classList.remove("red");
-		document.getElementById("tsym").innerHTML = row.children[3].innerHTML;
+		document.getElementById("tsym").innerHTML = row.children[13].innerHTML;
 		document.getElementById("exch").innerHTML = row.children[4].innerHTML;
 		document.getElementById("prdtype").innerHTML = row.children[1].innerHTML;
 		clearTimeout(timeOut);
