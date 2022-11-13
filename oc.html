@@ -74,6 +74,26 @@
    </section>
    <section class="space oi-fixed">
       <div class="container-fluid">
+         <div class="row">
+            <div class="col-md-9">
+               <div class="scipt-name oc-select">
+                  <div class="oi-head">
+                     <h4><span id="name"></span> <span class="token"></span></h4>
+                  </div>
+               </div>
+            </div>
+            <div class="col-md-2">
+               <div class="expiry oc-select">
+                  <select class="input-group form-control" id="exp" onchange="changeExp()">
+                  </select>
+               </div>
+            </div>
+            <div class="col-md-1">
+               <div class="expiry oc-select oi-ranger">
+                  <input type="number" step="1" min="1" max="40" value="30" id="strikeC" onchange="changeExp()">
+               </div>
+            </div>
+         </div>
         <div class="row">
             <div class="col-md-4">
                <div class="oi-click-button">
@@ -98,7 +118,7 @@
             </div>
             <div id="decayS" class="d-none">
                 <div class="row">
-                                   <div class="col-md-6">
+                 <div class="col-md-6">
                   <h3>Decay</h3>
                   <div id="decay" class="chart"></div>
                </div>
@@ -116,27 +136,9 @@
                   <h4>CALLS</h4>
                </div>
             </div>
-            <div class="col-md-4">
-               <div class="scipt-name oc-select">
-                  <div class="oi-head">
-                     <h4><span id="name"></span> <span class="token"></span></h4>
-                  </div>
-               </div>
-            </div>
             <div class="col-md-2">
                <div class="oi-head">
                   <h4>PUTS</h4>
-               </div>
-            </div>
-            <div class="col-md-2">
-               <div class="expiry oc-select">
-                  <select class="input-group form-control" id="exp" onchange="changeExp()">
-                  </select>
-               </div>
-            </div>
-            <div class="col-md-1">
-               <div class="expiry oc-select oi-ranger">
-                  <input type="number" step="1" min="1" max="40" value="30" id="strikeC" onchange="changeExp()">
                </div>
             </div>
             <!-- open interest -->
