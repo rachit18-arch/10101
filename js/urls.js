@@ -2690,7 +2690,7 @@ async function roi() {
 					uid: localStorage.getItem("uid"),
 					actid: localStorage.getItem("actid"),
 					exch: row.children[4].innerHTML,
-					tsym: row.children[3].innerHTML,
+					tsym: row.children[13].innerHTML,
 					qty: `${Math.abs(row.children[5].innerHTML)}`,
 					prc: row.children[6].innerHTML,
 					prd:
@@ -2706,7 +2706,7 @@ async function roi() {
 			else {
 				let values = {
 					exch: row.children[4].innerHTML,
-					tsym: row.children[3].innerHTML,
+					tsym: row.children[13].innerHTML,
 					qty: `${Math.abs(row.children[5].innerHTML)}`,
 					prc: row.children[6].innerHTML,
 					prd:
