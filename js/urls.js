@@ -2258,8 +2258,8 @@ async function oc() {
 		if (opts[i].value === val) {
 			// An item was selected from the list!
 			// yourCallbackHere()
-			token = opts[i].id;
-			name = opts[i].value;
+			token = opts[i].value;
+			name = opts[i].innerHTML;
 		}
 	}
 	let oFO = {
