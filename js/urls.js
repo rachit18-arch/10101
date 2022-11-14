@@ -254,11 +254,11 @@ async function chart(element, iT, tex) {
 			}
 			priceSeries = chart.addCandlestickSeries({
 				upColor: "#FFFFFF",
-				downColor: "#000",
-				borderDownColor: "#000",
-				borderUpColor: "#000",
-				wickDownColor: "#000",
-				wickUpColor: "#000",
+				downColor: "#4dd0e1",
+				borderDownColor: "#4dd0e1",
+				borderUpColor: "#FFFFFF",
+				wickDownColor: "#4dd0e1",
+				wickUpColor: "#4dd0e1",
 			});
 			volSeries = chart.addLineSeries({
 				color: "black",
@@ -1057,34 +1057,6 @@ function exitB() {
 	all(value, "PlaceOrder");
 }
 //exit button in position popup
-async function search() {
-	if (document.getElementById("search").value.length > 1) {
-		let svalues = {
-			uid: localStorage.getItem("uid"),
-			stext: document.getElementById("search").value,
-			//	exch: "NFO",
-		};
-		let scripts = await all(svalues, "SearchScrip");
-		let ul = document.getElementById("searchList");
-		ul.innerHTML = "";
-		if (scripts.stat == "Not_Ok") {
-			let li = document.createElement("li");
-			li.appendChild(document.createTextNode(`No Scripts`));
-			ul.appendChild(li);
-		} else {
-			scripts.values.forEach((element) => {
-				let li = document.createElement("li");
-				li.appendChild(
-					document.createTextNode(`${element.tsym} ${element.exch}`)
-				);
-				li.setAttribute("id", element.token);
-				li.setAttribute("onclick", "oc(event)");
-				ul.appendChild(li);
-			});
-		}
-	}
-}
-//search both for oc and dashboard
 let timeOut = null;
 function buttons(event) {
 	let buttons = document.getElementsByClassName("buttons")[0];
@@ -1679,6 +1651,7 @@ const chartProperties = {
 	},
 };
 async function optionSort(oFOV) {
+	document.getElementById("search").value = "";
 	let ocE = await oFOV.opt_exp.sort(expSort);
 	let futE = await oFOV.fut.sort(expSort);
 	let expLi = document.getElementById("exp");
@@ -2276,52 +2249,32 @@ async function changeExp() {
 	}
 }
 //changes oc when expiry changes
-function getLastWord(words) {
-	var n = words.split(" ");
-	return n[n.length - 1];
-
-}
-//check exchange name  in option chain and dashboard
-function getFirstWord(words) {
-	var n = words.replace(/\w+[.!?]?$/, '');
-	return n;
-}
-//changes name for option chain in dashboard and oc
-async function oc(event) {
-	let token = await event.target.id;
-	let ul = document.getElementById("searchList");
-	ul.innerHTML = "";
-	document.getElementById("search").value = "";
+async function oc() {
+	let token = null;
+	let name = null;
+	let val = document.getElementById("search").value;
+	let opts = document.getElementById('dlist').childNodes;
+	for (var i = 0; i < opts.length; i++) {
+		if (opts[i].value === val) {
+			// An item was selected from the list!
+			// yourCallbackHere()
+			token = opts[i].value;
+			name = opts[i].innerHTML;
+		}
+	}
 	let oFO = {
 		uid: localStorage.getItem("uid"),
-		exch: getLastWord(event.target.innerHTML),
+		exch: "NSE",
 		token: token,
 	};
 	let oFOV = await all(oFO, "GetLinkedScrips");
-	document.getElementById("name").innerHTML = getFirstWord(event.target.innerHTML);
+	document.getElementById("name").innerHTML = name;
 	let ltp = document.querySelector(".token");
-	ltp.setAttribute('id', event.target.id);
-	sendMessageToSocket(`{"t":"t","k":"${oFO.exch}|${event.target.id}"}`);
-	if (oFOV.fut.length == 0) {
-		let svalues = {
-			uid: localStorage.getItem("uid"),
-			stext: document.getElementById("name").innerHTML,
-			exch: "NFO",
-		};
-		let scripts = await all(svalues, "SearchScrip");
-		if (scripts.stat == "Not_Ok") {
-			alert('no scripts');
-		} else {
-			oFO = {
-				uid: localStorage.getItem("uid"),
-				exch: 'NFO',
-				token: scripts.values[0].token,
-			};
-			oFOV = await all(oFO, "GetLinkedScrips");
-			optionSort(oFOV)
-		}
-	} else {
-		optionSort(oFOV);
+	ltp.setAttribute('id', token);
+	sendMessageToSocket(`{"t":"t","k":"NSE|${token}"}`);
+	if (oFOV.fut.length != 0) { optionSort(oFOV); } else {
+		alert('No Script');
+		document.getElementById("search").value = "";
 	}
 }
 //list all ce and pe in option chain
@@ -2780,17 +2733,17 @@ async function roi() {
 function changeDiv(event) {
 	let button = event.target.innerHTML;
 	if (button == "Table") {
-		document.getElementById("mainTable").classList.remove('d-none')
+		document.getElementById("tableDiv").classList.remove('d-none')
 		document.getElementById("decayS").classList.add('d-none')
 		document.getElementById("OIGraph").classList.add('d-none');
 	}
 	else if (button == "OI Graph") {
-		document.getElementById("mainTable").classList.add('d-none')
+		document.getElementById("tableDiv").classList.add('d-none')
 		document.getElementById("decayS").classList.add('d-none')
 		document.getElementById("OIGraph").classList.remove('d-none');
 	}
 	else if (button == "Decay Strangle") {
-		document.getElementById("mainTable").classList.add('d-none')
+		document.getElementById("tableDiv").classList.add('d-none')
 		document.getElementById("decayS").classList.remove('d-none')
 		document.getElementById("OIGraph").classList.add('d-none');
 	}
