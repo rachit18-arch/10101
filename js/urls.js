@@ -452,7 +452,7 @@ async function pos() {
 			return chartdata.reverse();
 		}
 		pos.sort((a, b) => {
-			return a.qty - b.qty;
+			return a.netqty - b.netqty;
 		});
 		setTimeout(() => {
 			pos.forEach((element) => {

@@ -90,7 +90,7 @@
 }
 
 .oi-head h4 {
-    text-align:center;
+    text-align: center;
     font-weight: 500;
     font-family: math;
     color: #686868;
@@ -100,9 +100,8 @@
     text-transform: uppercase;
 }
 
-.oi-head-spot h4
-{
-    text-align:left;
+.oi-head-spot h4 {
+    text-align: left;
     font-weight: 500;
     font-family: inherit;
     color: #686868;
@@ -430,6 +429,7 @@ td {
     border: 1px solid #ffffff1f !important;
     width: fit-content;
     font-family: inherit;
+    padding: 8px 0 !important;
 }
 
 .strat-details .table tr td {
@@ -987,5 +987,5 @@ input[type=number] {
 }
 
 .oi-main-head {
-    margin-bottom:20px;
+    margin-bottom: 20px;
 }
