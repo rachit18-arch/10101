@@ -415,45 +415,55 @@
             </div>
             <!-- chart strat -->
          </div>
+         <div class="row">
+            <div class="col-md-6">
+               <div class="vix-input-date">
+                  <input type="date" id="dte" class="input-group form-control" onchange="stratGraph()">
+               </div>
+            </div>
+            <div class="col-md-6">
+               <div class="payoff-chart">
+                  <p><span>VIX :</span> <span id="26017"></span></p>
+                  <div id="chartDiv"></div>
+                  <table id="greek" class="d-none">
+                     <thead>
+                        <th>Gap</th>
+                        <th>leg 1</th>
+                        <th>leg 2</th>
+                        <th>leg 3</th>
+                        <th>leg 4</th>
+                     </thead>
+                     <tbody id="greekTable">
+
+                     </tbody>
+                  </table>
+                  <table id="greekLive" class="d-none">
+                     <thead>
+                        <th>Gap</th>
+                        <th>leg 1</th>
+                        <th>leg 2</th>
+                        <th>leg 3</th>
+                        <th>leg 4</th>
+                     </thead>
+                     <tbody id="liveGreekTable">
+
+                     </tbody>
+                  </table>
+                  <table id="greek2" class="d-none">
+                     <thead>
+                        <th>Gap</th>
+                        <th>Expiry</th>
+                        <th>Live</th>
+                     </thead>
+                     <tbody id="greekTable1">
+
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+         </div>
       </div>
-      <div><input type="date" id="dte" class="input-group form-control"></div>
-      <p><span>VIX :</span> <span id="26017"></span></p>
-      <div id="chartDiv"></div>
-      <div id="chartDiv2"></div>
-      <table id="greek" class="d-none">
-         <thead>
-            <th>Gap</th>
-            <th>leg 1</th>
-            <th>leg 2</th>
-            <th>leg 3</th>
-            <th>leg 4</th>
-         </thead>
-         <tbody id="greekTable">
 
-         </tbody>
-      </table>
-      <table id="greekLive" class="d-none">
-         <thead>
-            <th>Gap</th>
-            <th>leg 1</th>
-            <th>leg 2</th>
-            <th>leg 3</th>
-            <th>leg 4</th>
-         </thead>
-         <tbody id="liveGreekTable">
-
-         </tbody>
-      </table>
-      <table id="greek2" class="d-none">
-         <thead>
-            <th>Gap</th>
-            <th>Expiry</th>
-            <th>Live</th>
-         </thead>
-         <tbody id="greekTable1">
-
-         </tbody>
-      </table>
    </section>
    <!-- alert -->
    <div class="d-none noti-set mn-noti" id="alert">
