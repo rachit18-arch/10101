@@ -1296,13 +1296,13 @@ let distribution = document.title == 'Option Chain' || document.title == 'Strate
 function volFind(row) {
 	let date_expiry = new Date(document.getElementById("exp").value.slice(0, 11).replaceAll('-', '/'));
 	let volt = parseFloat(row.children[15].innerHTML) >= 0 ? parseFloat(row.children[15].innerHTML) / 100 : 50;
-	date_expiry.setHours(23, 59, 0, 0)
+	date_expiry.setHours(15, 30, 0, 0)
 	let date_now = new Date();
-	let int_rate = 10 / 100;
+	let int_rate = 0;
 	let seconds = Math.floor((date_expiry - date_now) / 1000),
-		minutes = Math.floor(seconds / 60),
-		hours = Math.floor(minutes / 60),
-		delta_t = Math.floor(hours / 24) / 365.0;
+		minutes = seconds / 60,
+		hours = minutes / 60,
+		delta_t = (hours / 24) / 365.0;
 	let spot = parseFloat(document.getElementsByClassName("token")[0].innerHTML);
 	let strike = parseFloat(row.children[7].innerHTML);
 	let callPrice = parseFloat(row.children[6].innerHTML);
@@ -1356,8 +1356,6 @@ function volFind(row) {
 		put_rho = (-1 * fv_strike * delta_t * distribution.cdf(-1 * d2)) / 100;
 }
 //find iv in strategy builder
-
-// ws msg received
 function expSort(a, b) {
 	let ad = new Date(a.exd.replaceAll('-', '/'));
 	let bd = new Date(b.exd.replaceAll('-', '/'));
@@ -2418,6 +2416,7 @@ function closeAlert() {
 }
 //close alert button
 async function addLeg() {
+	sendMessageToSocket(`{"t":"t","k":"NSE|26017"}`);
 	let table = document.getElementById('stratBody');
 	let row = document.createElement('tr');
 	let expiry = document.getElementById('exp').value.split(" ", 1);
@@ -2495,6 +2494,7 @@ async function addLeg() {
 	table.appendChild(row);
 	limits();
 	basketMargins();
+	stratGraph();
 }
 //add leg to strategy builder
 async function findGreek(row) {
@@ -2503,13 +2503,13 @@ async function findGreek(row) {
 	if (row.children[12].innerHTML == 'NaN' || row.children[12].innerHTML == 'INFINITY') {
 		volt = 0.5;
 	}
-	date_expiry.setHours(23, 59, 0, 0)
+	date_expiry.setHours(15, 30, 0, 0)
 	let date_now = new Date();
-	let int_rate = 10 / 100;
+	let int_rate = 0;
 	let seconds = Math.floor((date_expiry - date_now) / 1000),
-		minutes = Math.floor(seconds / 60),
-		hours = Math.floor(minutes / 60),
-		delta_t = Math.floor(hours / 24) / 365.0;
+		minutes = seconds / 60,
+		hours = minutes / 60,
+		delta_t = hours / 24 / 365.0;
 	let spot = parseFloat(document.getElementsByClassName("token")[0].innerHTML);
 	let strike = parseFloat(row.querySelector('input[name="strike"]').value);
 	let callPrice = parseFloat(row.children[6].innerHTML);
@@ -2582,6 +2582,7 @@ async function changeStrike(event) {
 	sendMessageToSocket(`{ "t": "t", "k": "NFO|${scripts.values[0].token}" } `);
 	limits();
 	basketMargins();
+	stratGraph();
 }
 //strategy builder change strike or ce pe
 function tradeS() {
