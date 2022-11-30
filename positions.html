@@ -73,49 +73,51 @@
       <div class="container-fluid">
          <div class="row">
             <div class="tab-content">
-               <div onclick="hideTables(event)" class="row" id="NSEHeader">
-                  <div class="order-head">Other Exchanges</div>
+               <div id="NSEHeader">
+                  <div onclick="hideTables(event)" class="row">
+                     <div class="order-head">Other Exchanges</div>
+                  </div>
+                  <table class="table table-striped position-table d-none" id="posTable">
+                     <thead>
+                        <tr>
+                           <th><input id="topCB" type="checkbox" name="click" onclick="checkAll(event)"></th>
+                           <th>Product</th>
+                           <th>Convert</th>
+                           <th>Script</th>
+                           <th>Exchange</th>
+                           <th>Qty</th>
+                           <th>Average</th>
+                           <th>LTP</th>
+                           <th>MTM</th>
+                           <th>R P&L</th>
+                           <th>% Chg</th>
+                           <th>-</th>
+                           <th>SPREAD</th>
+                        </tr>
+                     </thead>
+                     <tbody id="posBody">
+                     </tbody>
+                     <tfoot id="posFoot">
+                        <tr>
+                           <td><button id="eSB" class="d-none" onclick="exitS()">Exit</button></td>
+                           <td></td>
+                           <td></td>
+                           <td><input onchange="webhook(event)" class="form-control" placeholder="Discord Api" required>
+                           </td>
+                           <td>M Used</td>
+                           <td id="margin"></td>
+                           <td>total</td>
+                           <td id="total"></td>
+                           <td id="mtm"></td>
+                           <td id="rpnl"></td>
+                           <td id="marginused"></td>
+                           <td style="width: 8%;"><input type="number" id="prevPnl" class="form-control" value="0"
+                                 style="width:80%;margin:auto;"></td>
+                           <td style="width: 8%;"><input type="number" id="sl" class="form-control" value="0"></td>
+                        </tr>
+                     </tfoot>
+                  </table>
                </div>
-               <table class="table table-striped position-table d-none" id="posTable">
-                  <thead>
-                     <tr>
-                        <th><input id="topCB" type="checkbox" name="click" onclick="checkAll(event)"></th>
-                        <th>Product</th>
-                        <th>Convert</th>
-                        <th>Script</th>
-                        <th>Exchange</th>
-                        <th>Qty</th>
-                        <th>Average</th>
-                        <th>LTP</th>
-                        <th>MTM</th>
-                        <th>R P&L</th>
-                        <th>% Chg</th>
-                        <th>-</th>
-                        <th>SPREAD</th>
-                     </tr>
-                  </thead>
-                  <tbody id="posBody">
-                  </tbody>
-                  <tfoot id="posFoot">
-                     <tr>
-                        <td><button id="eSB" class="d-none" onclick="exitS()">Exit</button></td>
-                        <td></td>
-                        <td></td>
-                        <td><input onchange="webhook(event)" class="form-control" placeholder="Discord Api" required>
-                        </td>
-                        <td>M Used</td>
-                        <td id="margin"></td>
-                        <td>total</td>
-                        <td id="total"></td>
-                        <td id="mtm"></td>
-                        <td id="rpnl"></td>
-                        <td id="marginused"></td>
-                        <td style="width: 8%;"><input type="number" id="prevPnl" class="form-control" value="0"
-                              style="width:80%;margin:auto;"></td>
-                        <td style="width: 8%;"><input type="number" id="sl" class="form-control" value="0"></td>
-                     </tr>
-                  </tfoot>
-               </table>
             </div>
             <div class="row">
                <div class="col-md-6">
