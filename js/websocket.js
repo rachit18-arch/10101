@@ -97,7 +97,6 @@ worker.port.addEventListener("message", function (event) {
                         : row.children[8].setAttribute("class", "red");
                     row.children[10].innerHTML = (parseFloat(row.children[7].innerHTML) - parseFloat(row.children[6].innerHTML)).toFixed(2) + " %";
                 } else {
-                    console.log(row.children[6].innerHTML)
                     row.children[7].innerHTML = (
                         (parseFloat(row.children[6].innerHTML) -
                             parseFloat(row.children[5].innerHTML)) *

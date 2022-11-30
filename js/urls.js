@@ -1007,7 +1007,7 @@ function table(element) {
 	   <td></td>
 	   <td></td>
 	   <td></td>
-	   <td></td>
+	   <td><button onclick="posGraph(event)">Graph</button></td>
 	   <td></td>
 	   <td style="width: 8%;"><input type="number" class="form-control" value="0"
 			 style="width:80%;margin:auto;"></td>
@@ -1318,7 +1318,7 @@ async function exitS() {
 						prd:
 							row.children[1].innerHTML == "MIS"
 								? "I"
-								: row.children[4].innerHTML == "NFO"
+								: exch == "NFO"
 									? "M"
 									: "C",
 						trantype: '0',

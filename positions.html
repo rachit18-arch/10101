@@ -114,6 +114,52 @@
                      </tr>
                   </tfoot>
                </table>
+               <div class="row">
+                  <div class="col-md-6">
+                     <div class="vix-input-date">
+                        <input type="date" id="dte" class="input-group form-control" onchange="posGraph()">
+                     </div>
+                  </div>
+                  <div class="col-md-6">
+                     <div class="payoff-chart">
+                        <div id="chartDiv"></div>
+                        <table id="greek" class="d-none">
+                           <thead>
+                              <th>Gap</th>
+                              <th>leg 1</th>
+                              <th>leg 2</th>
+                              <th>leg 3</th>
+                              <th>leg 4</th>
+                           </thead>
+                           <tbody id="greekTable">
+
+                           </tbody>
+                        </table>
+                        <table id="greekLive" class="d-none">
+                           <thead>
+                              <th>Gap</th>
+                              <th>leg 1</th>
+                              <th>leg 2</th>
+                              <th>leg 3</th>
+                              <th>leg 4</th>
+                           </thead>
+                           <tbody id="liveGreekTable">
+
+                           </tbody>
+                        </table>
+                        <table id="greek2" class="d-none">
+                           <thead>
+                              <th>Gap</th>
+                              <th>Expiry</th>
+                              <th>Live</th>
+                           </thead>
+                           <tbody id="greekTable1">
+
+                           </tbody>
+                        </table>
+                     </div>
+                  </div>
+               </div>
             </div>
             <div class="d-none order-head" id="noP">No Positions!</div>
          </div>
@@ -175,6 +221,10 @@
       integrity="sha512-IetiMzopsrb75HtZydIM8zRv1mlSmV42P0iZVT4sPHxDnhM0I9O8/75bFqlfWoCKTnDB+pFqvoQrlnkgUeShaA=="
       crossorigin="anonymous" referrerpolicy="no-referrer"></script>
    <script src="https://kit.fontawesome.com/2ac9fdd832.js" crossorigin="anonymous"></script>
+   <script src="https://code.highcharts.com/highcharts.js"></script>
+   <script src="https://code.highcharts.com/modules/data.js"></script>
+   <script src="https://code.highcharts.com/modules/exporting.js"></script>
+   <script src="https://code.highcharts.com/modules/accessibility.js"></script>
    <script type="text/javascript" src="js/gaussian.js"></script>
    <script src="js/main.js"></script>
    <script src="js/urls.js"></script>
