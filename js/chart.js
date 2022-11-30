@@ -705,9 +705,8 @@ async function posGraph(event) {
                             total.insertCell(0).innerHTML = greekTable.children[i].children[0].innerHTML;
                         }
                     }
-                    console.log(table.children[2].children[7]);
-                    total.insertCell(-1).innerHTML = a.toFixed(2) + parseFloat(table.children[2].children[7].innerHTML);
-                    total.insertCell(-1).innerHTML = b.toFixed(2) + parseFloat(table.children[2].children[7].innerHTML);
+                    total.insertCell(-1).innerHTML = (a + parseFloat(table.children[2].children[0].children[8].innerHTML)).toFixed(2);
+                    total.insertCell(-1).innerHTML = (b + parseFloat(table.children[2].children[0].children[8].innerHTML)).toFixed(2);
                 }
                 pnlArray.push([parseInt(row.children[0].innerHTML), parseInt(row.children[1].innerHTML)])
             }
