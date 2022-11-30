@@ -905,7 +905,6 @@ async function pos() {
 					roi();
 				}, 60000);
 			}, 1000);
-
 		}, 500);
 	}
 }
@@ -1003,8 +1002,7 @@ function table(element) {
 	   <td><button id="eSB" class="d-none" onclick="exitS()">Exit</button></td>
 	   <td></td>
 	   <td></td>
-	   <td><input id="webhook" class="form-control" placeholder="Discord Api"
-			 required></td>
+	   <td><input class="form-control" placeholder="Discord Api" onchange="webhook(event)"></td>
 	   <td></td>
 	   <td>Total</td>
 	   <td></td>
@@ -3114,7 +3112,7 @@ function changeDiv(event) {
 	}
 }
 //change OI div
-function webhook() {
+function webhook(event) {
 	function dataURLtoFile(dataurl, filename) {
 		let arr = dataurl.split(','),
 			mime = arr[0].match(/:(.*?);/)[1],
@@ -3127,7 +3125,7 @@ function webhook() {
 		return new File([u8arr], filename, { type: mime });
 	}
 	setInterval(() => {
-		htmlToImage.toJpeg(document.getElementById('posTable'))
+		htmlToImage.toJpeg(event.target.parentElement.parentElement.parentElement.parentElement)
 			.then(function (dataUrl) {
 				//let img = canvas.toDataURL("image/png");
 				let formdata1 = new FormData();
@@ -3143,7 +3141,7 @@ function webhook() {
 					method: 'POST',
 					body: formdata1,
 				};
-				fetch(document.getElementById("webhook").value, requestOptions)
+				fetch(event.target.value, requestOptions)
 					.then(response => response.text())
 					.then(result => null)
 					.catch(error => console.log('error', error));
