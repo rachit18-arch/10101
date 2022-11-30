@@ -382,7 +382,7 @@ async function pos() {
 	};
 	let pos = await all(posvalues, "PositionBook");
 	if (pos.stat == "Not_Ok") {
-		document.getElementById("posTable").classList.add("d-none");
+		document.getElementById("NSEHeader").classList.add("d-none");
 		document.getElementById("noP").classList.remove("d-none");
 	} else {
 		let posbody = document.getElementById("posBody");
@@ -673,7 +673,7 @@ async function pos() {
 					row.insertCell(
 						2
 					).innerHTML = `<button class="convert" onclick = "convert(event)"><i class="fa-solid fa-rotate"></i></button> <button class="exit" onclick = "exit(event)"><i class="fa-solid fa-xmark"></i></button>`; //modify
-					row.insertCell(3).innerHTML = element.dname;
+					row.insertCell(3).innerHTML = element.dname ? element.dname : element.tsym;
 					row.insertCell(4).innerHTML = element.exch;
 					row.insertCell(5).innerHTML = element.netqty;
 					row.insertCell(6).innerHTML =
@@ -710,7 +710,7 @@ async function pos() {
 					sendMessageToSocket(`{"t":"t","k":"${element.exch}|${element.token}"}`);
 					sendMessageToSocket(`{"t":"d","k":"${element.exch}|${element.token}"}`);
 					setInterval(function () {
-						let rows = document.getElementsByClassName("posTr");
+						let rows = document.getElementById("posBody").children;
 						let m = 0;
 						let r = 0;
 						for (let i = 0; i < rows.length; i++) {
@@ -909,18 +909,18 @@ async function pos() {
 		}, 500);
 	}
 }
+//positions
 function table(element) {
 	let div = document.createElement('div');
 	let infoDiv = document.createElement('div');
+	infoDiv.setAttribute('onclick', 'hideTables(event)');
+	infoDiv.setAttribute('class', 'order-head')
 	let nameSpan = document.createElement('span');
-	nameSpan.innerHTML = element[1];
+	nameSpan.innerHTML = element[1] + ` `;
 	let token = document.createElement('span');
 	token.id = element[0];
-	sendMessageToSocket(
-		`{"t":"t","k":"NSE|${element[0]}"}`
-	);
 	let table = document.createElement("TABLE");
-	table.classList.add('table', 'table-striped', 'position-table')
+	table.classList.add('table', 'table-striped', 'position-table', 'd-none')
 	let thead = table.createTHead();
 	let tbody = document.createElement('tbody');
 	table.appendChild(tbody);
@@ -942,6 +942,9 @@ function table(element) {
 	infoDiv.appendChild(token);
 	div.appendChild(infoDiv);
 	div.appendChild(table);
+	let tabContent = document.getElementsByClassName('tab-content')[0];
+	nseTable = tabContent.querySelector('#NSEHeader');
+	tabContent.insertBefore(div, nseTable);
 	element[2].forEach(element => {
 		let row = tbody.insertRow(-1);
 		row.classList.add("posTr");
@@ -1000,10 +1003,10 @@ function table(element) {
 	   <td><button id="eSB" class="d-none" onclick="exitS()">Exit</button></td>
 	   <td></td>
 	   <td></td>
-	   <td><input id="webhook" onchange="webhook()" class="form-control" placeholder="Discord Api"
+	   <td><input id="webhook" class="form-control" placeholder="Discord Api"
 			 required></td>
-	   <td>M Used</td>
 	   <td></td>
+	   <td>Total</td>
 	   <td></td>
 	   <td></td>
 	   <td></td>
@@ -1042,11 +1045,20 @@ function table(element) {
 		a = parseFloat(a) / parseFloat(b) * 100;
 		tFootRow.children[10].innerHTML = a.toFixed(2) + " %";
 	}, 1);
-	let tabContent = document.getElementsByClassName('tab-content')[0];
-	nseTable = tabContent.querySelector('#NSEHeader');
-	tabContent.insertBefore(div, nseTable)
+	sendMessageToSocket(
+		`{"t":"t","k":"NSE|${element[0]}"}`
+	);
 }
-//positions
+//add NFO tables
+function hideTables(event) {
+	let tables = document.querySelectorAll('table');
+	tables.forEach(element => {
+		element.classList.add('d-none');
+	});
+	let table = event.target.parentElement.nextElementSibling;
+	table.classList.remove('d-none');
+}
+//hide Other Tables in Positions
 async function dash() {
 	document.getElementById("myAudio").muted = true;
 	document.getElementById("myAudio").play();
