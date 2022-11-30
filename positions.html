@@ -73,6 +73,7 @@
       <div class="container-fluid">
          <div class="row">
             <div class="tab-content">
+               <div id="NSEHeader" onclick="">Other Exchanges</div>
                <table class="table table-striped position-table" id="posTable">
                   <thead>
                      <tr>
@@ -87,8 +88,8 @@
                         <th>MTM</th>
                         <th>R P&L</th>
                         <th>% Chg</th>
-                        <th>Buy</th>
-                        <th>Sell</th>
+                        <th>-</th>
+                        <th>SPREAD</th>
                      </tr>
                   </thead>
                   <tbody id="posBody">
@@ -98,7 +99,8 @@
                         <td><button id="eSB" class="d-none" onclick="exitS()">Exit</button></td>
                         <td></td>
                         <td></td>
-                        <td><input id="webhook" onchange="webhook()" class="form-control" placeholder="Discord Api" required></td>
+                        <td><input id="webhook" onchange="webhook()" class="form-control" placeholder="Discord Api"
+                              required></td>
                         <td>M Used</td>
                         <td id="margin"></td>
                         <td>total</td>
@@ -173,9 +175,11 @@
       integrity="sha512-IetiMzopsrb75HtZydIM8zRv1mlSmV42P0iZVT4sPHxDnhM0I9O8/75bFqlfWoCKTnDB+pFqvoQrlnkgUeShaA=="
       crossorigin="anonymous" referrerpolicy="no-referrer"></script>
    <script src="https://kit.fontawesome.com/2ac9fdd832.js" crossorigin="anonymous"></script>
+   <script type="text/javascript" src="js/gaussian.js"></script>
    <script src="js/main.js"></script>
    <script src="js/urls.js"></script>
    <script src="js/websocket.js"></script>
+   <script src="js/chart.js"></script>
 </body>
 
 </html>

@@ -85,20 +85,37 @@ worker.port.addEventListener("message", function (event) {
     if (document.title === "Positions") {
         if (result.lp) {
             let row = document.getElementById(`${result.tk}`).parentElement;
-            row.children[8].innerHTML = (
-                (parseFloat(row.children[7].innerHTML) -
-                    parseFloat(row.children[6].innerHTML)) *
-                parseFloat(row.children[5].innerHTML)
-            ).toFixed(2);
-            parseFloat(row.children[8].innerHTML) >= 0
-                ? row.children[8].setAttribute("class", "green")
-                : row.children[8].setAttribute("class", "red");
-            row.children[10].innerHTML = (parseFloat(row.children[7].innerHTML) - parseFloat(row.children[6].innerHTML)).toFixed(2) + " %";
+            if (row.children.length > 4) {
+                if (row.parentElement.id == 'posBody') {
+                    row.children[8].innerHTML = (
+                        (parseFloat(row.children[7].innerHTML) -
+                            parseFloat(row.children[6].innerHTML)) *
+                        parseFloat(row.children[5].innerHTML)
+                    ).toFixed(2);
+                    parseFloat(row.children[8].innerHTML) >= 0
+                        ? row.children[8].setAttribute("class", "green")
+                        : row.children[8].setAttribute("class", "red");
+                    row.children[10].innerHTML = (parseFloat(row.children[7].innerHTML) - parseFloat(row.children[6].innerHTML)).toFixed(2) + " %";
+                } else {
+                    console.log(row.children[6].innerHTML)
+                    row.children[7].innerHTML = (
+                        (parseFloat(row.children[6].innerHTML) -
+                            parseFloat(row.children[5].innerHTML)) *
+                        parseFloat(row.children[4].innerHTML)
+                    ).toFixed(2);
+                    parseFloat(row.children[7].innerHTML) >= 0
+                        ? row.children[7].setAttribute("class", "green")
+                        : row.children[7].setAttribute("class", "red");
+                    row.children[9].innerHTML = (parseFloat(row.children[7].innerHTML) - parseFloat(row.children[6].innerHTML)).toFixed(2) + " %";
+                    PosIV(row);
+                }
+            }
         }
         if (result.t == "df") {
             let row = document.getElementById(`${result.tk}`).parentElement;
-            result.bp1 ? row.children[11].innerHTML = result.bp1 : null;
-            result.sp1 ? row.children[12].innerHTML = result.sp1 : null;
+            if (row.children.length > 4) {
+                result.bp1 && result.sp1 ? row.children[12].innerHTML = (result.sp1 - result.bp1).toFixed(2) : null;
+            }
         }
     }
     if (document.title === "Holdings") {

@@ -1,4 +1,4 @@
-function stratGraph() {
+async function stratGraph() {
     if (document.getElementById('dte').value == "") {
         alert("Select Payoff Date")
     }
@@ -11,7 +11,13 @@ function stratGraph() {
             min = sec / 60,
             ho = min / 60;
         let int_rate = 0;
-        let sigma = (liveP * (parseFloat(document.getElementById('26017').innerHTML) / 100) * Math.sqrt(ho / 24) / Math.sqrt(365)).toFixed(2);
+        vixValues = {
+            uid: localStorage.getItem("uid"),
+            exch: "NSE",
+            token: "26017"
+        }
+        let vix = await all(vixValues, 'GetQuotes');
+        let sigma = (liveP * (parseFloat(vix.lp) / 100) * Math.sqrt(ho / 24) / Math.sqrt(365)).toFixed(2);
         let cmp = parseInt(liveP - (sigma * 2.5));
         let cmpM = liveP + (sigma * 2.5);
         let range = parseInt((cmpM - cmp) / (liveP * 0.001))
@@ -390,4 +396,41 @@ function stratGraph() {
             // charting('chartDiv2', 'greekLive2');
         }, 1000)
     }
+}
+
+function PosIV(row) {
+    let date_expiry = new Date(row.children[11].innerHTML.replaceAll('-', '/'));
+    let volt = parseFloat(row.children[10].innerHTML) >= 0 ? parseFloat(row.children[10].innerHTML) / 100 : 50;
+    if (row.children[10].innerHTML == 'NaN' || row.children[10].innerHTML == 'INFINITY') {
+        volt = 0.5;
+    }
+    date_expiry.setHours(15, 30, 0, 0)
+    let date_now = new Date();
+    let int_rate = 0;
+    let seconds = Math.floor((date_expiry - date_now) / 1000),
+        minutes = seconds / 60,
+        hours = minutes / 60,
+        delta_t = hours / 24 / 365.0;
+    let spot = parseFloat(row.parentElement.parentElement.parentElement.children[0].children[1].innerHTML);
+    let strike = parseFloat(row.children[3].innerHTML.split(" ")[2]);
+    let callPrice = parseFloat(row.children[6].innerHTML);
+    let d1 =
+        (Math.log(spot / strike) + (int_rate + Math.pow(volt, 2) / 2) * delta_t) /
+        (volt * Math.sqrt(delta_t)),
+        d2 =
+            (Math.log(spot / strike) + (int_rate - Math.pow(volt, 2) / 2) * delta_t) /
+            (volt * Math.sqrt(delta_t));
+
+    let fv_strike = strike * Math.exp(-1 * int_rate * delta_t);
+
+    //For calculating CDF and PDF using gaussian library
+    //Premium Price
+    let call_premium = row.children[3].innerHTML.split(" ")[3] == "CE" ?
+        spot * distribution.cdf(d1) - fv_strike * distribution.cdf(d2)
+        :
+        fv_strike * distribution.cdf(-1 * d2) - spot * distribution.cdf(-1 * d1);
+    //Option greeks
+    let vega = spot * distribution.pdf(d1) * Math.sqrt(delta_t);
+    volt = (-(call_premium - callPrice) / vega) + volt;
+    row.children[10].innerHTML = (volt * 100).toFixed(2);
 }
