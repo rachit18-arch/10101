@@ -23,6 +23,10 @@
     color: white;
 }
 
+input {
+    color-scheme: dark;
+}
+
 #COtbody tr td {
     border: 1px solid #ffffff1f !important;
 }
