@@ -1008,7 +1008,7 @@ function table(element) {
 	   <td></td>
 	   <td></td>
 	   <td></td>
-	   <td><button onclick="posGraph(event)">Graph</button></td>
+	   <td><button onclick="posGraph(event)" class="graphbutton" >Graph</button></td>
 	   <td></td>
 	   <td style="width: 8%;"><input type="number" class="form-control" value="0"
 			 style="width:80%;margin:auto;"></td>
