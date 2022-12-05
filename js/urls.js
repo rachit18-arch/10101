@@ -1240,37 +1240,40 @@ async function options() {
 //oc
 function convert(event) {
 	let row = event.target.parentNode.parentNode.parentNode;
-	if (parseInt(row.children[5].innerHTML) != 0) {
-		let convertValues = {
-			uid: localStorage.getItem("uid"),
-			actid: localStorage.getItem("actid"),
-			exch: row.children[4].innerHTML,
-			tsym: row.children[3].innerHTML,
-			qty: `${Math.abs(row.children[5].innerHTML)}`,
-			prd:
-				row.children[1].innerHTML == "NRML"
-					? "I"
-					: row.children[4].innerHTML == "NFO"
-						? "M"
-						: "C",
-			prevprd:
-				row.children[1].innerHTML == "MIS"
-					? "I"
-					: row.children[4].innerHTML == "NFO"
-						? "M"
-						: "C",
-			trantype: parseInt(row.children[5].innerHTML) > 0 ? "B" : "S",
-			postype: "DAY",
-		};
-		all(convertValues, "ProductConversion").then((ans) => {
-			if (ans.stat == "Ok") {
-				alert("Conveted");
-				location.reload();
-			} else if (ans.stat == "Not_Ok") {
-				alert("Not Converted");
-			}
-		});
+	let exch = row.parentElement.id == "posBody" ? "Other" : "NFO"
+	let convertValues = {
+		uid: localStorage.getItem("uid"),
+		actid: localStorage.getItem("actid"),
+		exch: exch == "other" ? row.children[4].innerHTML : "NFO",
+		tsym: row.children[14].innerHTML,
+		qty: exch == "other" ? `${Math.abs(row.children[5].innerHTML)}` : `${Math.abs(row.children[4].innerHTML)}`,
+		prd:
+			row.children[1].innerHTML == "NRML"
+				? "I"
+				: exch == "NFO"
+					? "M"
+					: "C",
+		prevprd:
+			row.children[1].innerHTML == "MIS"
+				? "I"
+				: exch == "NFO"
+					? "M"
+					: "C",
+		trantype: parseInt(row.children[5].innerHTML) > 0 ? "B" : "S",
+		postype: "DAY",
+	};
+	if (exch == "other") { convertValues.trantype = parseInt(row.children[5].innerHTML) > 0 ? "S" : "B" }
+	else {
+		convertValues.trantype = parseInt(row.children[4].innerHTML) > 0 ? "S" : "B"
 	}
+	all(convertValues, "ProductConversion").then((ans) => {
+		if (ans.stat == "Ok") {
+			alert("Conveted");
+			location.reload();
+		} else if (ans.stat == "Not_Ok") {
+			alert("Not Converted");
+		}
+	});
 }
 //convert position
 function show() {
