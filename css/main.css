@@ -972,7 +972,10 @@ input[type=number]::-webkit-outer-spin-button {
     border-radius: 50%;
     font-size: 9px;
 }
-
+.payoff-space 
+{
+    padding-bottom: 60px;;
+}
 .left-reject {
     position: absolute;
     left: -4px;
