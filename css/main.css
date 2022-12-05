@@ -982,7 +982,9 @@ input[type=number]::-webkit-outer-spin-button {
     border-radius: 50%;
     font-size: 9px;
 }
-
+.vix-input-date {
+    padding: 0;
+}
 .order-no {
     position: relative;
 }
