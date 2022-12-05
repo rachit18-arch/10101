@@ -415,13 +415,23 @@
             </div>
             <!-- chart strat -->
          </div>
+      </div>
+   </section>
+
+   <section>
+      <div class="container">
          <div class="row">
-            <div class="col-md-6">
-               <div class="vix-input-date">
-                  <input type="date" id="dte" class="input-group form-control" onchange="stratGraph()">
+            <div class="col-md-8" style="margin: auto;">
+               <!-- input pay off -->
+               <div class="row">
+                  <div class="vix-input-date">
+                     <input type="date" id="dte" class="input-group form-control" onchange="stratGraph()">
+                  </div>
                </div>
-            </div>
-            <div class="col-md-6">
+                <!-- input pay off -->
+
+               <!-- payoff graph  -->
+               <div class="row">
                <div class="payoff-chart">
                   <div id="chartDiv"></div>
                   <table id="greek" class="d-none">
@@ -459,11 +469,13 @@
                      </tbody>
                   </table>
                </div>
+               </div>
+               <!-- payoff graph  -->
             </div>
          </div>
       </div>
-
    </section>
+
    <!-- alert -->
    <div class="d-none noti-set mn-noti" id="alert">
       <span class="fas fa-exclamation-circle"></span>
