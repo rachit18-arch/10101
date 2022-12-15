@@ -19,8 +19,8 @@ async function stratGraph() {
         let vix = await all(vixValues, 'GetQuotes');
         let sigma = (liveP * (parseFloat(vix.lp) / 100) * Math.sqrt(ho / 24) / Math.sqrt(365)).toFixed(2);
         let cmp = parseInt(liveP - (sigma * 2.5));
-        let cmpM = liveP + (sigma * 2.5);
-        let range = parseInt((cmpM - cmp) / (liveP * 0.001))
+        let cmpL = parseInt(liveP - (sigma * 2.5));
+        let cmpH = parseInt(liveP + (sigma * 2.5));
         let greekTable = document.getElementById('greekTable');
         let liveGreekTable = document.getElementById('liveGreekTable');
         greekTable.innerHTML = '';
@@ -96,7 +96,7 @@ async function stratGraph() {
             }
         }, 100);
         setTimeout(() => {
-            for (let index = 0; index < 3000; index++) {
+            for (let index = cmpL; index < cmpH; index++) {
                 let row = greekTable.insertRow(-1);
                 let row2 = liveGreekTable.insertRow(-1);
                 row.insertCell(0).innerHTML = cmp;
@@ -248,7 +248,7 @@ async function stratGraph() {
                 let row2 = liveGreekTable.children[i];
                 let a = 0;
                 let b = 0;
-                if (row.children[0].innerHTML >= (liveP - (liveP * 2 / 100)) && row.children[0].innerHTML <= cmpM) {
+                if (row.children[0].innerHTML >= cmpL && row.children[0].innerHTML <= cmpH) {
                     let total = gt.insertRow(-1);
                     for (let j = 0; j < row.children.length; j++) {
                         const element = row.children[j];
@@ -265,43 +265,46 @@ async function stratGraph() {
                 }
                 pnlArray.push([parseInt(row.children[0].innerHTML), parseInt(row.children[1].innerHTML)])
             }
+            setTimeout(() => {
+                let maxCE = pnlArray[(pnlArray.length - 1)][1];
+                let maxCE_1 = pnlArray[(pnlArray.length - 2)][1];
+                let maxPE = pnlArray[0][1];
+                let maxPE_1 = pnlArray[1][1];
+                let unlimitedPPE = false;
+                let unlimitedPCE = false;
+                let unlimitedLPE = false;
+                let unlimitedLCE = false;
 
-            let maxHU = greekTable.children[greekTable.children.length - 1].children[1].innerHTML;
-            let maxHU1 = greekTable.children[greekTable.children.length - 2].children[1].innerHTML;
-            let maxLU = greekTable.children[0].children[1].innerHTML;
-            let maxLU1 = greekTable.children[1].children[1].innerHTML;
-            let unlimitedP = false;
-            let unlimitedL = false;
-            if (maxLU == maxLU1) {
-                console.log('FIXED PROFIT PE')
-            } else if (maxLU > maxLU1) {
-                console.log('unlimited LOSS PE')
-                unlimitedL = true;
-            } else if (maxLU < maxLU1) {
-                console.log('unlimited Profit PE')
-                unlimitedP = true;
-            }
-            if (maxHU == maxHU1) {
-                console.log('FIXED CE')
-            }
-            else if (maxHU > maxHU1) {
-                console.log('unlimited Profit CE')
-                unlimitedP = true;
-            } else if (maxHU < maxHU1) {
-                console.log('unlimited LOSS CE')
-                unlimitedL = true;
-            }
-            if (unlimitedL == true && unlimitedP == true) {
-                console.log('gg')
-            }
-            else if (unlimitedL == true) {
-                console.log("ok")
-
-            } else if (unlimitedP == true) {
-                console.log('k')
-            } else {
-                console.log("test")
-            }
+                if (maxPE == maxPE_1 || maxPE - maxPE_1 < 100) {
+                    maxPE > 0 ?
+                        console.log('FIXED PROFIT PE') : console.log('fixed loss PE')
+                    console.log(maxPE)
+                } else if (maxPE > maxPE_1 || maxPE < maxPE_1) {
+                    maxPE > 0 ?
+                        console.log('unlimited Profit PE') : console.log('unlimited loss PE')
+                    maxPE > 0 ?
+                        unlimitedPPE = true : unlimitedLPE = true
+                    //unlimitedL = true;
+                }
+                console.log(maxCE, maxCE_1, maxPE, maxPE_1)
+                if (maxCE == maxCE_1 || maxCE - maxCE_1 < 100) {
+                    maxCE > 0 ?
+                        console.log('FIXED PROFIT CE') : console.log('fixed loss CE')
+                    console.log(maxCE)
+                }
+                else if (maxCE > maxCE_1 || maxCE < maxCE_1) {
+                    maxCE > 0 ? console.log('unlimited Profit CE') : console.log('unlimited loss CE')
+                    maxCE > 0 ? unlimitedPCE = true : unlimitedLCE = true;
+                }
+                const max = pnlArray.reduce(function (prev, current) {
+                    return (prev[1] > current[1]) ? prev : current
+                })
+                console.log(max)
+                const min = pnlArray.reduce(function (prev, current) {
+                    return (prev[1] < current[1]) ? prev : current
+                })
+                console.log(min)
+            }, 200)
             function charting(chartDiv, datatable) {
                 Highcharts.chart(chartDiv, {
                     data: {
@@ -309,12 +312,12 @@ async function stratGraph() {
                     },
                     chart: {
                         //type: 'line',
-                        backgroundColor: '#565656',
+                        backgroundColor: '#131516',
                     }, series: [{
                         type: 'areaspline',
-                        negativeFillColor: 'RGB(255,0,0,0.3)',
+                        negativeFillColor: 'RGB(255,0,0,0.5)',
                         lineColor: '#67b1f2',
-                        fillColor: 'RGB(0,255,0,0.3)',
+                        fillColor: 'RGB(0,255,0,0.5)',
                         threshold: 0,
                     }],
                     title: {
@@ -338,7 +341,8 @@ async function stratGraph() {
                         plotLines: [{
                             color: '#FF0000', // Red
                             width: 2,
-                            value: 100 // Position, you'll have to translate this to the values on your x axis
+                            value: 2014, // Position, you'll have to translate this to the values on your x axis
+                            dashStyle: 'ShortDash'
                         }],
                         title: {
                             style: {
@@ -357,10 +361,12 @@ async function stratGraph() {
                         tickWidth: 1,
                         //tickColor: '#000',
                         plotLines: [{
-                            color: '#ffce6e',
+                            color: 'skyblue',
                             value: 0,
                             width: 2,
                             zIndex: 4,
+                            dashStyle: 'LongDash'
+
                         }],
                         labels: {
                             style: {
@@ -456,8 +462,8 @@ async function posGraph(event) {
         let vix = await all(vixValues, 'GetQuotes');
         let sigma = (liveP * (parseFloat(vix.lp) / 100) * Math.sqrt(ho / 24) / Math.sqrt(365)).toFixed(2);
         let cmp = parseInt(liveP - (sigma * 2.5));
-        let cmpM = liveP + (sigma * 2.5);
-        let range = parseInt((cmpM - cmp) / (liveP * 0.001))
+        let cmpL = parseInt(liveP - (sigma * 2.5));
+        let cmpH = parseInt(liveP + (sigma * 2.5));
         let greekTable = document.getElementById('greekTable');
         let liveGreekTable = document.getElementById('liveGreekTable');
         greekTable.innerHTML = '';
@@ -535,7 +541,7 @@ async function posGraph(event) {
             }
         }, 100);
         setTimeout(() => {
-            for (let index = 0; index < 3000; index++) {
+            for (let index = cmpL; index < cmpH; index++) {
                 let row = greekTable.insertRow(-1);
                 let row2 = liveGreekTable.insertRow(-1);
                 row.insertCell(0).innerHTML = cmp;
@@ -693,7 +699,7 @@ async function posGraph(event) {
                 let row2 = liveGreekTable.children[i];
                 let a = 0;
                 let b = 0;
-                if (row.children[0].innerHTML >= (liveP - (liveP * 2 / 100)) && row.children[0].innerHTML <= cmpM) {
+                if (row.children[0].innerHTML >= cmpL && row.children[0].innerHTML <= cmpH) {
                     let total = gt.insertRow(-1);
                     for (let j = 0; j < row.children.length; j++) {
                         const element = row.children[j];
@@ -710,43 +716,46 @@ async function posGraph(event) {
                 }
                 pnlArray.push([parseInt(row.children[0].innerHTML), parseInt(row.children[1].innerHTML)])
             }
+            setTimeout(() => {
+                let maxCE = pnlArray[(pnlArray.length - 1)][1];
+                let maxCE_1 = pnlArray[(pnlArray.length - 2)][1];
+                let maxPE = pnlArray[0][1];
+                let maxPE_1 = pnlArray[1][1];
+                let unlimitedPPE = false;
+                let unlimitedPCE = false;
+                let unlimitedLPE = false;
+                let unlimitedLCE = false;
 
-            let maxHU = greekTable.children[greekTable.children.length - 1].children[1].innerHTML;
-            let maxHU1 = greekTable.children[greekTable.children.length - 2].children[1].innerHTML;
-            let maxLU = greekTable.children[0].children[1].innerHTML;
-            let maxLU1 = greekTable.children[1].children[1].innerHTML;
-            let unlimitedP = false;
-            let unlimitedL = false;
-            if (maxLU == maxLU1) {
-                console.log('FIXED PROFIT PE')
-            } else if (maxLU > maxLU1) {
-                console.log('unlimited LOSS PE')
-                unlimitedL = true;
-            } else if (maxLU < maxLU1) {
-                console.log('unlimited Profit PE')
-                unlimitedP = true;
-            }
-            if (maxHU == maxHU1) {
-                console.log('FIXED CE')
-            }
-            else if (maxHU > maxHU1) {
-                console.log('unlimited Profit CE')
-                unlimitedP = true;
-            } else if (maxHU < maxHU1) {
-                console.log('unlimited LOSS CE')
-                unlimitedL = true;
-            }
-            if (unlimitedL == true && unlimitedP == true) {
-                console.log('gg')
-            }
-            else if (unlimitedL == true) {
-                console.log("ok")
-
-            } else if (unlimitedP == true) {
-                console.log('k')
-            } else {
-                console.log("test")
-            }
+                if (maxPE == maxPE_1 || maxPE - maxPE_1 < 100) {
+                    maxPE > 0 ?
+                        console.log('FIXED PROFIT PE') : console.log('fixed loss PE')
+                    console.log(maxPE)
+                } else if (maxPE > maxPE_1 || maxPE < maxPE_1) {
+                    maxPE > 0 ?
+                        console.log('unlimited Profit PE') : console.log('unlimited loss PE')
+                    maxPE > 0 ?
+                        unlimitedPPE = true : unlimitedLPE = true
+                    //unlimitedL = true;
+                }
+                console.log(maxCE, maxCE_1, maxPE, maxPE_1)
+                if (maxCE == maxCE_1 || maxCE - maxCE_1 < 100) {
+                    maxCE > 0 ?
+                        console.log('FIXED PROFIT CE') : console.log('fixed loss CE')
+                    console.log(maxCE)
+                }
+                else if (maxCE > maxCE_1 || maxCE < maxCE_1) {
+                    maxCE > 0 ? console.log('unlimited Profit CE') : console.log('unlimited loss CE')
+                    maxCE > 0 ? unlimitedPCE = true : unlimitedLCE = true;
+                }
+                const max = pnlArray.reduce(function (prev, current) {
+                    return (prev[1] > current[1]) ? prev : current
+                })
+                console.log(max)
+                const min = pnlArray.reduce(function (prev, current) {
+                    return (prev[1] < current[1]) ? prev : current
+                })
+                console.log(min)
+            }, 200)
             function charting(chartDiv, datatable) {
                 Highcharts.chart(chartDiv, {
                     data: {
@@ -754,12 +763,12 @@ async function posGraph(event) {
                     },
                     chart: {
                         //type: 'line',
-                        backgroundColor: '#565656',
+                        backgroundColor: '#131516',
                     }, series: [{
                         type: 'areaspline',
-                        negativeFillColor: 'RGB(255,0,0,0.3)',
+                        negativeFillColor: 'RGB(255,0,0,0.5)',
                         lineColor: '#67b1f2',
-                        fillColor: 'RGB(0,255,0,0.3)',
+                        fillColor: 'RGB(0,255,0,0.5)',
                         threshold: 0,
                     }],
                     title: {
@@ -783,7 +792,8 @@ async function posGraph(event) {
                         plotLines: [{
                             color: '#FF0000', // Red
                             width: 2,
-                            value: 100 // Position, you'll have to translate this to the values on your x axis
+                            value: 2014, // Position, you'll have to translate this to the values on your x axis
+                            dashStyle: 'ShortDash'
                         }],
                         title: {
                             style: {
@@ -802,10 +812,12 @@ async function posGraph(event) {
                         tickWidth: 1,
                         //tickColor: '#000',
                         plotLines: [{
-                            color: '#ffce6e',
+                            color: 'skyblue',
                             value: 0,
                             width: 2,
                             zIndex: 4,
+                            dashStyle: 'LongDash'
+
                         }],
                         labels: {
                             style: {

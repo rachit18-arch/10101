@@ -411,7 +411,7 @@ td {
     color: white !important;
     text-transform: uppercase;
     font-family: 'Urbanist', sans-serif;
-    padding: 7px 15px !important;
+    padding: 7px 13px !important;
 }
 
 .posi-badge {
@@ -972,14 +972,17 @@ input[type=number]::-webkit-outer-spin-button {
     border-radius: 50%;
     font-size: 9px;
 }
-.payoff-space 
-{
-    padding-bottom: 60px;;
+
+.payoff-space {
+    padding-bottom: 60px;
+    ;
 }
+
 .graphbutton {
     background: #26a69a;
     color: white;
 }
+
 .left-reject {
     position: absolute;
     left: -4px;
@@ -989,9 +992,11 @@ input[type=number]::-webkit-outer-spin-button {
     border-radius: 50%;
     font-size: 9px;
 }
+
 .vix-input-date {
     padding: 0;
 }
+
 .order-no {
     position: relative;
 }
