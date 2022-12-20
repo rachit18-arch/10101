@@ -2859,7 +2859,6 @@ async function addLeg() {
 	table.appendChild(row);
 	limits();
 	basketMargins();
-	stratGraph();
 }
 //add leg to strategy builder
 async function findGreek(row) {
@@ -2947,7 +2946,6 @@ async function changeStrike(event) {
 	sendMessageToSocket(`{ "t": "t", "k": "NFO|${scripts.values[0].token}" } `);
 	limits();
 	basketMargins();
-	stratGraph();
 }
 //strategy builder change strike or ce pe
 function tradeS() {
