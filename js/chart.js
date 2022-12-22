@@ -18,83 +18,15 @@ async function stratGraph() {
         }
         let vix = await all(vixValues, 'GetQuotes');
         let sigma = (liveP * (parseFloat(vix.lp) / 100) * Math.sqrt(ho / 24) / Math.sqrt(365)).toFixed(2);
-        let cmp = parseInt(liveP - (sigma * 2.5));
-        let cmpL = parseInt(liveP - (sigma * 2.5));
-        let cmpH = parseInt(liveP + (sigma * 2.5));
+        let perce = liveP > 10000 ? 2.5 : liveP > 1000 ? 10 : 20;
+        let cmp = parseInt(liveP - (sigma * perce));
+        let cmpL = parseInt(liveP - (sigma * perce));
+        let cmpH = parseInt(liveP + (sigma * perce));
         let greekTable = document.getElementById('greekTable');
         let liveGreekTable = document.getElementById('liveGreekTable');
+        let strikeArray = [];
         greekTable.innerHTML = '';
         liveGreekTable.innerHTML = '';
-        setTimeout(() => {
-            let cmp = 1;
-            let row = greekTable.insertRow(-1);
-            let row2 = liveGreekTable.insertRow(-1);
-            row.insertCell(0).innerHTML = cmp;
-            row2.insertCell(0).innerHTML = cmp;
-            if (document.title == 'Strategy Builder') {
-                let body = document.getElementById("stratBody");
-                let totalPNL = 0;
-                for (let i = 0; i < body.children.length; i++) {
-                    const element = body.children[i];
-                    let qty = element.querySelector('input[name="bs"]').checked ? element.querySelector('input[name="qty"]').value : -element.querySelector('input[name="qty"]').value;
-                    let iv = parseFloat(element.children[12].innerHTML) / 100;
-                    let entryPrice = parseFloat(element.children[6].innerHTML).toFixed(2);
-                    let strike = element.querySelector('input[name="strike"]').value;
-                    let ce = element.querySelector('input[name="cepe"]').checked ? 1 : 0;
-                    let a = null;
-                    let dte = new Date(element.children[2].innerHTML.replaceAll('-', '/'));
-                    dte.setHours(15, 30, 0, 0)
-                    if (dte.getTime() != date_expiry.getTime()) {
-                        let diff = dte.getTime() - date_expiry.getTime()
-                        let seconds2 = Math.floor(diff / 1000),
-                            minutes2 = seconds2 / 60,
-                            hours2 = minutes2 / 60;
-                        let delta_t2 = (hours2 / 24) / 365.0;
-                        let fv_strike2 = strike * Math.exp(-1 * int_rate * delta_t2);
-                        let d12 =
-                            (Math.log(cmp / strike) + (int_rate + Math.pow(iv, 2) / 2) * delta_t2) /
-                            (iv * Math.sqrt(delta_t2)),
-                            d22 =
-                                (Math.log(cmp / strike) + (int_rate - Math.pow(iv, 2) / 2) * delta_t2) /
-                                (iv * Math.sqrt(delta_t2));
-
-                        let call_premium2 = element.querySelector('input[name="cepe"]').checked ?
-                            cmp * distribution.cdf(d12) - fv_strike2 * distribution.cdf(d22)
-                            :
-                            fv_strike2 * distribution.cdf(-1 * d22) - cmp * distribution.cdf(-1 * d12);
-                        a = call_premium2;
-                    }
-                    else {
-                        if (ce == 1) {
-                            a = Math.max(cmp - strike, 0)
-                        } else {
-                            a = Math.max(strike - cmp, 0)
-                        };
-                    }
-                    let seconds = Math.floor((dte - date_now) / 1000),
-                        minutes = seconds / 60,
-                        hours = minutes / 60;
-                    delta_t = (hours / 24) / 365.0;
-                    let fv_strike = strike * Math.exp(-1 * int_rate * delta_t);
-                    let d1 =
-                        (Math.log(cmp / strike) + (int_rate + Math.pow(iv, 2) / 2) * delta_t) /
-                        (iv * Math.sqrt(delta_t)),
-                        d2 =
-                            (Math.log(cmp / strike) + (int_rate - Math.pow(iv, 2) / 2) * delta_t) /
-                            (iv * Math.sqrt(delta_t));
-                    let call_premium = element.querySelector('input[name="cepe"]').checked ?
-                        cmp * distribution.cdf(d1) - fv_strike * distribution.cdf(d2)
-                        :
-                        fv_strike * distribution.cdf(-1 * d2) - cmp * distribution.cdf(-1 * d1);
-                    let premiumPNL = a - entryPrice;
-                    let rupeesPNL = (premiumPNL * qty).toFixed(2);
-                    row.insertCell(-1).innerHTML = rupeesPNL;
-                    let livePremiumPNL = call_premium - entryPrice;
-                    let liveRupeesPNL = (livePremiumPNL * qty).toFixed(2);
-                    row2.insertCell(-1).innerHTML = liveRupeesPNL;
-                }
-            }
-        }, 100);
         setTimeout(() => {
             for (let index = cmpL; index < cmpH; index++) {
                 let row = greekTable.insertRow(-1);
@@ -109,7 +41,10 @@ async function stratGraph() {
                         let qty = element.querySelector('input[name="bs"]').checked ? element.querySelector('input[name="qty"]').value : -element.querySelector('input[name="qty"]').value;
                         let iv = parseFloat(element.children[12].innerHTML) / 100;
                         let entryPrice = parseFloat(element.children[6].innerHTML).toFixed(2);
-                        let strike = element.querySelector('input[name="strike"]').value;
+                        let strike = parseInt(element.querySelector('input[name="strike"]').value);
+                        if (index == cmpL) {
+                            strikeArray.push(strike);
+                        }
                         let ce = element.querySelector('input[name="cepe"]').checked ? 1 : 0;
                         let a = null;
                         let dte = new Date(element.children[2].innerHTML.replaceAll('-', '/'));
@@ -169,76 +104,6 @@ async function stratGraph() {
             }
         }, 200);
         setTimeout(() => {
-            let cmp = 100000;
-            let row = greekTable.insertRow(-1);
-            let row2 = liveGreekTable.insertRow(-1);
-            row.insertCell(0).innerHTML = cmp;
-            row2.insertCell(0).innerHTML = cmp;
-            if (document.title == 'Strategy Builder') {
-                let body = document.getElementById("stratBody");
-                let totalPNL = 0;
-                for (let i = 0; i < body.children.length; i++) {
-                    const element = body.children[i];
-                    let qty = element.querySelector('input[name="bs"]').checked ? element.querySelector('input[name="qty"]').value : -element.querySelector('input[name="qty"]').value;
-                    let iv = parseFloat(element.children[12].innerHTML) / 100;
-                    let entryPrice = parseFloat(element.children[6].innerHTML).toFixed(2);
-                    let strike = element.querySelector('input[name="strike"]').value;
-                    let ce = element.querySelector('input[name="cepe"]').checked ? 1 : 0;
-                    let a = null;
-                    let dte = new Date(element.children[2].innerHTML.replaceAll('-', '/'));
-                    dte.setHours(15, 30, 0, 0)
-                    if (dte.getTime() != date_expiry.getTime()) {
-                        let diff = dte.getTime() - date_expiry.getTime()
-                        let seconds2 = Math.floor(diff / 1000),
-                            minutes2 = seconds2 / 60,
-                            hours2 = minutes2 / 60;
-                        let delta_t2 = (hours2 / 24) / 365.0;
-                        let fv_strike2 = strike * Math.exp(-1 * int_rate * delta_t2);
-                        let d12 =
-                            (Math.log(cmp / strike) + (int_rate + Math.pow(iv, 2) / 2) * delta_t2) /
-                            (iv * Math.sqrt(delta_t2)),
-                            d22 =
-                                (Math.log(cmp / strike) + (int_rate - Math.pow(iv, 2) / 2) * delta_t2) /
-                                (iv * Math.sqrt(delta_t2));
-
-                        let call_premium2 = element.querySelector('input[name="cepe"]').checked ?
-                            cmp * distribution.cdf(d12) - fv_strike2 * distribution.cdf(d22)
-                            :
-                            fv_strike2 * distribution.cdf(-1 * d22) - cmp * distribution.cdf(-1 * d12);
-                        a = call_premium2;
-                    }
-                    else {
-                        if (ce == 1) {
-                            a = Math.max(cmp - strike, 0)
-                        } else {
-                            a = Math.max(strike - cmp, 0)
-                        };
-                    }
-                    let seconds = Math.floor((dte - date_now) / 1000),
-                        minutes = seconds / 60,
-                        hours = minutes / 60;
-                    delta_t = (hours / 24) / 365.0;
-                    let fv_strike = strike * Math.exp(-1 * int_rate * delta_t);
-                    let d1 =
-                        (Math.log(cmp / strike) + (int_rate + Math.pow(iv, 2) / 2) * delta_t) /
-                        (iv * Math.sqrt(delta_t)),
-                        d2 =
-                            (Math.log(cmp / strike) + (int_rate - Math.pow(iv, 2) / 2) * delta_t) /
-                            (iv * Math.sqrt(delta_t));
-                    let call_premium = element.querySelector('input[name="cepe"]').checked ?
-                        cmp * distribution.cdf(d1) - fv_strike * distribution.cdf(d2)
-                        :
-                        fv_strike * distribution.cdf(-1 * d2) - cmp * distribution.cdf(-1 * d1);
-                    let premiumPNL = a - entryPrice;
-                    let rupeesPNL = (premiumPNL * qty).toFixed(2);
-                    row.insertCell(-1).innerHTML = rupeesPNL;
-                    let livePremiumPNL = call_premium - entryPrice;
-                    let liveRupeesPNL = (livePremiumPNL * qty).toFixed(2);
-                    row2.insertCell(-1).innerHTML = liveRupeesPNL;
-                }
-            }
-        }, 200);
-        setTimeout(() => {
             let gt = document.getElementById('greekTable1');
             gt.innerHTML = '';
             let closest = 0;
@@ -263,7 +128,7 @@ async function stratGraph() {
                     total.insertCell(-1).innerHTML = a.toFixed(2);
                     total.insertCell(-1).innerHTML = b.toFixed(2);
                 }
-                pnlArray.push([parseInt(row.children[0].innerHTML), parseInt(row.children[1].innerHTML)])
+                pnlArray.push([parseInt(row.children[0].innerHTML), parseInt(a)])
             }
             setTimeout(() => {
                 let maxCE = pnlArray[(pnlArray.length - 1)][1];
@@ -299,11 +164,38 @@ async function stratGraph() {
                 const max = pnlArray.reduce(function (prev, current) {
                     return (prev[1] > current[1]) ? prev : current
                 })
-                console.log(max)
+                document.getElementById('profit').innerHTML = max[1];
                 const min = pnlArray.reduce(function (prev, current) {
                     return (prev[1] < current[1]) ? prev : current
                 })
-                console.log(min)
+                document.getElementById('loss').innerHTML = min[1];
+                document.getElementById('rr').innerHTML = Math.abs(max[1] / min[1]).toFixed(2);
+                strikeArray.unshift(pnlArray[0][0])
+                strikeArray.push(pnlArray[pnlArray.length - 1][0])
+                strikeArray.sort((a, b) => a - b);
+                let tempNum = 0;
+                let BE = [];
+                for (let i = 0; i < strikeArray.length; i++) {
+                    let strike = strikeArray[i];
+                    if (i == 0) {
+                        pnlArray.forEach(element => {
+                            if (element[0] == strike) {
+                                tempNum = element[1];
+                            }
+                        })
+                    } else {
+                        let prvStrike = strikeArray[i - 1];
+                        pnlArray.forEach(element => {
+                            if (Math.sign(element[1]) != Math.sign(tempNum) && tempNum != 0) {
+                                if (element[0] == strike) {
+                                    BE.push(parseInt(prvStrike + (strike - prvStrike) * (0 - tempNum) / (element[1] - tempNum)));
+                                    tempNum = element[1];
+                                }
+                            }
+                        });
+                    }
+                    document.getElementById('BE').innerHTML = BE.length > 0 ? BE.toString() : '-';
+                }
             }, 200)
             function charting(chartDiv, datatable) {
                 Highcharts.chart(chartDiv, {
@@ -399,7 +291,6 @@ async function stratGraph() {
                 });
             }
             charting('chartDiv', 'greek2');
-            // charting('chartDiv2', 'greekLive2');
         }, 1000)
     }
 }
@@ -418,7 +309,7 @@ function PosIV(row) {
         hours = minutes / 60,
         delta_t = hours / 24 / 365.0;
     let spot = parseFloat(row.parentElement.parentElement.parentElement.children[0].children[1].innerHTML);
-    let strike = parseFloat(row.children[3].innerHTML.split(" ")[2]);
+    let strike = parseInt(row.children[3].innerHTML.split(" ")[2]);
     let callPrice = parseFloat(row.children[6].innerHTML);
     let d1 =
         (Math.log(spot / strike) + (int_rate + Math.pow(volt, 2) / 2) * delta_t) /
@@ -461,85 +352,15 @@ async function posGraph(event) {
         }
         let vix = await all(vixValues, 'GetQuotes');
         let sigma = (liveP * (parseFloat(vix.lp) / 100) * Math.sqrt(ho / 24) / Math.sqrt(365)).toFixed(2);
-        let cmp = parseInt(liveP - (sigma * 2.5));
-        let cmpL = parseInt(liveP - (sigma * 2.5));
-        let cmpH = parseInt(liveP + (sigma * 2.5));
+        let perce = liveP > 10000 ? 2.5 : liveP > 1000 ? 10 : 20;
+        let cmp = parseInt(liveP - (sigma * perce));
+        let cmpL = parseInt(liveP - (sigma * perce));
+        let cmpH = parseInt(liveP + (sigma * perce));
         let greekTable = document.getElementById('greekTable');
         let liveGreekTable = document.getElementById('liveGreekTable');
+        let strikeArray = [];
         greekTable.innerHTML = '';
         liveGreekTable.innerHTML = '';
-        setTimeout(() => {
-            let cmp = 1;
-            let row = greekTable.insertRow(-1);
-            let row2 = liveGreekTable.insertRow(-1);
-            row.insertCell(0).innerHTML = cmp;
-            row2.insertCell(0).innerHTML = cmp;
-            if (document.title == 'Positions') {
-                let body = table.children[1];
-                let totalPNL = 0;
-                for (let i = 0; i < body.children.length; i++) {
-                    const element = body.children[i];
-                    let qty = parseInt(element.children[4].innerHTML);
-                    if (qty != 0) {
-                        let iv = parseFloat(element.children[10].innerHTML) / 100;
-                        let entryPrice = parseFloat(element.children[5].innerHTML).toFixed(2);
-                        let strike = parseFloat(element.children[3].innerHTML.split(" ")[2]);
-                        let ce = element.children[3].innerHTML.split(" ")[3] == "CE" ? 1 : 0;
-                        let a = null;
-                        let dte = new Date(element.children[11].innerHTML.replaceAll('-', '/'));
-                        dte.setHours(15, 30, 0, 0)
-                        if (dte.getTime() != date_expiry.getTime()) {
-                            let diff = dte.getTime() - date_expiry.getTime()
-                            let seconds2 = Math.floor(diff / 1000),
-                                minutes2 = seconds2 / 60,
-                                hours2 = minutes2 / 60;
-                            let delta_t2 = (hours2 / 24) / 365.0;
-                            let fv_strike2 = strike * Math.exp(-1 * int_rate * delta_t2);
-                            let d12 =
-                                (Math.log(cmp / strike) + (int_rate + Math.pow(iv, 2) / 2) * delta_t2) /
-                                (iv * Math.sqrt(delta_t2)),
-                                d22 =
-                                    (Math.log(cmp / strike) + (int_rate - Math.pow(iv, 2) / 2) * delta_t2) /
-                                    (iv * Math.sqrt(delta_t2));
-
-                            let call_premium2 = ce == 1 ?
-                                cmp * distribution.cdf(d12) - fv_strike2 * distribution.cdf(d22)
-                                :
-                                fv_strike2 * distribution.cdf(-1 * d22) - cmp * distribution.cdf(-1 * d12);
-                            a = call_premium2;
-                        }
-                        else {
-                            if (ce == 1) {
-                                a = Math.max(cmp - strike, 0)
-                            } else {
-                                a = Math.max(strike - cmp, 0)
-                            };
-                        }
-                        let seconds = Math.floor((dte - date_now) / 1000),
-                            minutes = seconds / 60,
-                            hours = minutes / 60;
-                        delta_t = (hours / 24) / 365.0;
-                        let fv_strike = strike * Math.exp(-1 * int_rate * delta_t);
-                        let d1 =
-                            (Math.log(cmp / strike) + (int_rate + Math.pow(iv, 2) / 2) * delta_t) /
-                            (iv * Math.sqrt(delta_t)),
-                            d2 =
-                                (Math.log(cmp / strike) + (int_rate - Math.pow(iv, 2) / 2) * delta_t) /
-                                (iv * Math.sqrt(delta_t));
-                        let call_premium = ce == 1 ?
-                            cmp * distribution.cdf(d1) - fv_strike * distribution.cdf(d2)
-                            :
-                            fv_strike * distribution.cdf(-1 * d2) - cmp * distribution.cdf(-1 * d1);
-                        let premiumPNL = a - entryPrice;
-                        let rupeesPNL = (premiumPNL * qty).toFixed(2);
-                        row.insertCell(-1).innerHTML = rupeesPNL;
-                        let livePremiumPNL = call_premium - entryPrice;
-                        let liveRupeesPNL = (livePremiumPNL * qty).toFixed(2);
-                        row2.insertCell(-1).innerHTML = liveRupeesPNL;
-                    }
-                }
-            }
-        }, 100);
         setTimeout(() => {
             for (let index = cmpL; index < cmpH; index++) {
                 let row = greekTable.insertRow(-1);
@@ -555,7 +376,10 @@ async function posGraph(event) {
                         if (qty != 0) {
                             let iv = parseFloat(element.children[10].innerHTML) / 100;
                             let entryPrice = parseFloat(element.children[5].innerHTML).toFixed(2);
-                            let strike = parseFloat(element.children[3].innerHTML.split(" ")[2]);
+                            let strike = parseInt(element.children[3].innerHTML.split(" ")[2]);
+                            if (index == cmpL) {
+                                strikeArray.push(strike);
+                            }
                             let ce = element.children[3].innerHTML.split(" ")[3] == "CE" ? 1 : 0;
                             let a = null;
                             let dte = new Date(element.children[11].innerHTML.replaceAll('-', '/'));
@@ -616,80 +440,6 @@ async function posGraph(event) {
             }
         }, 200);
         setTimeout(() => {
-            let cmp = 100000;
-            let row = greekTable.insertRow(-1);
-            let row2 = liveGreekTable.insertRow(-1);
-            row.insertCell(0).innerHTML = cmp;
-            row2.insertCell(0).innerHTML = cmp;
-            if (document.title == 'Positions') {
-                let body = table.children[1];
-                let totalPNL = 0;
-                for (let i = 0; i < body.children.length; i++) {
-                    const element = body.children[i];
-
-                    let qty = parseInt(element.children[4].innerHTML);
-                    if (qty != 0) {
-                        let iv = parseFloat(element.children[10].innerHTML) / 100;
-                        let entryPrice = //parseFloat(element.children[5].innerHTML).toFixed(2);
-                            180
-                        let strike = parseFloat(element.children[3].innerHTML.split(" ")[2]);
-                        let ce = element.children[3].innerHTML.split(" ")[3] == "CE" ? 1 : 0;
-                        let a = null;
-                        let dte = new Date(element.children[11].innerHTML.replaceAll('-', '/'));
-                        dte.setHours(15, 30, 0, 0)
-                        if (dte.getTime() != date_expiry.getTime()) {
-                            let diff = dte.getTime() - date_expiry.getTime()
-                            let seconds2 = Math.floor(diff / 1000),
-                                minutes2 = seconds2 / 60,
-                                hours2 = minutes2 / 60;
-                            let delta_t2 = (hours2 / 24) / 365.0;
-                            let fv_strike2 = strike * Math.exp(-1 * int_rate * delta_t2);
-                            let d12 =
-                                (Math.log(cmp / strike) + (int_rate + Math.pow(iv, 2) / 2) * delta_t2) /
-                                (iv * Math.sqrt(delta_t2)),
-                                d22 =
-                                    (Math.log(cmp / strike) + (int_rate - Math.pow(iv, 2) / 2) * delta_t2) /
-                                    (iv * Math.sqrt(delta_t2));
-
-                            let call_premium2 = ce == 1 ?
-                                cmp * distribution.cdf(d12) - fv_strike2 * distribution.cdf(d22)
-                                :
-                                fv_strike2 * distribution.cdf(-1 * d22) - cmp * distribution.cdf(-1 * d12);
-                            a = call_premium2;
-                        }
-                        else {
-                            if (ce == 1) {
-                                a = Math.max(cmp - strike, 0)
-                            } else {
-                                a = Math.max(strike - cmp, 0)
-                            };
-                        }
-                        let seconds = Math.floor((dte - date_now) / 1000),
-                            minutes = seconds / 60,
-                            hours = minutes / 60;
-                        delta_t = (hours / 24) / 365.0;
-                        let fv_strike = strike * Math.exp(-1 * int_rate * delta_t);
-                        let d1 =
-                            (Math.log(cmp / strike) + (int_rate + Math.pow(iv, 2) / 2) * delta_t) /
-                            (iv * Math.sqrt(delta_t)),
-                            d2 =
-                                (Math.log(cmp / strike) + (int_rate - Math.pow(iv, 2) / 2) * delta_t) /
-                                (iv * Math.sqrt(delta_t));
-                        let call_premium = ce == 1 ?
-                            cmp * distribution.cdf(d1) - fv_strike * distribution.cdf(d2)
-                            :
-                            fv_strike * distribution.cdf(-1 * d2) - cmp * distribution.cdf(-1 * d1);
-                        let premiumPNL = a - entryPrice;
-                        let rupeesPNL = (premiumPNL * qty).toFixed(2);
-                        row.insertCell(-1).innerHTML = rupeesPNL;
-                        let livePremiumPNL = call_premium - entryPrice;
-                        let liveRupeesPNL = (livePremiumPNL * qty).toFixed(2);
-                        row2.insertCell(-1).innerHTML = liveRupeesPNL;
-                    }
-                }
-            }
-        }, 200);
-        setTimeout(() => {
             let gt = document.getElementById('greekTable1');
             gt.innerHTML = '';
             let closest = 0;
@@ -714,7 +464,7 @@ async function posGraph(event) {
                     total.insertCell(-1).innerHTML = ((a + parseFloat(table.children[2].children[0].children[8].innerHTML)) + parseFloat(table.children[2].children[0].children[11].children[0].value)).toFixed(2);
                     total.insertCell(-1).innerHTML = ((b + parseFloat(table.children[2].children[0].children[8].innerHTML)) + parseFloat(table.children[2].children[0].children[11].children[0].value)).toFixed(2);
                 }
-                pnlArray.push([parseInt(row.children[0].innerHTML), parseInt(row.children[1].innerHTML)])
+                pnlArray.push([parseInt(row.children[0].innerHTML), parseInt(a)])
             }
             setTimeout(() => {
                 let maxCE = pnlArray[(pnlArray.length - 1)][1];
@@ -749,12 +499,39 @@ async function posGraph(event) {
                 }
                 const max = pnlArray.reduce(function (prev, current) {
                     return (prev[1] > current[1]) ? prev : current
-                })
-                console.log(max)
+                });
+                document.getElementById('profit').innerHTML = max[1];
                 const min = pnlArray.reduce(function (prev, current) {
                     return (prev[1] < current[1]) ? prev : current
-                })
-                console.log(min)
+                });
+                document.getElementById('loss').innerHTML = min[1];
+                document.getElementById('rr').innerHTML = Math.abs(max[1] / min[1]).toFixed(2);
+                strikeArray.unshift(pnlArray[0][0])
+                strikeArray.push(pnlArray[pnlArray.length - 1][0])
+                strikeArray.sort((a, b) => a - b);
+                let tempNum = 0;
+                let BE = [];
+                for (let i = 0; i < strikeArray.length; i++) {
+                    let strike = strikeArray[i];
+                    if (i == 0) {
+                        pnlArray.forEach(element => {
+                            if (element[0] == strike) {
+                                tempNum = element[1];
+                            }
+                        })
+                    } else {
+                        let prvStrike = strikeArray[i - 1];
+                        pnlArray.forEach(element => {
+                            if (Math.sign(element[1]) != Math.sign(tempNum) && tempNum != 0) {
+                                if (element[0] == strike) {
+                                    BE.push(parseInt(prvStrike + (strike - prvStrike) * (0 - tempNum) / (element[1] - tempNum)));
+                                    tempNum = element[1];
+                                }
+                            }
+                        });
+                    }
+                }
+                document.getElementById('BE').innerHTML = BE.length > 0 ? BE.toString() : '-';
             }, 200)
             function charting(chartDiv, datatable) {
                 Highcharts.chart(chartDiv, {
@@ -850,7 +627,6 @@ async function posGraph(event) {
                 });
             }
             charting('chartDiv', 'greek2');
-            // charting('chartDiv2', 'greekLive2');
         }, 1000)
     }
 }

@@ -347,7 +347,8 @@
                   <div class="row">
                      <div class="col-md-3">
                         <div class="strat-button">
-                           <button class="crypt-button-green-full" disabled id="trA">Trade All</button>
+                           <button class="crypt-button-green-full" disabled id="trA" onclick="tradeAll()">Trade
+                              All</button>
                         </div>
                      </div>
                      <div class="col-md-3">
@@ -446,7 +447,7 @@
                         </div>
                         <div class="col-md-6">
                            <div class="max-profit max-amount">
-                              <h4 class="green">2,085</h4>
+                              <h4 class="green" id="profit"></h4>
                            </div>
                         </div>
                      </div>
@@ -459,7 +460,7 @@
                         </div>
                         <div class="col-md-6">
                            <div class="max-profit max-amount">
-                              <h4 class="red">2,085</h4>
+                              <h4 class="red" id="loss"></h4>
                            </div>
                         </div>
                      </div>
@@ -472,7 +473,7 @@
                         </div>
                         <div class="col-md-6">
                            <div class="max-profit max-amount">
-                              <h4>1.4</h4>
+                              <h4 id="rr"></h4>
                            </div>
                         </div>
                      </div>
@@ -485,7 +486,7 @@
                         </div>
                         <div class="col-md-6">
                            <div class="max-profit max-amount">
-                              <h4>17108.3(0.03%)</h4>
+                              <h4 id='BE'></h4>
                            </div>
                         </div>
                      </div>

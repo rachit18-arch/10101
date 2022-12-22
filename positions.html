@@ -134,7 +134,7 @@
                   <div class="vix-input-date">
                      <input type="date" id="dte" class="input-group form-control" onchange="posGraph()">
                      <br>
-                  </div>                  
+                  </div>
                   <div class="row main-max">
                      <div class="col-md-12">
                         <div class="row">
@@ -145,7 +145,7 @@
                            </div>
                            <div class="col-md-6">
                               <div class="max-profit max-amount">
-                                 <h4 class="green">2,085</h4>
+                                 <h4 class="green" id="profit"></h4>
                               </div>
                            </div>
                         </div>
@@ -158,7 +158,7 @@
                            </div>
                            <div class="col-md-6">
                               <div class="max-profit max-amount">
-                                 <h4 class="red">2,085</h4>
+                                 <h4 class="red" id="loss"></h4>
                               </div>
                            </div>
                         </div>
@@ -171,7 +171,7 @@
                            </div>
                            <div class="col-md-6">
                               <div class="max-profit max-amount">
-                                 <h4>1.4</h4>
+                                 <h4 id="rr"></h4>
                               </div>
                            </div>
                         </div>
@@ -184,7 +184,7 @@
                            </div>
                            <div class="col-md-6">
                               <div class="max-profit max-amount">
-                                 <h4>17108.3(0.03%)</h4>
+                                 <h4 id='BE'></h4>
                               </div>
                            </div>
                         </div>
@@ -235,7 +235,7 @@
                            <th>leg 4</th>
                         </thead>
                         <tbody id="greekTable">
-   
+
                         </tbody>
                      </table>
                      <table id="greekLive" class="d-none">
@@ -247,7 +247,7 @@
                            <th>leg 4</th>
                         </thead>
                         <tbody id="liveGreekTable">
-   
+
                         </tbody>
                      </table>
                      <table id="greek2" class="d-none">
@@ -257,7 +257,7 @@
                            <th>Live</th>
                         </thead>
                         <tbody id="greekTable1">
-   
+
                         </tbody>
                      </table>
                   </div>

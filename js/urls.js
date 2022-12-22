@@ -2948,9 +2948,41 @@ async function changeStrike(event) {
 	basketMargins();
 }
 //strategy builder change strike or ce pe
+function tradeAll() {
+	let checkboxes = document.querySelectorAll("input[name='boxes']");
+	let rows = [];
+	for (let checkbox of checkboxes) {
+		let row = checkbox.parentElement.parentElement;
+		rows.push(row);
+	}
+	rows.sort((a, b) => {
+		return a.querySelector("input[name='qty']") - b.querySelector("input[name='qty']");
+	});
+	rows.forEach((row, i) => {
+		setTimeout(
+			function () {
+				let value = {
+					uid: localStorage.getItem("uid"),
+					actid: localStorage.getItem("actid"),
+					exch: 'NFO',
+					tsym: row.children[14].innerHTML,
+					qty: row.querySelector('input[name="qty"]').value,
+					prc: "0",
+					prd:
+						row.querySelector('select[name="NM"]').value == "MIS"
+							? "I"
+							: "M",
+					trantype: row.querySelector('input[name="bs"]').checked ? "B" : "S",
+					prctyp: "MKT",
+					ret: "DAY",
+				};
+				all(value, "PlaceOrder");
+			}, i * 200)
+	});
+}
+//trade all strategy builder
 function tradeS() {
 	let checkboxes = document.querySelectorAll("input[name='boxes']");
-	//console.log(checkboxes);
 	let rows = [];
 	for (let checkbox of checkboxes) {
 		if (checkbox.checked == true) {
