@@ -95,7 +95,7 @@ worker.port.addEventListener("message", function (event) {
                     parseFloat(row.children[8].innerHTML) >= 0
                         ? row.children[8].setAttribute("class", "green")
                         : row.children[8].setAttribute("class", "red");
-                    row.children[10].innerHTML = (parseFloat(row.children[7].innerHTML) - parseFloat(row.children[6].innerHTML)).toFixed(2) + " %";
+                    row.children[10].innerHTML = (parseFloat(row.children[7].innerHTML) / parseFloat(row.children[6].innerHTML) * 100).toFixed(2) + " %";
                 } else {
                     row.children[7].innerHTML = (
                         (parseFloat(row.children[6].innerHTML) -
@@ -105,7 +105,7 @@ worker.port.addEventListener("message", function (event) {
                     parseFloat(row.children[7].innerHTML) >= 0
                         ? row.children[7].setAttribute("class", "green")
                         : row.children[7].setAttribute("class", "red");
-                    row.children[9].innerHTML = (parseFloat(row.children[6].innerHTML) - parseFloat(row.children[5].innerHTML)).toFixed(2) + " %";
+                    row.children[9].innerHTML = (parseFloat(row.children[6].innerHTML) / parseFloat(row.children[5].innerHTML) * 100).toFixed(2) + " %";
                     result.oi ? PosIV(row) : null;
                 }
             }

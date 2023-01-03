@@ -352,7 +352,7 @@ async function posGraph(event) {
         }
         let vix = await all(vixValues, 'GetQuotes');
         let sigma = (liveP * (parseFloat(vix.lp) / 100) * Math.sqrt(ho / 24) / Math.sqrt(365)).toFixed(2);
-        let perce = liveP > 10000 ? 2.5 : liveP > 1000 ? 10 : 20;
+        let perce = liveP > 10000 ? 3.5 : liveP > 1000 ? 10 : 20;
         let cmp = parseInt(liveP - (sigma * perce));
         let cmpL = parseInt(liveP - (sigma * perce));
         let cmpH = parseInt(liveP + (sigma * perce));
