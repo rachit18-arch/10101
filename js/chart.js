@@ -18,7 +18,7 @@ async function stratGraph() {
         }
         let vix = await all(vixValues, 'GetQuotes');
         let sigma = (liveP * (parseFloat(vix.lp) / 100) * Math.sqrt(ho / 24) / Math.sqrt(365)).toFixed(2);
-        let perce = liveP > 10000 ? 3.5 : liveP > 1000 ? 10 : 20;
+        let perce = liveP > 10000 ? 2.5 : liveP > 1000 ? 10 : 20;
         let cmp = parseInt(liveP - (sigma * perce));
         let cmpL = parseInt(liveP - (sigma * perce));
         let cmpH = parseInt(liveP + (sigma * perce));
@@ -131,36 +131,6 @@ async function stratGraph() {
                 pnlArray.push([parseInt(row.children[0].innerHTML), parseInt(a)])
             }
             setTimeout(() => {
-                let maxCE = pnlArray[(pnlArray.length - 1)][1];
-                let maxCE_1 = pnlArray[(pnlArray.length - 2)][1];
-                let maxPE = pnlArray[0][1];
-                let maxPE_1 = pnlArray[1][1];
-                let unlimitedPPE = false;
-                let unlimitedPCE = false;
-                let unlimitedLPE = false;
-                let unlimitedLCE = false;
-
-                if (maxPE == maxPE_1 || maxPE - maxPE_1 < 100) {
-                    maxPE > 0 ?
-                        console.log('FIXED PROFIT PE') : console.log('fixed loss PE')
-                    console.log(maxPE)
-                } else if (maxPE > maxPE_1 || maxPE < maxPE_1) {
-                    maxPE > 0 ?
-                        console.log('unlimited Profit PE') : console.log('unlimited loss PE')
-                    maxPE > 0 ?
-                        unlimitedPPE = true : unlimitedLPE = true
-                    //unlimitedL = true;
-                }
-                console.log(maxCE, maxCE_1, maxPE, maxPE_1)
-                if (maxCE == maxCE_1 || maxCE - maxCE_1 < 100) {
-                    maxCE > 0 ?
-                        console.log('FIXED PROFIT CE') : console.log('fixed loss CE')
-                    console.log(maxCE)
-                }
-                else if (maxCE > maxCE_1 || maxCE < maxCE_1) {
-                    maxCE > 0 ? console.log('unlimited Profit CE') : console.log('unlimited loss CE')
-                    maxCE > 0 ? unlimitedPCE = true : unlimitedLCE = true;
-                }
                 const max = pnlArray.reduce(function (prev, current) {
                     return (prev[1] > current[1]) ? prev : current
                 })
@@ -352,7 +322,7 @@ async function posGraph(event) {
         }
         let vix = await all(vixValues, 'GetQuotes');
         let sigma = (liveP * (parseFloat(vix.lp) / 100) * Math.sqrt(ho / 24) / Math.sqrt(365)).toFixed(2);
-        let perce = liveP > 10000 ? 3.5 : liveP > 1000 ? 10 : 20;
+        let perce = liveP > 10000 ? 2.5 : liveP > 1000 ? 10 : 20;
         let cmp = parseInt(liveP - (sigma * perce));
         let cmpL = parseInt(liveP - (sigma * perce));
         let cmpH = parseInt(liveP + (sigma * perce));
@@ -464,39 +434,9 @@ async function posGraph(event) {
                     total.insertCell(-1).innerHTML = ((a + parseFloat(table.children[2].children[0].children[8].innerHTML)) + parseFloat(table.children[2].children[0].children[11].children[0].value)).toFixed(2);
                     total.insertCell(-1).innerHTML = ((b + parseFloat(table.children[2].children[0].children[8].innerHTML)) + parseFloat(table.children[2].children[0].children[11].children[0].value)).toFixed(2);
                 }
-                pnlArray.push([parseInt(row.children[0].innerHTML), parseInt(a)])
+                pnlArray.push([parseInt(row.children[0].innerHTML), a + parseFloat(table.children[2].children[0].children[8].innerHTML) + parseFloat(table.children[2].children[0].children[11].children[0].value)])
             }
             setTimeout(() => {
-                let maxCE = pnlArray[(pnlArray.length - 1)][1];
-                let maxCE_1 = pnlArray[(pnlArray.length - 2)][1];
-                let maxPE = pnlArray[0][1];
-                let maxPE_1 = pnlArray[1][1];
-                let unlimitedPPE = false;
-                let unlimitedPCE = false;
-                let unlimitedLPE = false;
-                let unlimitedLCE = false;
-
-                if (maxPE == maxPE_1 || maxPE - maxPE_1 < 100) {
-                    maxPE > 0 ?
-                        console.log('FIXED PROFIT PE') : console.log('fixed loss PE')
-                    console.log(maxPE)
-                } else if (maxPE > maxPE_1 || maxPE < maxPE_1) {
-                    maxPE > 0 ?
-                        console.log('unlimited Profit PE') : console.log('unlimited loss PE')
-                    maxPE > 0 ?
-                        unlimitedPPE = true : unlimitedLPE = true
-                    //unlimitedL = true;
-                }
-                console.log(maxCE, maxCE_1, maxPE, maxPE_1)
-                if (maxCE == maxCE_1 || maxCE - maxCE_1 < 100) {
-                    maxCE > 0 ?
-                        console.log('FIXED PROFIT CE') : console.log('fixed loss CE')
-                    console.log(maxCE)
-                }
-                else if (maxCE > maxCE_1 || maxCE < maxCE_1) {
-                    maxCE > 0 ? console.log('unlimited Profit CE') : console.log('unlimited loss CE')
-                    maxCE > 0 ? unlimitedPCE = true : unlimitedLCE = true;
-                }
                 const max = pnlArray.reduce(function (prev, current) {
                     return (prev[1] > current[1]) ? prev : current
                 });
