@@ -140,6 +140,7 @@ async function stratGraph() {
                 })
                 document.getElementById('loss').innerHTML = min[1];
                 document.getElementById('rr').innerHTML = Math.abs(max[1] / min[1]).toFixed(2);
+                document.getElementById('eROI').innerHTML = (max[1] / parseInt(document.getElementById('margin').innerHTML) * 100).toFixed(2) + '%'
                 strikeArray.unshift(pnlArray[0][0])
                 strikeArray.push(pnlArray[pnlArray.length - 1][0])
                 strikeArray.sort((a, b) => a - b);
@@ -203,7 +204,7 @@ async function stratGraph() {
                         plotLines: [{
                             color: '#FF0000', // Red
                             width: 2,
-                            value: 2014, // Position, you'll have to translate this to the values on your x axis
+                            value: parseInt(pnlArray.length / 2), // Position, you'll have to translate this to the values on your x axis
                             dashStyle: 'ShortDash'
                         }],
                         title: {
@@ -509,7 +510,7 @@ async function posGraph(event) {
                         plotLines: [{
                             color: '#FF0000', // Red
                             width: 2,
-                            value: 2014, // Position, you'll have to translate this to the values on your x axis
+                            value: parseInt(pnlArray.length / 2), // Position, you'll have to translate this to the values on your x axis
                             dashStyle: 'ShortDash'
                         }],
                         title: {
