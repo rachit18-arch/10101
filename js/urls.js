@@ -33,6 +33,8 @@ if ("susertoken" in localStorage && getCookie("loggedIn")) {
 		window.onload = options;
 	} else if (document.title === "Indices") {
 		window.onload = indices;
+	} else if (document.title === "Hedge") {
+		window.onload = hedge;
 	}
 } else {
 	alert("Not Logged In");
@@ -2075,7 +2077,8 @@ async function optionSort(oFOV) {
 			document.getElementById("gamma").innerHTML = gamma.toFixed(4);
 			document.getElementById("vega").innerHTML = vega.toFixed(3);
 		}, 1000);
-	} else {
+	}
+	else {
 		document.getElementById("strikeC").value = "30";
 		setTimeout(async () => {
 			let ltp = document.querySelector(".token");
@@ -3182,3 +3185,114 @@ function webhook(event) {
 	}, 60000);
 };
 //send position ss
+
+async function hedge() {
+	let posvalues = {
+		uid: localStorage.getItem("uid"),
+		actid: localStorage.getItem("actid"),
+	};
+	let pos = await all(posvalues, "PositionBook");
+	if (pos.stat == "Not_Ok") {
+		document.getElementById("NSEHeader").classList.add("d-none");
+		document.getElementById("noP").classList.remove("d-none");
+	} else {
+		let posLi = document.getElementById("posList");
+		posLi.innerHTML = "";
+		pos.forEach((element) => {
+			let option = document.createElement("option");
+			option.innerHTML = `${element.dname}`;
+			//option.id = element.token;
+			posLi.appendChild(option);
+		});
+		selPos(posLi)
+	}
+}
+async function selPos(s) {
+	let dname = s[s.selectedIndex].value; // get value
+	let token = s[s.selectedIndex].id; // get id
+	let posvalues = {
+		uid: localStorage.getItem("uid"),
+		actid: localStorage.getItem("actid"),
+	};
+	let pos = await all(posvalues, "PositionBook");
+	if (pos.stat == "Not_Ok") {
+		document.getElementById("NSEHeader").classList.add("d-none");
+		document.getElementById("noP").classList.remove("d-none");
+	} else {
+		pos.forEach((element) => {
+			if (element.dname.slice(0, -1) == dname && element.netqty != 0) {
+				let div = document.getElementById('tableDiv');
+				document.getElementById('type').innerHTML =
+					element.prd == "M" || element.prd == "C" ? "NRML" : "MIS";
+				document.getElementById('dname').innerHTML = element.dname;
+				document.getElementById('qty').innerHTML = element.netqty;
+				document.getElementById('avgPrice').innerHTML =
+					element.daybuyqty == "0" && element.daysellqty == "0"
+						? element.upldprc
+						: element.netavgprc;
+				document.getElementsByClassName('ltp')[0].setAttribute("id", element.token);
+				document.getElementById('strike').innerHTML = element.dname.split(" ")[2] + `&nbsp;`;
+				document.getElementById('tsym').innerHTML = element.tsym;
+				let ocvalues = {
+					uid: localStorage.getItem("uid"),
+					exch: "NFO",
+					tsym: element.tsym,
+					cnt: '2',
+					strprc: element.dname.split(" ")[2],
+				};
+				all(ocvalues, "GetOptionChain").then((ocV) => {
+					let num = ocV.values[0].tsym.match(/\d+/g);
+					let num1 = ocV.values[1].tsym.match(/\d+/g);
+					if (element.dname.split(" ")[3] == 'CE') {
+						console.log(ocV.values[2])
+						document.getElementById('dname').innerHTML = ocV.values[2].dname;
+						document.getElementById('btsym').innerHTML = ocV.values[2].tsym;
+					} else {
+						console.log(ocV.values[5])
+						document.getElementById('dname').innerHTML = ocV.values[5].dname;
+						document.getElementById('btsym').innerHTML = ocV.values[5].tsym;
+					}
+				});
+				sendMessageToSocket(`{"t":"t","k":"${element.exch}|${element.token}"}`);
+				sendMessageToSocket(`{"t":"d","k":"${element.exch}|${element.token}"}`);
+			}
+		});
+	}
+}
+function orderTimer() {
+	setInterval(async () => {
+		let posvalues = {
+			uid: localStorage.getItem("uid"),
+			actid: localStorage.getItem("actid"),
+		};
+		let pos = await all(posvalues, "PositionBook");
+		placeOrder(pos);
+	}, 1000);
+}
+async function placeOrder(pos) {
+	pos.forEach(element => {
+		if (document.getElementById("btsym").innerHTML != element.tsym) {
+			let bvalue = {
+				uid: localStorage.getItem("uid"),
+				actid: localStorage.getItem("actid"),
+				exch: "NFO",
+				tsym: document.getElementById("btsym").innerHTML,
+				qty: `${Math.abs(document.getElementById("qty").innerHTML)}`,
+				prc: '0',
+				prd: document.getElementById("type").value == "MIS" ? "I" : "M",
+				trgprc: '0',
+				trantype: "B",
+				prctyp: 'MKT',
+				ret: "DAY",
+			};
+			if (document.getElementsByClassName('ltp')[0].innerHTML > document.getElementById('buyAbove').value) {
+				bvalue.trantype = 'B';
+				all(bvalue, "PlaceOrder");
+			}
+			else if (document.getElementsByClassName('ltp')[0].innerHTML < document.getElementById('sellAbove').value) {
+				bvalue.trantype = 'S';
+				all(bvalue, "PlaceOrder");
+			}
+		}
+	});
+}
