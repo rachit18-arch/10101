@@ -3271,7 +3271,7 @@ function orderTimer() {
 }
 async function placeOrder(pos) {
 	pos.forEach(element => {
-		if (document.getElementById("btsym").innerHTML != element.tsym) {
+		if (document.getElementById("btsym").innerHTML != element.tsym && element.tsym == document.getElementById('tsym').innerHTML) {
 			let bvalue = {
 				uid: localStorage.getItem("uid"),
 				actid: localStorage.getItem("actid"),

@@ -293,8 +293,9 @@
          <div>
             <span id="dname"></span>&nbsp;
             <span id="btsym"></span>
-            <input placeholder="Buy Price" id="buyAbove" onchange="orderTimer()">
-            <input placeholder="Sell Price" id="sellBelow" onchange="orderTimer()">
+            <input placeholder="Buy Price" id="buyAbove" class="form-control" type="number" step="0.05" min="0.05">
+            <input placeholder="Sell Price" id="sellBelow" class="form-control" type="number" step="0.05" min="0.05">
+            <button onclick="orderTimer()" class="crypt-button-green-full">Start</button>
          </div>
       </div>
    </section>
