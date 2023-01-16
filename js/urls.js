@@ -3271,28 +3271,33 @@ function orderTimer() {
 }
 async function placeOrder(pos) {
 	pos.forEach(element => {
-		if (document.getElementById("btsym").innerHTML != element.tsym && element.tsym == document.getElementById('tsym').innerHTML) {
-			let bvalue = {
-				uid: localStorage.getItem("uid"),
-				actid: localStorage.getItem("actid"),
-				exch: "NFO",
-				tsym: document.getElementById("btsym").innerHTML,
-				qty: `${Math.abs(document.getElementById("qty").innerHTML)}`,
-				prc: '0',
-				prd: document.getElementById("type").value == "MIS" ? "I" : "M",
-				trgprc: '0',
-				trantype: "B",
-				prctyp: 'MKT',
-				ret: "DAY",
-			};
-			if (document.getElementsByClassName('ltp')[0].innerHTML > document.getElementById('buyAbove').value) {
-				bvalue.trantype = 'B';
-				all(bvalue, "PlaceOrder");
-			}
-			else if (document.getElementsByClassName('ltp')[0].innerHTML < document.getElementById('sellAbove').value) {
-				bvalue.trantype = 'S';
-				all(bvalue, "PlaceOrder");
-			}
+		if (document.getElementById("btsym").innerHTML != element.tsym) {
+			pos.forEach(element => {
+				if (element.tsym == document.getElementById('tsym').innerHTML) {
+					let bvalue = {
+						uid: localStorage.getItem("uid"),
+						actid: localStorage.getItem("actid"),
+						exch: "NFO",
+						tsym: document.getElementById("btsym").innerHTML,
+						qty: `${Math.abs(document.getElementById("qty").innerHTML)}`,
+						prc: '0',
+						prd: document.getElementById("type").value == "MIS" ? "I" : "M",
+						trgprc: '0',
+						trantype: "B",
+						prctyp: 'MKT',
+						ret: "DAY",
+					};
+					if (document.getElementsByClassName('ltp')[0].innerHTML > document.getElementById('buyAbove').value) {
+						bvalue.trantype = 'B';
+						all(bvalue, "PlaceOrder");
+					}
+					else if (document.getElementsByClassName('ltp')[0].innerHTML < document.getElementById('sellAbove').value) {
+						bvalue.trantype = 'S';
+						all(bvalue, "PlaceOrder");
+					}
+				}
+			});
+
 		}
 	});
 }
