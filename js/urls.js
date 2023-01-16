@@ -3270,34 +3270,42 @@ function orderTimer() {
 	}, 1000);
 }
 async function placeOrder(pos) {
-	pos.forEach(element => {
-		if (document.getElementById("btsym").innerHTML != element.tsym) {
-			pos.forEach(element => {
-				if (element.tsym == document.getElementById('tsym').innerHTML) {
-					let bvalue = {
-						uid: localStorage.getItem("uid"),
-						actid: localStorage.getItem("actid"),
-						exch: "NFO",
-						tsym: document.getElementById("btsym").innerHTML,
-						qty: `${Math.abs(document.getElementById("qty").innerHTML)}`,
-						prc: '0',
-						prd: document.getElementById("type").value == "MIS" ? "I" : "M",
-						trgprc: '0',
-						trantype: "B",
-						prctyp: 'MKT',
-						ret: "DAY",
-					};
-					if (document.getElementsByClassName('ltp')[0].innerHTML > document.getElementById('buyAbove').value) {
-						bvalue.trantype = 'B';
+	for (let i = 0; i < pos.length; i++) {
+		const elemenT = pos[i];
+		if (elemenT.tsym == document.getElementById('tsym').innerHTML) { // check for 18000 CE
+			let bvalue = {
+				uid: localStorage.getItem("uid"),
+				actid: localStorage.getItem("actid"),
+				exch: "NFO",
+				tsym: document.getElementById("btsym").innerHTML,
+				qty: `${Math.abs(document.getElementById("qty").innerHTML)}`,
+				prc: '0',
+				prd: document.getElementById("type").value == "MIS" ? "I" : "M",
+				trgprc: '0',
+				trantype: "B",
+				prctyp: 'MKT',
+				ret: "DAY",
+			};
+			for (let j = 0; j < pos.length; j++) {
+				const element = pos[j];
+				if (document.getElementById("btsym").innerHTML == element.tsym) { // check for 17900
+					if (document.getElementsByClassName('ltp')[0].innerHTML > document.getElementById('buyAbove').value && element.netqty == '0') {
+						bvalue.trantype = 'B'; // check for qty == 0 and 18000 value > fixed value
 						all(bvalue, "PlaceOrder");
 					}
-					else if (document.getElementsByClassName('ltp')[0].innerHTML < document.getElementById('sellAbove').value) {
+					else if (document.getElementsByClassName('ltp')[0].innerHTML < document.getElementById('sellAbove').value && element.netqty > '0') {
 						bvalue.trantype = 'S';
 						all(bvalue, "PlaceOrder");
 					}
 				}
-			});
-
+				else {
+					if (document.getElementsByClassName('ltp')[0].innerHTML > document.getElementById('buyAbove').value) {
+						bvalue.trantype = 'B';
+						all(bvalue, "PlaceOrder");
+						break;
+					}
+				}
+			}
 		}
-	});
+	}
 }
