@@ -3293,7 +3293,7 @@ async function placeOrder(pos) {
 						bvalue.trantype = 'B'; // check for qty == 0 and 18000 value > fixed value
 						all(bvalue, "PlaceOrder");
 					}
-					else if (document.getElementsByClassName('ltp')[0].innerHTML < document.getElementById('sellAbove').value && element.netqty > '0') {
+					else if (document.getElementsByClassName('ltp')[0].innerHTML < document.getElementById('sellBelow').value && element.netqty > '0') {
 						bvalue.trantype = 'S';
 						all(bvalue, "PlaceOrder");
 					}
