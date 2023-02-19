@@ -3209,7 +3209,6 @@ async function hedge() {
 }
 async function selPos(s) {
 	let dname = s[s.selectedIndex].value; // get value
-	let token = s[s.selectedIndex].id; // get id
 	let posvalues = {
 		uid: localStorage.getItem("uid"),
 		actid: localStorage.getItem("actid"),
@@ -3241,16 +3240,14 @@ async function selPos(s) {
 					strprc: element.dname.split(" ")[2],
 				};
 				all(ocvalues, "GetOptionChain").then((ocV) => {
-					let num = ocV.values[0].tsym.match(/\d+/g);
-					let num1 = ocV.values[1].tsym.match(/\d+/g);
 					if (element.dname.split(" ")[3] == 'CE') {
-						console.log(ocV.values[2])
-						document.getElementById('dname').innerHTML = ocV.values[2].dname;
+						document.getElementsByClassName('bdtoken')[0].id = ocV.values[2].token;
 						document.getElementById('btsym').innerHTML = ocV.values[2].tsym;
+						sendMessageToSocket(`{"t":"t","k":"${ocV.values[2].exch}|${ocV.values[2].token}"}`);
 					} else {
-						console.log(ocV.values[5])
-						document.getElementById('dname').innerHTML = ocV.values[5].dname;
+						document.getElementsByClassName('bdtoken')[0].id = ocV.values[5].token;
 						document.getElementById('btsym').innerHTML = ocV.values[5].tsym;
+						sendMessageToSocket(`{"t":"t","k":"${ocV.values[2].exch}|${ocV.values[2].token}"}`);
 					}
 				});
 				sendMessageToSocket(`{"t":"t","k":"${element.exch}|${element.token}"}`);
@@ -3272,7 +3269,7 @@ function orderTimer() {
 async function placeOrder(pos) {
 	for (let i = 0; i < pos.length; i++) {
 		const elemenT = pos[i];
-		if (elemenT.tsym == document.getElementById('tsym').innerHTML) { // check for 18000 CE
+		if (elemenT.tsym == document.getElementById('tsym').innerHTML) {
 			let bvalue = {
 				uid: localStorage.getItem("uid"),
 				actid: localStorage.getItem("actid"),
@@ -3282,28 +3279,27 @@ async function placeOrder(pos) {
 				prc: '0',
 				prd: document.getElementById("type").value == "MIS" ? "I" : "M",
 				trgprc: '0',
-				trantype: "B",
 				prctyp: 'MKT',
 				ret: "DAY",
 			};
-			for (let j = 0; j < pos.length; j++) {
-				const element = pos[j];
-				if (document.getElementById("btsym").innerHTML == element.tsym) { // check for 17900
-					if (document.getElementsByClassName('ltp')[0].innerHTML > document.getElementById('buyAbove').value && element.netqty == '0') {
-						bvalue.trantype = 'B'; // check for qty == 0 and 18000 value > fixed value
-						all(bvalue, "PlaceOrder");
-					}
-					else if (document.getElementsByClassName('ltp')[0].innerHTML < document.getElementById('sellBelow').value && element.netqty > '0') {
-						bvalue.trantype = 'S';
-						all(bvalue, "PlaceOrder");
-					}
+			let buyArray = pos.filter(function (element) {
+				return document.getElementById("btsym").innerHTML == element.tsym;
+			})
+			if (buyArray.length > 0) {
+				let element = buyArray[0];
+				if (parseFloat(document.getElementsByClassName('ltp')[0].innerHTML) > document.getElementById('buyAbove').value && element.netqty == '0') {
+					bvalue.trantype = 'B';
+					all(bvalue, "PlaceOrder");
 				}
-				else {
-					if (document.getElementsByClassName('ltp')[0].innerHTML > document.getElementById('buyAbove').value) {
-						bvalue.trantype = 'B';
-						all(bvalue, "PlaceOrder");
-						break;
-					}
+				else if (parseFloat(document.getElementsByClassName('ltp')[0].innerHTML) < document.getElementById('sellBelow').value && element.netqty > '0') {
+					bvalue.trantype = 'S';
+					all(bvalue, "PlaceOrder");
+				}
+			}
+			else {
+				if (parseFloat(document.getElementsByClassName('ltp')[0].innerHTML) > document.getElementById('buyAbove').value) {
+					bvalue.trantype = 'B';
+					all(bvalue, "PlaceOrder");
 				}
 			}
 		}
