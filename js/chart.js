@@ -302,12 +302,12 @@ function PosIV(row) {
     row.children[10].innerHTML = (volt * 100).toFixed(2);
 }
 
-async function posGraph(event) {
+async function posGraph(posGB) {
     if (document.getElementById('dte').value == "") {
         alert("Select Payoff Date")
     }
     else {
-        let table = event.target.parentElement.parentElement.parentElement.parentElement;
+        let table = posGB.parentElement.parentElement.parentElement.parentElement;
         let liveP = parseInt(table.parentElement.children[0].children[1].innerHTML);
         let date_expiry = new Date(document.getElementById('dte').value.replaceAll('-', '/'));
         date_expiry.setHours(15, 30, 0, 0)

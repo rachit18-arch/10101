@@ -1,9 +1,9 @@
 let worker = new SharedWorker("./js/worker.js");
 let rejected = 0;
 let completed = 0;
-worker.port.addEventListener("message", function (event) {
-    let result = event.data;
-    let a = event.data.s;
+worker.port.addEventListener("message", function (msg) {
+    let result = msg.data;
+    let a = msg.data.s;
     document.getElementsByClassName("dot")[0].style.backgroundColor =
         "#55ad82";
     if (a == 'OK' && a != undefined) {

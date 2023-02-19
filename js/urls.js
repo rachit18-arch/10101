@@ -334,8 +334,8 @@ async function chart(element, iT, tex) {
 			button.style.color = "#4c525e";
 		});
 		//
-		worker.port.addEventListener("message", function (event) {
-			let result = event.data;
+		worker.port.addEventListener("message", function (msg) {
+			let result = msg.data;
 			if (result.tk == iT) {
 				if (result.lp == undefined) {
 					null;
@@ -674,7 +674,7 @@ async function pos() {
 					cell2.classList.add("bg-secondary");
 					row.insertCell(
 						2
-					).innerHTML = `<button class="convert" onclick = "convert(event)"><i class="fa-solid fa-rotate"></i></button> <button class="exit" onclick = "exit(event)"><i class="fa-solid fa-xmark"></i></button>`; //modify
+					).innerHTML = `<button class="convert" onclick = "convert(this)"><i class="fa-solid fa-rotate"></i></button> <button class="exit" onclick = "exit(this)"><i class="fa-solid fa-xmark"></i></button>`; //modify
 					row.insertCell(3).innerHTML = element.dname ? element.dname : element.tsym;
 					row.insertCell(4).innerHTML = element.exch;
 					row.insertCell(5).innerHTML = element.netqty;
@@ -804,8 +804,8 @@ async function pos() {
 								title: element.netqty,
 							};
 							candleSeries.createPriceLine(avgPriceLine);
-							worker.port.addEventListener("message", function (event) {
-								let result = event.data;
+							worker.port.addEventListener("message", function (msg) {
+								let result = msg.data;
 								if (result.tk == element.token) {
 									if (result.lp == undefined) {
 										null;
@@ -914,7 +914,7 @@ async function pos() {
 function table(element) {
 	let div = document.createElement('div');
 	let infoDiv = document.createElement('div');
-	infoDiv.setAttribute('onclick', 'hideTables(event)');
+	infoDiv.setAttribute('onclick', 'hideTables(this)');
 	infoDiv.setAttribute('class', 'order-head')
 	let nameSpan = document.createElement('span');
 	nameSpan.innerHTML = element[1] + ` `;
@@ -926,7 +926,7 @@ function table(element) {
 	let tbody = document.createElement('tbody');
 	table.appendChild(tbody);
 	let row = thead.insertRow();
-	row.innerHTML = `<th><input id="topCB" type="checkbox" name="click" onclick="checkAll(event)"></th>
+	row.innerHTML = `<th><input id="topCB" type="checkbox" name="click" onclick="checkAll(this)"></th>
 	<th>Product</th>
 	<th>Convert</th>
 	<th>Script</th>
@@ -962,7 +962,7 @@ function table(element) {
 		cell2.classList.add("bg-secondary");
 		row.insertCell(
 			2
-		).innerHTML = `<button class="convert" onclick = "convert(event)"><i class="fa-solid fa-rotate"></i></button> <button class="exit" onclick = "exit(event)"><i class="fa-solid fa-xmark"></i></button>`; //modify
+		).innerHTML = `<button class="convert" onclick = "convert(this)"><i class="fa-solid fa-rotate"></i></button> <button class="exit" onclick = "exit(this)"><i class="fa-solid fa-xmark"></i></button>`; //modify
 		row.insertCell(3).innerHTML = element.dname;
 		row.insertCell(4).innerHTML = element.netqty;
 		row.insertCell(5).innerHTML =
@@ -1004,13 +1004,13 @@ function table(element) {
 	   <td><button id="eSB" class="d-none" onclick="exitS()">Exit</button></td>
 	   <td></td>
 	   <td></td>
-	   <td><input class="form-control" placeholder="Discord Api" onchange="webhook(event)"></td>
+	   <td><input class="form-control" placeholder="Discord Api" onchange="webhook(this)"></td>
 	   <td></td>
 	   <td>Total</td>
 	   <td></td>
 	   <td></td>
 	   <td></td>
-	   <td><button onclick="posGraph(event)" class="graphbutton" >Graph</button></td>
+	   <td><button onclick="posGraph(this)" class="graphbutton" >Graph</button></td>
 	   <td></td>
 	   <td style="width: 8%;"><input type="number" class="form-control" value="0"
 			 style="width:80%;margin:auto;"></td>
@@ -1050,12 +1050,12 @@ function table(element) {
 	);
 }
 //add NFO tables
-function hideTables(event) {
+function hideTables(posTables) {
 	let tables = document.querySelectorAll('table');
 	tables.forEach(element => {
 		element.classList.add('d-none');
 	});
-	let table = event.target.parentElement.nextElementSibling;
+	let table = posTables.parentElement.nextElementSibling;
 	table.classList.remove('d-none');
 }
 //hide Other Tables in Positions
@@ -1091,7 +1091,7 @@ async function order() {
 				row.insertCell(8).innerHTML = element.norenordno;
 				row.insertCell(
 					9
-				).innerHTML = `<button class="or-cancel" onclick='cancel(event)'><i class="fa-solid fa-xmark"></i></button>`;
+				).innerHTML = `<button class="or-cancel" onclick='cancel(this)'><i class="fa-solid fa-xmark"></i></button>`;
 			} else {
 				document.getElementById("COTable").classList.remove("d-none");
 				let row = COtbody.insertRow(0);
@@ -1240,8 +1240,8 @@ async function options() {
 
 }
 //oc
-function convert(event) {
-	let row = event.target.parentNode.parentNode.parentNode;
+function convert(convertB) {
+	let row = convertB.parentNode.parentNode.parentNode;
 	let exch = row.parentElement.id == "posBody" ? "Other" : "NFO"
 	let convertValues = {
 		uid: localStorage.getItem("uid"),
@@ -1290,8 +1290,8 @@ function show() {
 	}
 }
 // show exit button
-function checkAll(event) {
-	if (event.target.checked == true) {
+function checkAll(boxes) {
+	if (boxes.checked == true) {
 		let checkboxes = document.getElementsByClassName("cb");
 		for (let checkbox of checkboxes) {
 			checkbox.checked = true;
@@ -1350,13 +1350,14 @@ async function exitS() {
 	}, 200);
 }
 //exit selected
-function exit(event) {
-	let row = event.target.parentElement.parentElement.parentElement;
+
+function exit(exitButton) {
+	let row = exitButton.parentElement.parentElement.parentElement;
 	let buttons = document.getElementById("exitP");
 	buttons.style.zIndex = 100;
-	buttons.style.top = `${event.target.getBoundingClientRect().top + window.scrollY - 10
+	buttons.style.top = `${exitButton.getBoundingClientRect().top + window.scrollY - 10
 		}px`;
-	buttons.style.left = `${event.target.getBoundingClientRect().left + window.scrollX
+	buttons.style.left = `${exitButton.getBoundingClientRect().left + window.scrollX
 		}px`;
 	buttons.style.position = "absolute";
 	buttons.style.width = "100%";
@@ -1427,14 +1428,14 @@ function exitB() {
 }
 //exit button in position popup
 let timeOut = null;
-function buttons(event) {
+function buttons(button) {
 	let buttons = document.getElementsByClassName("buttons")[0];
 	buttons.classList.remove("d-none");
-	buttons.style.top = `${event.target.getBoundingClientRect().top + window.scrollY + 5
+	buttons.style.top = `${button.getBoundingClientRect().top + window.scrollY + 5
 		}px`;
-	buttons.style.left = `${event.target.getBoundingClientRect().left + window.scrollX + 20
+	buttons.style.left = `${button.getBoundingClientRect().left + window.scrollX + 20
 		}px`;
-	buttons.setAttribute("id", event.target.id);
+	buttons.setAttribute("id", button.id);
 	clearTimeout(timeOut);
 	timeOut = setTimeout(function () {
 		document.getElementsByClassName("buttons")[0].classList.add("d-none");
@@ -1475,8 +1476,8 @@ async function sell() {
 	await all(svalue, "PlaceOrder");
 }
 // sell button in dashboard
-async function cancel(event) {
-	let row = event.target.parentNode.parentNode.parentNode;
+async function cancel(cancelB) {
+	let row = cancelB.parentNode.parentNode.parentNode;
 	let Oid = row.children[8].innerHTML;
 	let cValues = {
 		norenordno: Oid,
@@ -1498,8 +1499,8 @@ async function indices() {
 	sendMessageToSocket(`{"t":"t","k":"BSE|1"}`);
 }
 // indices
-async function b(event) {
-	let token = await event.target.parentElement.id;
+async function b(buyButton) {
+	let token = await buyButton.parentElement.id;
 	let getsc = {
 		uid: localStorage.getItem("uid"),
 		exch: "NFO",
@@ -1519,35 +1520,11 @@ async function b(event) {
 		document.getElementById("bbutton").removeAttribute("disabled");
 		chart("bchart", sc.token, "NFO");
 		getMarginB();
-	} else if (document.title == 'Option Chain') {
-		let buttons = document.getElementById("exitP");
-		buttons.style.zIndex = 1000;
-		buttons.style.top = `${event.target.getBoundingClientRect().top + window.scrollY - 10
-			}px`;
-		buttons.style.left = `${event.target.getBoundingClientRect().left + window.scrollX
-			}px`;
-		buttons.style.position = "absolute";
-		buttons.style.width = "100%";
-		buttons.classList.remove("d-none");
-		document.getElementById("qtyB").step = sc.ls;
-		document.getElementById("qtyB").min = sc.ls;
-		document.getElementById("qtyB").value = sc.ls;
-		event.target.innerHTML == 'B' ?
-			document.getElementById("qtyB").classList.add("green") : null;
-		event.target.innerHTML == 'B' ?
-			document.getElementById("qtyB").classList.remove("red") : null;
-		document.getElementById("tsym").innerHTML = sc.tsym;
-		document.getElementById("exch").innerHTML = sc.exch;
-		//document.getElementById("prdtype").innerHTML = row.children[1].innerHTML;
-		clearTimeout(timeOut);
-		timeOut = setTimeout(() => {
-			buttons.classList.add("d-none");
-		}, 3000);
 	}
 }
 //set buy chart div, buy div
-async function s(event) {
-	let token = event.target.parentElement.id;
+async function s(sellButton) {
+	let token = sellButton.parentElement.id;
 	let getsc = {
 		uid: localStorage.getItem("uid"),
 		exch: "NFO",
@@ -1567,29 +1544,6 @@ async function s(event) {
 		chart("schart", sc.token, "NFO");
 		sendMessageToSocket(`{ "t": "t", "k": "NFO|${sc.token}" }`);
 		getMarginS();
-	} else if (document.title == 'Option Chain') {
-		let buttons = document.getElementById("exitP");
-		buttons.style.zIndex = 1000;
-		buttons.style.top = `${event.target.getBoundingClientRect().top + window.scrollY - 10
-			}px`;
-		buttons.style.left = `${event.target.getBoundingClientRect().left
-			}px`;
-		buttons.style.position = "absolute";
-		//buttons.style.width = "100%";
-		buttons.classList.remove("d-none");
-		document.getElementById("qtyB").step = sc.ls;
-		document.getElementById("qtyB").min = sc.ls;
-		document.getElementById("qtyB").value = sc.ls;
-		event.target.innerHTML == 'S' ?
-			document.getElementById("qtyB").classList.add("red") : null;
-		event.target.innerHTML == 'S' ?
-			document.getElementById("qtyB").classList.remove("green") : null;
-		document.getElementById("tsym").innerHTML = sc.tsym;
-		document.getElementById("exch").innerHTML = sc.exch;
-		clearTimeout(timeOut);
-		timeOut = setTimeout(() => {
-			buttons.classList.add("d-none");
-		}, 3000);
 	}
 }
 //set sell chart div, sell div
@@ -2330,10 +2284,10 @@ async function optionSort(oFOV) {
 					let cell1 = row.insertCell(0); //ce ltp
 					let cell2 = row.insertCell(1); //strike
 					let cell3 = row.insertCell(2); //pe ltp
-					cell1.setAttribute("onmouseenter", "buttons(event)");
+					cell1.setAttribute("onmouseenter", "buttons(this)");
 					cell2.setAttribute("id", element.strprc);
 					cell2.innerHTML = element.strprc;
-					cell3.setAttribute("onmouseenter", "buttons(event)");
+					cell3.setAttribute("onmouseenter", "buttons(this)");
 					element.strprc == atm.strprc ? row.setAttribute("class", "atm") : "";
 				});
 				ocV.values.forEach((element) => {
@@ -2598,10 +2552,10 @@ async function changeExp() {
 			let cell1 = row.insertCell(0); //ce ltp
 			let cell2 = row.insertCell(1); //strike
 			let cell3 = row.insertCell(2); //pe ltp
-			cell1.setAttribute("onmouseenter", "buttons(event)");
+			cell1.setAttribute("onmouseenter", "buttons(this)");
 			cell2.setAttribute("id", element.strprc);
 			cell2.innerHTML = element.strprc;
-			cell3.setAttribute("onmouseenter", "buttons(event)");
+			cell3.setAttribute("onmouseenter", "buttons(this)");
 			element.strprc == atm.strprc ? row.setAttribute("class", "atm") : "";
 		});
 		ocV.values.forEach((element) => {
@@ -2795,7 +2749,7 @@ async function addLeg() {
 	row.innerHTML += `
 			<td>
 			<label class="toggle">
-				<input type="checkbox" name="bs" onchange="changeStrike(event)">
+				<input type="checkbox" name="bs" onchange="changeStrike(this)">
 					<span class="labels" data-on="B" data-off="S"></span>
 			</label>
 </td> `;
@@ -2807,13 +2761,13 @@ async function addLeg() {
 		<td>
 		<div class="input-group mb-3">
 			<input type="number" class="form-control" value="${document.getElementById('strikeP').innerHTML}"
-				step="${document.getElementById('diff').innerHTML}" onchange="changeStrike(event)" name="strike">
+				step="${document.getElementById('diff').innerHTML}" onchange="changeStrike(this)" name="strike">
 		</div>
 </td> `;
 	row.innerHTML += `
 		<td>
 		<label class="toggle">
-			<input type="checkbox" name="cepe" onchange="changeStrike(event)">
+			<input type="checkbox" name="cepe" onchange="changeStrike(this)">
 				<span class="labels" data-on="CE" data-off="PE"></span>
 		</label>
 </td> `;
@@ -2854,7 +2808,7 @@ async function addLeg() {
 	row.innerHTML += `
 		<td>
 		<span class="badge bg-secondary strat-badge"
-			onclick="event.target.parentElement.parentElement.remove()">DEL</span>
+			onclick="this.parentElement.parentElement.remove()">DEL</span>
 </td> `;
 	sendMessageToSocket(`{ "t": "t", "k": "NFO|${scripts.values[0].token}" } `);
 	row.classList.add('strat-inner');
@@ -2933,8 +2887,8 @@ async function findGreek(row) {
 		put_rho = (-1 * fv_strike * delta_t * distribution.cdf(-1 * d2)) / 100;
 }
 //find iv in oi table
-async function changeStrike(event) {
-	let row = event.target.parentElement.parentElement.parentElement;
+async function changeStrike(strikeList) {
+	let row = strikeList.parentElement.parentElement.parentElement;
 	let scriptN = document.getElementById('name').innerHTML;
 	let scriptName = scriptN.slice(-4) == '-EQ ' ? scriptN.substring(0, scriptN.length - 4) : scriptN;
 	let svalues = {
@@ -3129,8 +3083,8 @@ async function roi() {
 	}
 }
 //roi calculator
-function changeDiv(event) {
-	let button = event.target.innerHTML;
+function changeDiv(buttons) {
+	let button = buttons.innerHTML;
 	if (button == "Table") {
 		document.getElementById("tableDiv").classList.remove('d-none')
 		document.getElementById("decayS").classList.add('d-none')
@@ -3148,7 +3102,7 @@ function changeDiv(event) {
 	}
 }
 //change OI div
-function webhook(event) {
+function webhook(discordUrl) {
 	function dataURLtoFile(dataurl, filename) {
 		let arr = dataurl.split(','),
 			mime = arr[0].match(/:(.*?);/)[1],
@@ -3161,7 +3115,7 @@ function webhook(event) {
 		return new File([u8arr], filename, { type: mime });
 	}
 	setInterval(() => {
-		htmlToImage.toJpeg(event.target.parentElement.parentElement.parentElement.parentElement)
+		htmlToImage.toJpeg(discordUrl.parentElement.parentElement.parentElement.parentElement)
 			.then(function (dataUrl) {
 				//let img = canvas.toDataURL("image/png");
 				let formdata1 = new FormData();
@@ -3177,7 +3131,7 @@ function webhook(event) {
 					method: 'POST',
 					body: formdata1,
 				};
-				fetch(event.target.value, requestOptions)
+				fetch(discordUrl.value, requestOptions)
 					.then(response => response.text())
 					.then(result => null)
 					.catch(error => console.log('error', error));

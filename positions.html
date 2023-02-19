@@ -74,13 +74,13 @@
          <div class="row">
             <div class="tab-content">
                <div id="NSEHeader">
-                  <div onclick="hideTables(event)" class="row">
+                  <div onclick="hideTables(this)" class="row">
                      <div class="order-head">Other Exchanges</div>
                   </div>
                   <table class="table table-striped position-table d-none" id="posTable">
                      <thead>
                         <tr>
-                           <th><input id="topCB" type="checkbox" name="click" onclick="checkAll(event)"></th>
+                           <th><input id="topCB" type="checkbox" name="click" onclick="checkAll(this)"></th>
                            <th>Product</th>
                            <th>Convert</th>
                            <th>Script</th>
@@ -102,7 +102,7 @@
                            <td><button id="eSB" class="d-none" onclick="exitS()">Exit</button></td>
                            <td></td>
                            <td></td>
-                           <td><input onchange="webhook(event)" class="form-control" placeholder="Discord Api" required>
+                           <td><input onchange="webhook(this)" class="form-control" placeholder="Discord Api" required>
                            </td>
                            <td>M Used</td>
                            <td id="margin"></td>
