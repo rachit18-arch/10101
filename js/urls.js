@@ -1055,7 +1055,7 @@ function hideTables(posTables) {
 	tables.forEach(element => {
 		element.classList.add('d-none');
 	});
-	let table = posTables.parentElement.nextElementSibling;
+	let table = posTables.nextElementSibling;
 	table.classList.remove('d-none');
 }
 //hide Other Tables in Positions
@@ -1477,7 +1477,7 @@ async function sell() {
 }
 // sell button in dashboard
 async function cancel(cancelB) {
-	let row = cancelB.parentNode.parentNode.parentNode;
+	let row = cancelB.parentNode.parentNode;
 	let Oid = row.children[8].innerHTML;
 	let cValues = {
 		norenordno: Oid,
