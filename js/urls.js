@@ -54,317 +54,6 @@ function all(values, reply) {
 		});
 }
 // request handler
-async function chart(element, iT, tex) {
-	let timeValues = {
-		uid: localStorage.getItem("uid"),
-		exch: `${tex}`,
-		token: `${iT}`,
-		st: `${Math.round((Date.now() - 3456000000) / 1000)}`,
-		et: `${Math.round(Date.now() / 1000)}`,
-	};
-	let c1M = await all(timeValues, "TPSeries");
-	timeValues.intrv = "5";
-	let c5M = await all(timeValues, "TPSeries");
-	timeValues.intrv = "15";
-	let c15M = await all(timeValues, "TPSeries");
-	timeValues.intrv = "30";
-	let c30M = await all(timeValues, "TPSeries");
-	timeValues.intrv = "60";
-	let c60M = await all(timeValues, "TPSeries");
-
-	async function reversePrice(ohlcs) {
-		let chartdata = await ohlcs.map((ohlc) => {
-			let timestamp = new Date(ohlc.ssboe * 1000).getTime() / 1000;
-			//open: parseFloat(ohlc.into), high: parseFloat(ohlc.inth), low: parseFloat(ohlc.intl), close: parseFloat(ohlc.intc)
-			//value: parseFloat(ohlc.intc)
-			return {
-				time: timestamp + 19800,
-				open: parseFloat(ohlc.into),
-				high: parseFloat(ohlc.inth),
-				low: parseFloat(ohlc.intl),
-				close: parseFloat(ohlc.intc),
-			};
-		});
-		return chartdata.reverse();
-	}
-	async function reverseVol(ohlcs) {
-		let chartdata = await ohlcs.map((ohlc) => {
-			let timestamp = new Date(ohlc.ssboe * 1000).getTime() / 1000;
-			//open: parseFloat(ohlc.into), high: parseFloat(ohlc.inth), low: parseFloat(ohlc.intl), close: parseFloat(ohlc.intc)
-			//value: parseFloat(ohlc.intc)
-			return {
-				time: timestamp + 19800,
-				value: ohlc.oi,
-			};
-		});
-		return chartdata.reverse();
-	}
-
-	if (c1M.stat == "Not_Ok") {
-		const chartDiv = document.getElementById(`${element}`);
-		chartDiv.innerHTML = "No Data";
-		chartDiv.style.color = "white";
-		let legend = chartDiv.nextElementSibling;
-		legend.innerHTML = "";
-		let switcherElement = legend.nextElementSibling;
-		switcherElement.innerHTML = "";
-		let button = switcherElement.nextElementSibling;
-		button.innerHTML = "";
-	} else {
-		const chartProperties1 = {
-			width: 750,
-			height: 290,
-			timeScale: {
-				timeVisible: true,
-				secondsVisible: true,
-			},
-			layout: {
-				textColor: "#ffffff",
-				backgroundColor: "#000000", //"rgba(120, 123, 134, 1)", rgba(93, 96, 107, 1)
-			},
-			rightPriceScale: {
-				scaleMargins: {
-					top: 0.3,
-					bottom: 0.25,
-				},
-			},
-			grid: {
-				vertLines: {
-					color: "rgba(120, 123, 134, 1)",
-					visible: false,
-				},
-				horzLines: {
-					color: "rgba(120, 123, 134, 1)",
-					visible: false,
-				},
-			},
-			crosshair: {
-				mode: LightweightCharts.CrosshairMode.Normal,
-				vertLine: {
-					color: "#fff",
-				},
-				horzLine: {
-					color: "#fff",
-				},
-			},
-		};
-		const chartDiv = document.getElementById(`${element}`);
-		chartDiv.innerHTML = "";
-		const chart = LightweightCharts.createChart(chartDiv, chartProperties1);
-
-		let p1M = await reversePrice(c1M);
-		let p5M = await reversePrice(c5M);
-		let p15M = await reversePrice(c15M);
-		let p30M = await reversePrice(c30M);
-		let p60M = await reversePrice(c60M);
-		let v1M = await reverseVol(c1M);
-		let v5M = await reverseVol(c5M);
-		let v15M = await reverseVol(c15M);
-		let v30M = await reverseVol(c30M);
-		let v60M = await reverseVol(c60M);
-		////// data feed
-		const renderOHLC = (price, vol) => {
-			const { open, high, low, close } = price;
-			let coloredValues = `<p>O<span class="${open > close ? "red" : "green"
-				}">${open}</span> H<span class="${open > close ? "red" : "green"
-				}">${high}</span> L<span class="${open > close ? "red" : "green"
-				}">${low}</span> C<span class="${open > close ? "red" : "green"
-				}">${close}</span> <span>OI ${vol}</span> </p>`;
-			legend.children[1].innerHTML = coloredValues;
-		};
-		let ohlcValues = null;
-		let volValues = null;
-		chart.subscribeCrosshairMove((param) => {
-			ohlcValues = param.seriesPrices.get(priceSeries);
-			volValues = param.seriesPrices.get(volSeries);
-			ohlcValues ? renderOHLC(ohlcValues, volValues) : null;
-		});
-		let legend = chartDiv.nextElementSibling;
-		legend.style.display = "block";
-		legend.style.position = "absolute";
-		legend.style.zIndex = "15";
-		legend.style.left = `${chartDiv.getBoundingClientRect().left + window.scrollX + 20
-			}px`;
-		legend.style.top = `${chartDiv.getBoundingClientRect().top + 2}px`;
-		legend.style.zIndex = "50";
-		legend.innerHTML =
-			'<div style="font-size: 20px; margin: 4px 0px; color: #fff">' +
-			element.toUpperCase() +
-			" <span id=" +
-			iT +
-			"></span></div><div></div>";
-		///////// switcher
-		function createSimpleSwitcher(
-			items,
-			activeItem,
-			activeItemChangedCallback
-		) {
-			let switcherElement = legend.nextElementSibling;
-			switcherElement.innerHTML = "";
-			let intervalElements = items.map(function (item) {
-				let itemEl = document.createElement("button");
-				itemEl.innerText = item;
-				itemEl.classList.add("switcher-item");
-				itemEl.classList.toggle("switcher-active-item", item === activeItem);
-				itemEl.addEventListener("click", function () {
-					onItemClicked(item);
-				});
-				switcherElement.appendChild(itemEl);
-				return itemEl;
-			});
-			function onItemClicked(item) {
-				if (item === activeItem) {
-					return;
-				}
-				intervalElements.forEach(function (element, index) {
-					element.classList.toggle(
-						"switcher-active-item",
-						items[index] === item
-					);
-				});
-				activeItem = item;
-				activeItemChangedCallback(item);
-			}
-			return switcherElement;
-		}
-		let intervals = ["1M", "5M", "15M", "30M", "60M"];
-		let priceData = new Map([
-			["1M", p1M],
-			["5M", p5M],
-			["15M", p15M],
-			["30M", p30M],
-			["60M", p60M],
-		]);
-		let volData = new Map([
-			["1M", v1M],
-			["5M", v5M],
-			["15M", v15M],
-			["30M", v30M],
-			["60M", v60M],
-		]);
-		let switcherElement = createSimpleSwitcher(
-			intervals,
-			intervals[0],
-			syncToInterval
-		);
-		let priceSeries = null;
-		let volSeries = null;
-		function syncToInterval(interval) {
-			if (priceSeries || volSeries) {
-				chart.removeSeries(priceSeries);
-				chart.removeSeries(volSeries);
-			}
-			priceSeries = chart.addCandlestickSeries({
-				upColor: "#FFFFFF",
-				downColor: "#4dd0e1",
-				borderDownColor: "#4dd0e1",
-				borderUpColor: "#FFFFFF",
-				wickDownColor: "#4dd0e1",
-				wickUpColor: "#4dd0e1",
-			});
-			volSeries = chart.addLineSeries({
-				color: "black",
-				priceFormat: {
-					type: "volume",
-				},
-				priceScaleId: "",
-				scaleMargins: {
-					top: 0.8,
-					bottom: 0.02,
-				},
-			});
-			priceSeries.setData(priceData.get(interval));
-			volSeries.setData(volData.get(interval));
-		}
-		syncToInterval(intervals[0]);
-		//////////////////////////
-		let lastIndex = c1M.length - 1;
-		let currentIndex = lastIndex + 1;
-		let currentBar = {
-			open: null,
-			high: null,
-			low: null,
-			close: null,
-			time: Math.round(Date.now() / 1000) + 19800,
-		};
-		let currentVol = {
-			value: null,
-			time: Math.round(Date.now() / 1000) + 19800,
-		};
-		function mergeTickToBar(result) {
-			if (currentBar.open === null) {
-				currentBar.open = result.lp;
-				currentBar.high = result.lp;
-				currentBar.low = result.lp;
-				currentBar.close = result.lp;
-			} else {
-				currentBar.close = result.lp;
-				currentBar.high = Math.max(currentBar.high, result.lp);
-				currentBar.low = Math.min(currentBar.low, result.lp);
-			}
-			if (result.oi) {
-				currentVol.value = result.oi;
-				volSeries.update(currentVol);
-			}
-			priceSeries.update(currentBar);
-		}
-		/// button
-		let button = switcherElement.nextElementSibling;
-		button.style.left =
-			chartDiv.getBoundingClientRect().left + window.scrollX + 500 + "px";
-		button.style.top =
-			chartDiv.getBoundingClientRect().top + window.scrollY + 230 + "px";
-		button.style.color = "#4c525e";
-		button.innerHTML =
-			'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M6.5 1.5l5 5.5-5 5.5M3 4l2.5 3L3 10"></path></svg>';
-		let timeScale = chart.timeScale();
-		timeScale.subscribeVisibleTimeRangeChange(function () {
-			let buttonVisible = timeScale.scrollPosition() < 0;
-			button.style.display = buttonVisible ? "block" : "none";
-		});
-		button.addEventListener("click", function () {
-			timeScale.scrollToRealTime();
-		});
-		button.addEventListener("mouseover", function () {
-			button.style.background = "rgba(250, 250, 250, 1)";
-			button.style.color = "#000";
-		});
-		button.addEventListener("mouseout", function () {
-			button.style.background = "rgba(250, 250, 250, 0.6)";
-			button.style.color = "#4c525e";
-		});
-		//
-		worker.port.addEventListener("message", function (msg) {
-			let result = msg.data;
-			if (result.tk == iT) {
-				if (result.lp == undefined) {
-					null;
-				} else {
-					mergeTickToBar(result);
-					// && new Date().getMilliseconds() > 500
-					if (new Date().getSeconds() == 0) {
-						// move to next bar
-						currentIndex++;
-						let timestamp = Math.round(Date.now() / 1000);
-						currentBar = {
-							open: null,
-							high: null,
-							low: null,
-							close: null,
-							time: timestamp + 19800,
-						};
-						currentVol = {
-							value: null,
-							time: timestamp + 19800,
-						};
-					}
-					//candleSeries.update({ time: Math.round(Date.now() / 1000) + 19800, value: result.lp });
-				}
-			}
-		});
-	}
-}
-//chart with multiple tf
 function randomInteger(max) {
 	return Math.floor(Math.random() * (max + 1));
 }
@@ -377,6 +66,175 @@ function randomRgbColor() {
 	return string;
 }
 //rgb randomizer mixer
+let timeOut = null;
+async function dash() {
+	document.getElementById("myAudio").muted = true;
+	document.getElementById("myAudio").play();
+}
+//dashboard
+function buttons(button) {
+	let buttons = document.getElementsByClassName("buttons")[0];
+	buttons.classList.remove("d-none");
+	buttons.style.top = `${button.getBoundingClientRect().top + window.scrollY + 5
+		}px`;
+	buttons.style.left = `${button.getBoundingClientRect().left + window.scrollX + 20
+		}px`;
+	buttons.setAttribute("id", button.id);
+	clearTimeout(timeOut);
+	timeOut = setTimeout(function () {
+		document.getElementsByClassName("buttons")[0].classList.add("d-none");
+	}, 3000);
+}
+// show buttons onmouseover dashboard option chain elements
+async function buy() {
+	let bvalue = {
+		uid: localStorage.getItem("uid"),
+		actid: localStorage.getItem("actid"),
+		exch: "NFO",
+		tsym: document.getElementById("btsym").innerHTML,
+		qty: document.getElementById("bqty").value,
+		prc: document.getElementById("bprice").value,
+		prd: document.getElementById("bprdt").value == "MIS" ? "I" : "M",
+		trgprc: document.getElementById("bprice").value,
+		trantype: "B",
+		prctyp: document.getElementById("bptype").value,
+		ret: "DAY",
+	};
+	await all(bvalue, "PlaceOrder");
+}
+// buy button in dashboard
+async function sell() {
+	let svalue = {
+		uid: localStorage.getItem("uid"),
+		actid: localStorage.getItem("actid"),
+		exch: "NFO",
+		tsym: document.getElementById("stsym").innerHTML,
+		qty: document.getElementById("sqty").value,
+		prc: document.getElementById("sprice").value,
+		prd: document.getElementById("sprdt").value == "MIS" ? "I" : "M",
+		trgprc: document.getElementById("sprice").value,
+		trantype: "S",
+		prctyp: document.getElementById("sptype").value,
+		ret: "DAY",
+	};
+	await all(svalue, "PlaceOrder");
+}
+// sell button in dashboard
+async function b(buyButton) {
+	let token = await buyButton.parentElement.id;
+	let getsc = {
+		uid: localStorage.getItem("uid"),
+		exch: "NFO",
+		token: token,
+	};
+	let sc = await all(getsc, "GetSecurityInfo");
+	if (document.title == 'Dashboard') {
+		document.getElementById("btsym").innerHTML = sc.tsym;
+		document.getElementById("bqty").setAttribute("step", sc.ls);
+		document.getElementById("bqty").setAttribute("value", sc.ls);
+		document.getElementById("bqty").setAttribute("min", sc.ls);
+		document.getElementById("bprice").value = 0;
+		document.getElementById("bptype").value = "MKT";
+		document.getElementById("bptype").removeAttribute("disabled");
+		document.getElementById("bprdt").removeAttribute("disabled");
+		document.getElementById("bqty").removeAttribute("disabled");
+		document.getElementById("bbutton").removeAttribute("disabled");
+		chart("bchart", sc.token, "NFO");
+		getMarginB();
+	}
+}
+//set buy chart div, buy div
+async function s(sellButton) {
+	let token = sellButton.parentElement.id;
+	let getsc = {
+		uid: localStorage.getItem("uid"),
+		exch: "NFO",
+		token: token,
+	};
+	let sc = await all(getsc, "GetSecurityInfo");
+	if (document.title == 'Dashboard') {
+		document.getElementById("stsym").innerHTML = sc.tsym;
+		document.getElementById("sqty").setAttribute("step", sc.ls);
+		document.getElementById("sqty").setAttribute("value", sc.ls);
+		document.getElementById("sprice").value = 0;
+		document.getElementById("sptype").value = "MKT";
+		document.getElementById("sptype").removeAttribute("disabled");
+		document.getElementById("sprdt").removeAttribute("disabled");
+		document.getElementById("sqty").removeAttribute("disabled");
+		document.getElementById("sbutton").removeAttribute("disabled");
+		chart("schart", sc.token, "NFO");
+		sendMessageToSocket(`{ "t": "t", "k": "NFO|${sc.token}" }`);
+		getMarginS();
+	}
+}
+//set sell chart div, sell div
+function changeValue() {
+	let x = document.getElementById("sptype");
+	if (!x.disabled) {
+		if (x.value == "MKT") {
+			document.getElementById("sprice").toggleAttribute("disabled");
+			document.getElementById("sprice").value = 0;
+			getMarginS();
+		} else {
+			document.getElementById("sprice").toggleAttribute("disabled");
+			getMarginS();
+		}
+	}
+	let y = document.getElementById("bptype");
+	if (!y.disabled) {
+		if (y.value == "MKT") {
+			document.getElementById("bprice").toggleAttribute("disabled");
+			document.getElementById("bprice").value = 0;
+			getMarginB();
+		} else {
+			document.getElementById("bprice").toggleAttribute("disabled");
+			getMarginB();
+		}
+	}
+}
+// disable price on mkt
+async function getMarginB() {
+	let mV = {
+		uid: localStorage.getItem("uid"),
+		actid: localStorage.getItem("actid"),
+		exch: "NFO",
+		tsym: btsym.innerHTML,
+		qty: document.getElementById("bqty").value,
+		prc: document.getElementById("bprice").value,
+		prd: document.getElementById("bprdt").value == "MIS" ? "I" : "M",
+		trantype: "B",
+		prctyp: document.getElementById("bptype").value,
+		rorgqty: "0",
+		rorgprc: "0",
+	};
+	let marg = await all(mV, "GetOrderMargin");
+	document.getElementById("breq").innerHTML = marg.marginused;
+	marg.remarks == "Order Success"
+		? document.getElementById("breq").setAttribute("class", "green")
+		: document.getElementById("breq").setAttribute("class", "red");
+}
+// get Req Margin
+async function getMarginS() {
+	let mV = {
+		uid: localStorage.getItem("uid"),
+		actid: localStorage.getItem("actid"),
+		exch: "NFO",
+		tsym: stsym.innerHTML,
+		qty: document.getElementById("sqty").value,
+		prc: document.getElementById("sprice").value,
+		prd: document.getElementById("sprdt").value == "MIS" ? "I" : "M",
+		trantype: "S",
+		prctyp: document.getElementById("sptype").value,
+		rorgqty: "0",
+		rorgprc: "0",
+	};
+	let marg = await all(mV, "GetOrderMargin");
+	document.getElementById("sreq").innerHTML = marg.marginused;
+	marg.remarks == "Order Success"
+		? document.getElementById("sreq").setAttribute("class", "green")
+		: document.getElementById("sreq").setAttribute("class", "red");
+}
+// get Req Margin
 async function pos() {
 	let posvalues = {
 		uid: localStorage.getItem("uid"),
@@ -1059,57 +917,816 @@ function hideTables(posTables) {
 	table.classList.remove('d-none');
 }
 //hide Other Tables in Positions
-async function dash() {
-	document.getElementById("myAudio").muted = true;
-	document.getElementById("myAudio").play();
-}
-//dashboard
-async function order() {
-	let ovalues = {
-		uid: localStorage.getItem("uid"),
-	};
-	let orders = await all(ovalues, "OrderBook");
-	if (orders.stat === "Not_Ok") {
-		document.getElementById("noO").classList.remove("d-none");
+function checkAll(boxes) {
+	if (boxes.checked == true) {
+		let checkboxes = document.getElementsByClassName("cb");
+		for (let checkbox of checkboxes) {
+			checkbox.checked = true;
+		}
+		show();
 	} else {
-		let OOtbody = document.getElementById("OOtbody");
-		let COtbody = document.getElementById("COtbody");
-		orders.forEach((element) => {
-			if (element.status === "OPEN") {
-				document.getElementById("OOTable").classList.remove("d-none");
-				let row = OOtbody.insertRow(0);
-				row.insertCell(0).innerHTML = element.dname;
-				row.insertCell(1).innerHTML = element.exch;
-				row.insertCell(2).innerHTML = element.trantype;
-				row.insertCell(3).innerHTML =
-					element.prd == "M" || element.prd == "C" ? "NRML" : "MIS";
-				row.insertCell(4).innerHTML = `${element.fillshares ? element.fillshares : 0
-					}/${element.qty}`;
-				row.insertCell(5).innerHTML = element.prc;
-				row.insertCell(6).innerHTML = element.status;
-				row.insertCell(7).innerHTML = element.norentm.slice(0, 8);
-				row.insertCell(8).innerHTML = element.norenordno;
-				row.insertCell(
-					9
-				).innerHTML = `<button class="or-cancel" onclick='cancel(this)'><i class="fa-solid fa-xmark"></i></button>`;
+		let checkboxes = document.getElementsByClassName("cb");
+		for (let checkbox of checkboxes) {
+			checkbox.checked = false;
+		}
+		show();
+	}
+}
+//check uncheck positions
+function show() {
+	let checkboxes = document.getElementsByClassName("cb");
+	for (let checkbox of checkboxes) {
+		if (checkbox.checked == true) {
+			document.getElementById("eSB").classList.remove("d-none");
+			break;
+		} else {
+			document.getElementById("eSB").classList.add("d-none");
+		}
+	}
+}
+// show exit button
+async function exitS() {
+	let checkboxes = document.getElementsByClassName("cb");
+	let rows = [];
+	for (let checkbox of checkboxes) {
+		if (checkbox.checked == true) {
+			let row = await checkbox.parentElement.parentElement;
+			rows.push(row);
+		}
+	}
+	setTimeout(() => {
+		// rows.sort((a, b) => {
+		// 	return a.qty - b.qty;
+		// });
+		let exch = rows[0].parentElement.id == "posBody" ? "Other" : "NFO"
+		rows.forEach((row, i) => {
+			setTimeout(
+				function () {
+					let value = {
+						uid: localStorage.getItem("uid"),
+						actid: localStorage.getItem("actid"),
+						exch: exch == "other" ? row.children[4].innerHTML : "NFO",
+						tsym: row.children[13].innerHTML,
+						qty: exch == "other" ? `${Math.abs(row.children[5].innerHTML)}` : `${Math.abs(row.children[4].innerHTML)}`,
+						prc: "0",
+						prd:
+							row.children[1].innerHTML == "MIS"
+								? "I"
+								: exch == "NFO"
+									? "M"
+									: "C",
+						trantype: '0',
+						prctyp: "MKT",
+						ret: "DAY",
+					};
+					if (exch == "other") { value.trantype = parseInt(row.children[5].innerHTML) > 0 ? "S" : "B" }
+					else {
+						value.trantype = parseInt(row.children[4].innerHTML) > 0 ? "S" : "B"
+					}
+					all(value, "PlaceOrder");
+				}, i * 100)
+		});
+	}, 200);
+}
+//exit selected
+function convert(convertB) {
+	let row = convertB.parentNode.parentNode.parentNode;
+	let exch = row.parentElement.id == "posBody" ? "Other" : "NFO"
+	let convertValues = {
+		uid: localStorage.getItem("uid"),
+		actid: localStorage.getItem("actid"),
+		exch: exch == "other" ? row.children[4].innerHTML : "NFO",
+		tsym: row.children[14].innerHTML,
+		qty: exch == "other" ? `${Math.abs(row.children[5].innerHTML)}` : `${Math.abs(row.children[4].innerHTML)}`,
+		prd:
+			row.children[1].innerHTML == "NRML"
+				? "I"
+				: exch == "NFO"
+					? "M"
+					: "C",
+		prevprd:
+			row.children[1].innerHTML == "MIS"
+				? "I"
+				: exch == "NFO"
+					? "M"
+					: "C",
+		trantype: parseInt(row.children[5].innerHTML) > 0 ? "B" : "S",
+		postype: "DAY",
+	};
+	if (exch == "other") { convertValues.trantype = parseInt(row.children[5].innerHTML) > 0 ? "S" : "B" }
+	else {
+		convertValues.trantype = parseInt(row.children[4].innerHTML) > 0 ? "S" : "B"
+	}
+	all(convertValues, "ProductConversion").then((ans) => {
+		if (ans.stat == "Ok") {
+			alert("Conveted");
+			location.reload();
+		} else if (ans.stat == "Not_Ok") {
+			alert("Not Converted");
+		}
+	});
+}
+//convert position
+function exit(exitButton) {
+	let row = exitButton.parentElement.parentElement.parentElement;
+	let buttons = document.getElementById("exitP");
+	buttons.style.zIndex = 100;
+	buttons.style.top = `${exitButton.getBoundingClientRect().top + window.scrollY - 10
+		}px`;
+	buttons.style.left = `${exitButton.getBoundingClientRect().left + window.scrollX
+		}px`;
+	buttons.style.position = "absolute";
+	buttons.style.width = "100%";
+	if (parseInt(row.children[5].innerHTML) != 0) {
+		buttons.classList.remove("d-none");
+		let infoValues = {
+			uid: localStorage.getItem("uid"),
+			exch: row.children[4].innerHTML,
+			token: row.children[7].id,
+		};
+		all(infoValues, "GetSecurityInfo").then((scripDetail) => {
+			document.getElementById("qtyB").step = scripDetail.ls;
+			document.getElementById("qtyB").min = scripDetail.ls;
+		});
+		document.getElementById("qtyB").value = Math.abs(row.children[5].innerHTML);
+		parseInt(row.children[5].innerHTML) < 0
+			? document.getElementById("qtyB").classList.add("green")
+			: document.getElementById("qtyB").classList.add("red");
+		parseInt(row.children[5].innerHTML) > 0
+			? document.getElementById("qtyB").classList.remove("green")
+			: document.getElementById("qtyB").classList.remove("red");
+		document.getElementById("tsym").innerHTML = row.children[13].innerHTML;
+		document.getElementById("exch").innerHTML = row.children[4].innerHTML;
+		document.getElementById("prdtype").innerHTML = row.children[1].innerHTML;
+		clearTimeout(timeOut);
+		timeOut = setTimeout(() => {
+			buttons.classList.add("d-none");
+		}, 10000);
+	}
+}
+//show popup for exit
+function exitB() {
+	let value = {
+		uid: localStorage.getItem("uid"),
+		actid: localStorage.getItem("actid"),
+		exch: document.getElementById("exch").innerHTML,
+		tsym: document.getElementById("tsym").innerHTML,
+		qty: document.getElementById("qtyB").value,
+		prc: document.getElementById("priceB") ? document.getElementById("priceB").value : '0',
+		prd:
+			document.getElementById("prdtype").innerHTML == "MIS"
+				? "I"
+				: document.getElementById("exch").innerHTML == "NFO"
+					? "M"
+					: "C",
+		trgprc: document.getElementById("trgprice") ? document.getElementById("trgprice").value : '0',
+		trantype: document.getElementById("qtyB").classList.contains("red")
+			? "S"
+			: "B",
+		prctyp: document.getElementById("optionS") ? document.getElementById("optionS").value : "MKT",
+		ret: "DAY",
+	};
+	all(value, "PlaceOrder");
+}
+//exit button in position popup
+function changePrice() {
+	document.getElementById("optionS").value == "MKT" ||
+		document.getElementById("optionS").value == "LMT"
+		? document.getElementById("trgprice").classList.add("d-none")
+		: document.getElementById("trgprice").classList.remove("d-none");
+	document.getElementById("optionS").value == "MKT" ||
+		document.getElementById("optionS").value == "LMT"
+		? (document.getElementById("trgprice").value = 0)
+		: null;
+	document.getElementById("optionS").value == "MKT"
+		? (document.getElementById("priceB").value = 0)
+		: null;
+}
+//change Price in pos exit pop up
+function webhook(discordUrl) {
+	function dataURLtoFile(dataurl, filename) {
+		let arr = dataurl.split(','),
+			mime = arr[0].match(/:(.*?);/)[1],
+			bstr = atob(arr[1]),
+			n = bstr.length,
+			u8arr = new Uint8Array(n);
+		while (n--) {
+			u8arr[n] = bstr.charCodeAt(n);
+		}
+		return new File([u8arr], filename, { type: mime });
+	}
+	setInterval(() => {
+		htmlToImage.toJpeg(discordUrl.parentElement.parentElement.parentElement.parentElement)
+			.then(function (dataUrl) {
+				//let img = canvas.toDataURL("image/png");
+				let formdata1 = new FormData();
+				let file = dataURLtoFile(dataUrl, 'unknown.jpeg');
+				formdata1.append("file1", file);
+				let dated = new Date;
+				let time = {
+					content: dated.toLocaleTimeString()
+				}
+				time = JSON.stringify(time);
+				formdata1.append("payload_json", time);
+				let requestOptions = {
+					method: 'POST',
+					body: formdata1,
+				};
+				fetch(discordUrl.value, requestOptions)
+					.then(response => response.text())
+					.then(result => null)
+					.catch(error => console.log('error', error));
+			});
+	}, 60000);
+};
+//send position ss
+async function chart(element, iT, tex) {
+	let timeValues = {
+		uid: localStorage.getItem("uid"),
+		exch: `${tex}`,
+		token: `${iT}`,
+		st: `${Math.round((Date.now() - 3456000000) / 1000)}`,
+		et: `${Math.round(Date.now() / 1000)}`,
+	};
+	let c1M = await all(timeValues, "TPSeries");
+	timeValues.intrv = "5";
+	let c5M = await all(timeValues, "TPSeries");
+	timeValues.intrv = "15";
+	let c15M = await all(timeValues, "TPSeries");
+	timeValues.intrv = "30";
+	let c30M = await all(timeValues, "TPSeries");
+	timeValues.intrv = "60";
+	let c60M = await all(timeValues, "TPSeries");
+
+	async function reversePrice(ohlcs) {
+		let chartdata = await ohlcs.map((ohlc) => {
+			let timestamp = new Date(ohlc.ssboe * 1000).getTime() / 1000;
+			//open: parseFloat(ohlc.into), high: parseFloat(ohlc.inth), low: parseFloat(ohlc.intl), close: parseFloat(ohlc.intc)
+			//value: parseFloat(ohlc.intc)
+			return {
+				time: timestamp + 19800,
+				open: parseFloat(ohlc.into),
+				high: parseFloat(ohlc.inth),
+				low: parseFloat(ohlc.intl),
+				close: parseFloat(ohlc.intc),
+			};
+		});
+		return chartdata.reverse();
+	}
+	async function reverseVol(ohlcs) {
+		let chartdata = await ohlcs.map((ohlc) => {
+			let timestamp = new Date(ohlc.ssboe * 1000).getTime() / 1000;
+			//open: parseFloat(ohlc.into), high: parseFloat(ohlc.inth), low: parseFloat(ohlc.intl), close: parseFloat(ohlc.intc)
+			//value: parseFloat(ohlc.intc)
+			return {
+				time: timestamp + 19800,
+				value: ohlc.oi,
+			};
+		});
+		return chartdata.reverse();
+	}
+
+	if (c1M.stat == "Not_Ok") {
+		const chartDiv = document.getElementById(`${element}`);
+		chartDiv.innerHTML = "No Data";
+		chartDiv.style.color = "white";
+		let legend = chartDiv.nextElementSibling;
+		legend.innerHTML = "";
+		let switcherElement = legend.nextElementSibling;
+		switcherElement.innerHTML = "";
+		let button = switcherElement.nextElementSibling;
+		button.innerHTML = "";
+	} else {
+		const chartProperties1 = {
+			width: 750,
+			height: 290,
+			timeScale: {
+				timeVisible: true,
+				secondsVisible: true,
+			},
+			layout: {
+				textColor: "#ffffff",
+				backgroundColor: "#000000", //"rgba(120, 123, 134, 1)", rgba(93, 96, 107, 1)
+			},
+			rightPriceScale: {
+				scaleMargins: {
+					top: 0.3,
+					bottom: 0.25,
+				},
+			},
+			grid: {
+				vertLines: {
+					color: "rgba(120, 123, 134, 1)",
+					visible: false,
+				},
+				horzLines: {
+					color: "rgba(120, 123, 134, 1)",
+					visible: false,
+				},
+			},
+			crosshair: {
+				mode: LightweightCharts.CrosshairMode.Normal,
+				vertLine: {
+					color: "#fff",
+				},
+				horzLine: {
+					color: "#fff",
+				},
+			},
+		};
+		const chartDiv = document.getElementById(`${element}`);
+		chartDiv.innerHTML = "";
+		const chart = LightweightCharts.createChart(chartDiv, chartProperties1);
+
+		let p1M = await reversePrice(c1M);
+		let p5M = await reversePrice(c5M);
+		let p15M = await reversePrice(c15M);
+		let p30M = await reversePrice(c30M);
+		let p60M = await reversePrice(c60M);
+		let v1M = await reverseVol(c1M);
+		let v5M = await reverseVol(c5M);
+		let v15M = await reverseVol(c15M);
+		let v30M = await reverseVol(c30M);
+		let v60M = await reverseVol(c60M);
+		////// data feed
+		const renderOHLC = (price, vol) => {
+			const { open, high, low, close } = price;
+			let coloredValues = `<p>O<span class="${open > close ? "red" : "green"
+				}">${open}</span> H<span class="${open > close ? "red" : "green"
+				}">${high}</span> L<span class="${open > close ? "red" : "green"
+				}">${low}</span> C<span class="${open > close ? "red" : "green"
+				}">${close}</span> <span>OI ${vol}</span> </p>`;
+			legend.children[1].innerHTML = coloredValues;
+		};
+		let ohlcValues = null;
+		let volValues = null;
+		chart.subscribeCrosshairMove((param) => {
+			ohlcValues = param.seriesPrices.get(priceSeries);
+			volValues = param.seriesPrices.get(volSeries);
+			ohlcValues ? renderOHLC(ohlcValues, volValues) : null;
+		});
+		let legend = chartDiv.nextElementSibling;
+		legend.style.display = "block";
+		legend.style.position = "absolute";
+		legend.style.zIndex = "15";
+		legend.style.left = `${chartDiv.getBoundingClientRect().left + window.scrollX + 20
+			}px`;
+		legend.style.top = `${chartDiv.getBoundingClientRect().top + 2}px`;
+		legend.style.zIndex = "50";
+		legend.innerHTML =
+			'<div style="font-size: 20px; margin: 4px 0px; color: #fff">' +
+			element.toUpperCase() +
+			" <span id=" +
+			iT +
+			"></span></div><div></div>";
+		///////// switcher
+		function createSimpleSwitcher(
+			items,
+			activeItem,
+			activeItemChangedCallback
+		) {
+			let switcherElement = legend.nextElementSibling;
+			switcherElement.innerHTML = "";
+			let intervalElements = items.map(function (item) {
+				let itemEl = document.createElement("button");
+				itemEl.innerText = item;
+				itemEl.classList.add("switcher-item");
+				itemEl.classList.toggle("switcher-active-item", item === activeItem);
+				itemEl.addEventListener("click", function () {
+					onItemClicked(item);
+				});
+				switcherElement.appendChild(itemEl);
+				return itemEl;
+			});
+			function onItemClicked(item) {
+				if (item === activeItem) {
+					return;
+				}
+				intervalElements.forEach(function (element, index) {
+					element.classList.toggle(
+						"switcher-active-item",
+						items[index] === item
+					);
+				});
+				activeItem = item;
+				activeItemChangedCallback(item);
+			}
+			return switcherElement;
+		}
+		let intervals = ["1M", "5M", "15M", "30M", "60M"];
+		let priceData = new Map([
+			["1M", p1M],
+			["5M", p5M],
+			["15M", p15M],
+			["30M", p30M],
+			["60M", p60M],
+		]);
+		let volData = new Map([
+			["1M", v1M],
+			["5M", v5M],
+			["15M", v15M],
+			["30M", v30M],
+			["60M", v60M],
+		]);
+		let switcherElement = createSimpleSwitcher(
+			intervals,
+			intervals[0],
+			syncToInterval
+		);
+		let priceSeries = null;
+		let volSeries = null;
+		function syncToInterval(interval) {
+			if (priceSeries || volSeries) {
+				chart.removeSeries(priceSeries);
+				chart.removeSeries(volSeries);
+			}
+			priceSeries = chart.addCandlestickSeries({
+				upColor: "#FFFFFF",
+				downColor: "#4dd0e1",
+				borderDownColor: "#4dd0e1",
+				borderUpColor: "#FFFFFF",
+				wickDownColor: "#4dd0e1",
+				wickUpColor: "#4dd0e1",
+			});
+			volSeries = chart.addLineSeries({
+				color: "black",
+				priceFormat: {
+					type: "volume",
+				},
+				priceScaleId: "",
+				scaleMargins: {
+					top: 0.8,
+					bottom: 0.02,
+				},
+			});
+			priceSeries.setData(priceData.get(interval));
+			volSeries.setData(volData.get(interval));
+		}
+		syncToInterval(intervals[0]);
+		//////////////////////////
+		let lastIndex = c1M.length - 1;
+		let currentIndex = lastIndex + 1;
+		let currentBar = {
+			open: null,
+			high: null,
+			low: null,
+			close: null,
+			time: Math.round(Date.now() / 1000) + 19800,
+		};
+		let currentVol = {
+			value: null,
+			time: Math.round(Date.now() / 1000) + 19800,
+		};
+		function mergeTickToBar(result) {
+			if (currentBar.open === null) {
+				currentBar.open = result.lp;
+				currentBar.high = result.lp;
+				currentBar.low = result.lp;
+				currentBar.close = result.lp;
 			} else {
-				document.getElementById("COTable").classList.remove("d-none");
-				let row = COtbody.insertRow(0);
-				row.insertCell(0).innerHTML = element.dname;
-				row.insertCell(1).innerHTML = element.exch;
-				row.insertCell(2).innerHTML = element.trantype;
-				row.insertCell(3).innerHTML =
-					element.prd == "M" || element.prd == "C" ? "NRML" : "MIS";
-				row.insertCell(4).innerHTML = `${element.fillshares ? element.fillshares : 0
-					}/${element.qty}`;
-				row.insertCell(5).innerHTML = element.avgprc ? element.avgprc : 0;
-				row.insertCell(6).innerHTML = element.status;
-				row.insertCell(7).innerHTML = element.norentm.slice(0, 8);
+				currentBar.close = result.lp;
+				currentBar.high = Math.max(currentBar.high, result.lp);
+				currentBar.low = Math.min(currentBar.low, result.lp);
+			}
+			if (result.oi) {
+				currentVol.value = result.oi;
+				volSeries.update(currentVol);
+			}
+			priceSeries.update(currentBar);
+		}
+		/// button
+		let button = switcherElement.nextElementSibling;
+		button.style.left =
+			chartDiv.getBoundingClientRect().left + window.scrollX + 500 + "px";
+		button.style.top =
+			chartDiv.getBoundingClientRect().top + window.scrollY + 230 + "px";
+		button.style.color = "#4c525e";
+		button.innerHTML =
+			'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M6.5 1.5l5 5.5-5 5.5M3 4l2.5 3L3 10"></path></svg>';
+		let timeScale = chart.timeScale();
+		timeScale.subscribeVisibleTimeRangeChange(function () {
+			let buttonVisible = timeScale.scrollPosition() < 0;
+			button.style.display = buttonVisible ? "block" : "none";
+		});
+		button.addEventListener("click", function () {
+			timeScale.scrollToRealTime();
+		});
+		button.addEventListener("mouseover", function () {
+			button.style.background = "rgba(250, 250, 250, 1)";
+			button.style.color = "#000";
+		});
+		button.addEventListener("mouseout", function () {
+			button.style.background = "rgba(250, 250, 250, 0.6)";
+			button.style.color = "#4c525e";
+		});
+		//
+		worker.port.addEventListener("message", function (msg) {
+			let result = msg.data;
+			if (result.tk == iT) {
+				if (result.lp == undefined) {
+					null;
+				} else {
+					mergeTickToBar(result);
+					// && new Date().getMilliseconds() > 500
+					if (new Date().getSeconds() == 0) {
+						// move to next bar
+						currentIndex++;
+						let timestamp = Math.round(Date.now() / 1000);
+						currentBar = {
+							open: null,
+							high: null,
+							low: null,
+							close: null,
+							time: timestamp + 19800,
+						};
+						currentVol = {
+							value: null,
+							time: timestamp + 19800,
+						};
+					}
+					//candleSeries.update({ time: Math.round(Date.now() / 1000) + 19800, value: result.lp });
+				}
 			}
 		});
 	}
 }
-//order
+//chart with multiple tf
+async function addLeg() {
+	let table = document.getElementById('stratBody');
+	let row = document.createElement('tr');
+	let expiry = document.getElementById('exp').value.split(" ", 1);
+	row.innerHTML = `<td>
+		<input type="checkbox" checked name="boxes">
+		</td>`;
+
+	row.innerHTML += `
+			<td>
+			<label class="toggle">
+				<input type="checkbox" name="bs" onchange="changeStrike(this)">
+					<span class="labels" data-on="B" data-off="S"></span>
+			</label>
+</td> `;
+	row.innerHTML += `
+		<td>
+		${expiry}
+</td> `;
+	row.innerHTML += `
+		<td>
+		<div class="input-group mb-3">
+			<input type="number" class="form-control" value="${document.getElementById('strikeP').innerHTML}"
+				step="${document.getElementById('diff').innerHTML}" onchange="changeStrike(this)" name="strike">
+		</div>
+</td> `;
+	row.innerHTML += `
+		<td>
+		<label class="toggle">
+			<input type="checkbox" name="cepe" onchange="changeStrike(this)">
+				<span class="labels" data-on="CE" data-off="PE"></span>
+		</label>
+</td> `;
+	row.innerHTML += `
+		<td>
+		<div class="input-group mb-3">
+			<input type="number" class="form-control" value='${document.getElementById('ls').innerHTML}'
+			min='${document.getElementById('ls').innerHTML}' step='${document.getElementById('ls').innerHTML}' name="qty">
+		</div>
+</td> `;
+	let scriptN = document.getElementById('name').innerHTML;
+	let scriptName = scriptN.slice(-4) == '-EQ ' ? scriptN.substring(0, scriptN.length - 4) : scriptN;
+	scriptName = scriptN.slice(-2) == 'F ' ? scriptN.substring(0, scriptN.length - 9) : scriptN;
+	let svalues = {
+		uid: localStorage.getItem("uid"),
+		stext: scriptName + ' ' + expiry + ' ' + document.getElementById('strikeP').innerHTML + ' PE',
+		exch: "NFO",
+	};
+	let scripts = await all(svalues, "SearchScrip");
+	row.innerHTML += `
+		<td id="${scripts.values[0].token}"> 0 </td> `;
+	row.innerHTML += `<td>
+			<select class="form-control" name="NM">
+				<option>NRML</option>
+				<option>MIS</option>
+			</select>
+	</td> `;
+	row.innerHTML += `<td> Delta
+	</td> `;
+	row.innerHTML += `<td> theta
+	</td> `;
+	row.innerHTML += `<td> gamma
+	</td> `;
+	row.innerHTML += `<td> vega
+	</td> `;
+	row.innerHTML += `<td> 50
+	</td> `;
+	row.innerHTML += `
+		<td>
+		<span class="badge bg-secondary strat-badge"
+			onclick="this.parentElement.parentElement.remove()">DEL</span>
+</td> `;
+	sendMessageToSocket(`{ "t": "t", "k": "NFO|${scripts.values[0].token}" } `);
+	row.classList.add('strat-inner');
+	row.innerHTML += `<td class='d-none'>${scripts.values[0].tsym}</td> `;
+	table.appendChild(row);
+	limits();
+	basketMargins();
+}
+//add leg to strategy builder
+async function changeStrike(strikeList) {
+	let row = strikeList.parentElement.parentElement.parentElement;
+	let scriptN = document.getElementById('name').innerHTML;
+	let scriptName = scriptN.slice(-4) == '-EQ ' ? scriptN.substring(0, scriptN.length - 4) : scriptN;
+	let svalues = {
+		uid: localStorage.getItem("uid"),
+		stext: scriptName + ' ' + row.children[2].innerText + ' ' + row.querySelector('input[name="strike"]').value + (row.querySelector('input[name="cepe"]').checked ? ' CE' : ' PE'),
+		exch: "NFO",
+	};
+	let scripts = await all(svalues, "SearchScrip");
+	row.children[6].id = scripts.values[0].token;
+	row.children[12].innerHTML = 50;
+	row.children[14].innerHTML = scripts.values[0].tsym;
+	sendMessageToSocket(`{ "t": "t", "k": "NFO|${scripts.values[0].token}" } `);
+	limits();
+	basketMargins();
+}
+//strategy builder change strike or ce pe
+function tradeAll() {
+	let checkboxes = document.querySelectorAll("input[name='boxes']");
+	let rows = [];
+	for (let checkbox of checkboxes) {
+		let row = checkbox.parentElement.parentElement;
+		rows.push(row);
+	}
+	rows.sort((a, b) => {
+		return a.querySelector("input[name='qty']") - b.querySelector("input[name='qty']");
+	});
+	rows.forEach((row, i) => {
+		setTimeout(
+			function () {
+				let value = {
+					uid: localStorage.getItem("uid"),
+					actid: localStorage.getItem("actid"),
+					exch: 'NFO',
+					tsym: row.children[14].innerHTML,
+					qty: row.querySelector('input[name="qty"]').value,
+					prc: "0",
+					prd:
+						row.querySelector('select[name="NM"]').value == "MIS"
+							? "I"
+							: "M",
+					trantype: row.querySelector('input[name="bs"]').checked ? "B" : "S",
+					prctyp: "MKT",
+					ret: "DAY",
+				};
+				all(value, "PlaceOrder");
+			}, i * 200)
+	});
+}
+//trade all strategy builder
+function tradeS() {
+	let checkboxes = document.querySelectorAll("input[name='boxes']");
+	let rows = [];
+	for (let checkbox of checkboxes) {
+		if (checkbox.checked == true) {
+			let row = checkbox.parentElement.parentElement;
+			rows.push(row);
+		}
+	}
+	rows.sort((a, b) => {
+		return a.querySelector("input[name='qty']") - b.querySelector("input[name='qty']");
+	});
+	rows.forEach((row, i) => {
+		setTimeout(
+			function () {
+				let value = {
+					uid: localStorage.getItem("uid"),
+					actid: localStorage.getItem("actid"),
+					exch: 'NFO',
+					tsym: row.children[14].innerHTML,
+					qty: row.querySelector('input[name="qty"]').value,
+					prc: "0",
+					prd:
+						row.querySelector('select[name="NM"]').value == "MIS"
+							? "I"
+							: "M",
+					trantype: row.querySelector('input[name="bs"]').checked ? "B" : "S",
+					prctyp: "MKT",
+					ret: "DAY",
+				};
+				all(value, "PlaceOrder");
+			}, i * 200)
+	});
+}
+//trade selected strategy builder
+async function basketMargins() {
+	let checkboxes = document.querySelectorAll("input[name='boxes']");
+	//console.log(checkboxes);
+	let rows = [];
+	for (let checkbox of checkboxes) {
+		if (checkbox.checked == true) {
+			let row = checkbox.parentElement.parentElement;
+			rows.push(row);
+		}
+	}
+	let value;
+	let baskets = [];
+	for (let i = 0; i < rows.length; i++) {
+		const row = rows[i];
+		//console.log(row)
+		if (i == 0) {
+			value = {
+				uid: localStorage.getItem("uid"),
+				actid: localStorage.getItem("actid"),
+				exch: 'NFO',
+				tsym: row.children[14].innerHTML,
+				qty: row.querySelector('input[name="qty"]').value,
+				prc: "0",
+				prd:
+					row.querySelector('select[name="NM"]').value == "MIS"
+						? "I"
+						: "M",
+				trantype: row.querySelector('input[name="bs"]').checked ? "B" : "S",
+				prctyp: "MKT",
+			};
+		}
+		else {
+			let values = {
+				exch: 'NFO',
+				tsym: row.children[14].innerHTML,
+				qty: row.querySelector('input[name="qty"]').value,
+				prc: "0",
+				prd:
+					row.querySelector('select[name="NM"]').value == "MIS"
+						? "I"
+						: "M",
+				trantype: row.querySelector('input[name="bs"]').checked ? "B" : "S",
+				prctyp: "MKT",
+			};
+			baskets.push(values);
+		}
+	}
+	value.basketlists = baskets;
+	let margins = await all(value, 'GetBasketMargin');
+	document.getElementById('funds').innerHTML = margins.marginused;
+	document.getElementById('margin').innerHTML = margins.marginusedtrade;
+}
+//basket margin show
+async function roi() {
+	let checkboxes = document.getElementsByClassName("cb");
+	let rows = [];
+	for (let checkbox of checkboxes) {
+		let row = checkbox.parentElement.parentElement;
+		rows.push(row);
+	}
+	let value;
+	let baskets = [];
+	for (let i = 0; i < rows.length; i++) {
+		const row = rows[i];
+		if (Math.abs(row.children[5].innerHTML) != 0 && row.children[4].innerHTML == "NFO") {
+			if (i == 0) {
+				value = {
+					uid: localStorage.getItem("uid"),
+					actid: localStorage.getItem("actid"),
+					exch: row.children[4].innerHTML,
+					tsym: row.children[13].innerHTML,
+					qty: `${Math.abs(row.children[5].innerHTML)}`,
+					prc: row.children[6].innerHTML,
+					prd:
+						row.children[1].innerHTML == "MIS"
+							? "I"
+							: row.children[4].innerHTML == "NFO"
+								? "M"
+								: "C",
+					trantype: parseInt(row.children[5].innerHTML) > 0 ? "B" : "S",
+					prctyp: "LMT"
+				};
+			}
+			else {
+				let values = {
+					exch: row.children[4].innerHTML,
+					tsym: row.children[13].innerHTML,
+					qty: `${Math.abs(row.children[5].innerHTML)}`,
+					prc: row.children[6].innerHTML,
+					prd:
+						row.children[1].innerHTML == "MIS"
+							? "I"
+							: row.children[4].innerHTML == "NFO"
+								? "M"
+								: "C",
+					trantype: parseInt(row.children[5].innerHTML) > 0 ? "B" : "S",
+					prctyp: "LMT",
+				};
+				baskets.push(values);
+			}
+		}
+	}
+	if (value != undefined) {
+		value.basketlists = baskets == undefined ? null : baskets;
+		all(value, "GetBasketMargin").then(element => {
+			document.getElementById('margin').innerHTML = parseInt(element.marginusedtrade) / 2;
+		});
+	}
+}
+//roi calculator
 async function hold() {
 	let hvalues = {
 		uid: localStorage.getItem("uid"),
@@ -1201,6 +1818,63 @@ async function hold() {
 	}
 }
 //holdings
+async function order() {
+	let ovalues = {
+		uid: localStorage.getItem("uid"),
+	};
+	let orders = await all(ovalues, "OrderBook");
+	if (orders.stat === "Not_Ok") {
+		document.getElementById("noO").classList.remove("d-none");
+	} else {
+		let OOtbody = document.getElementById("OOtbody");
+		let COtbody = document.getElementById("COtbody");
+		orders.forEach((element) => {
+			if (element.status === "OPEN") {
+				document.getElementById("OOTable").classList.remove("d-none");
+				let row = OOtbody.insertRow(0);
+				row.insertCell(0).innerHTML = element.dname;
+				row.insertCell(1).innerHTML = element.exch;
+				row.insertCell(2).innerHTML = element.trantype;
+				row.insertCell(3).innerHTML =
+					element.prd == "M" || element.prd == "C" ? "NRML" : "MIS";
+				row.insertCell(4).innerHTML = `${element.fillshares ? element.fillshares : 0
+					}/${element.qty}`;
+				row.insertCell(5).innerHTML = element.prc;
+				row.insertCell(6).innerHTML = element.status;
+				row.insertCell(7).innerHTML = element.norentm.slice(0, 8);
+				row.insertCell(8).innerHTML = element.norenordno;
+				row.insertCell(
+					9
+				).innerHTML = `<button class="or-cancel" onclick='cancel(this)'><i class="fa-solid fa-xmark"></i></button>`;
+			} else {
+				document.getElementById("COTable").classList.remove("d-none");
+				let row = COtbody.insertRow(0);
+				row.insertCell(0).innerHTML = element.dname;
+				row.insertCell(1).innerHTML = element.exch;
+				row.insertCell(2).innerHTML = element.trantype;
+				row.insertCell(3).innerHTML =
+					element.prd == "M" || element.prd == "C" ? "NRML" : "MIS";
+				row.insertCell(4).innerHTML = `${element.fillshares ? element.fillshares : 0
+					}/${element.qty}`;
+				row.insertCell(5).innerHTML = element.avgprc ? element.avgprc : 0;
+				row.insertCell(6).innerHTML = element.status;
+				row.insertCell(7).innerHTML = element.norentm.slice(0, 8);
+			}
+		});
+	}
+}
+//orderbook
+async function cancel(cancelB) {
+	let row = cancelB.parentNode.parentNode;
+	let Oid = row.children[8].innerHTML;
+	let cValues = {
+		norenordno: Oid,
+		uid: localStorage.getItem("uid"),
+	};
+	await all(cValues, "CancelOrder");
+	window.location.reload();
+}
+// cancel in open orders
 async function limits() {
 	if (document.title == 'Limits') {
 
@@ -1240,380 +1914,6 @@ async function options() {
 
 }
 //oc
-function convert(convertB) {
-	let row = convertB.parentNode.parentNode.parentNode;
-	let exch = row.parentElement.id == "posBody" ? "Other" : "NFO"
-	let convertValues = {
-		uid: localStorage.getItem("uid"),
-		actid: localStorage.getItem("actid"),
-		exch: exch == "other" ? row.children[4].innerHTML : "NFO",
-		tsym: row.children[14].innerHTML,
-		qty: exch == "other" ? `${Math.abs(row.children[5].innerHTML)}` : `${Math.abs(row.children[4].innerHTML)}`,
-		prd:
-			row.children[1].innerHTML == "NRML"
-				? "I"
-				: exch == "NFO"
-					? "M"
-					: "C",
-		prevprd:
-			row.children[1].innerHTML == "MIS"
-				? "I"
-				: exch == "NFO"
-					? "M"
-					: "C",
-		trantype: parseInt(row.children[5].innerHTML) > 0 ? "B" : "S",
-		postype: "DAY",
-	};
-	if (exch == "other") { convertValues.trantype = parseInt(row.children[5].innerHTML) > 0 ? "S" : "B" }
-	else {
-		convertValues.trantype = parseInt(row.children[4].innerHTML) > 0 ? "S" : "B"
-	}
-	all(convertValues, "ProductConversion").then((ans) => {
-		if (ans.stat == "Ok") {
-			alert("Conveted");
-			location.reload();
-		} else if (ans.stat == "Not_Ok") {
-			alert("Not Converted");
-		}
-	});
-}
-//convert position
-function show() {
-	let checkboxes = document.getElementsByClassName("cb");
-	for (let checkbox of checkboxes) {
-		if (checkbox.checked == true) {
-			document.getElementById("eSB").classList.remove("d-none");
-			break;
-		} else {
-			document.getElementById("eSB").classList.add("d-none");
-		}
-	}
-}
-// show exit button
-function checkAll(boxes) {
-	if (boxes.checked == true) {
-		let checkboxes = document.getElementsByClassName("cb");
-		for (let checkbox of checkboxes) {
-			checkbox.checked = true;
-		}
-		show();
-	} else {
-		let checkboxes = document.getElementsByClassName("cb");
-		for (let checkbox of checkboxes) {
-			checkbox.checked = false;
-		}
-		show();
-	}
-}
-//check uncheck positions
-async function exitS() {
-	let checkboxes = document.getElementsByClassName("cb");
-	let rows = [];
-	for (let checkbox of checkboxes) {
-		if (checkbox.checked == true) {
-			let row = await checkbox.parentElement.parentElement;
-			rows.push(row);
-		}
-	}
-	setTimeout(() => {
-		// rows.sort((a, b) => {
-		// 	return a.qty - b.qty;
-		// });
-		let exch = rows[0].parentElement.id == "posBody" ? "Other" : "NFO"
-		rows.forEach((row, i) => {
-			setTimeout(
-				function () {
-					let value = {
-						uid: localStorage.getItem("uid"),
-						actid: localStorage.getItem("actid"),
-						exch: exch == "other" ? row.children[4].innerHTML : "NFO",
-						tsym: row.children[13].innerHTML,
-						qty: exch == "other" ? `${Math.abs(row.children[5].innerHTML)}` : `${Math.abs(row.children[4].innerHTML)}`,
-						prc: "0",
-						prd:
-							row.children[1].innerHTML == "MIS"
-								? "I"
-								: exch == "NFO"
-									? "M"
-									: "C",
-						trantype: '0',
-						prctyp: "MKT",
-						ret: "DAY",
-					};
-					if (exch == "other") { value.trantype = parseInt(row.children[5].innerHTML) > 0 ? "S" : "B" }
-					else {
-						value.trantype = parseInt(row.children[4].innerHTML) > 0 ? "S" : "B"
-					}
-					all(value, "PlaceOrder");
-				}, i * 100)
-		});
-	}, 200);
-}
-//exit selected
-
-function exit(exitButton) {
-	let row = exitButton.parentElement.parentElement.parentElement;
-	let buttons = document.getElementById("exitP");
-	buttons.style.zIndex = 100;
-	buttons.style.top = `${exitButton.getBoundingClientRect().top + window.scrollY - 10
-		}px`;
-	buttons.style.left = `${exitButton.getBoundingClientRect().left + window.scrollX
-		}px`;
-	buttons.style.position = "absolute";
-	buttons.style.width = "100%";
-	if (parseInt(row.children[5].innerHTML) != 0) {
-		buttons.classList.remove("d-none");
-		let infoValues = {
-			uid: localStorage.getItem("uid"),
-			exch: row.children[4].innerHTML,
-			token: row.children[7].id,
-		};
-		all(infoValues, "GetSecurityInfo").then((scripDetail) => {
-			document.getElementById("qtyB").step = scripDetail.ls;
-			document.getElementById("qtyB").min = scripDetail.ls;
-		});
-		document.getElementById("qtyB").value = Math.abs(row.children[5].innerHTML);
-		parseInt(row.children[5].innerHTML) < 0
-			? document.getElementById("qtyB").classList.add("green")
-			: document.getElementById("qtyB").classList.add("red");
-		parseInt(row.children[5].innerHTML) > 0
-			? document.getElementById("qtyB").classList.remove("green")
-			: document.getElementById("qtyB").classList.remove("red");
-		document.getElementById("tsym").innerHTML = row.children[13].innerHTML;
-		document.getElementById("exch").innerHTML = row.children[4].innerHTML;
-		document.getElementById("prdtype").innerHTML = row.children[1].innerHTML;
-		clearTimeout(timeOut);
-		timeOut = setTimeout(() => {
-			buttons.classList.add("d-none");
-		}, 10000);
-	}
-}
-//show popup for exit
-function changePrice() {
-	document.getElementById("optionS").value == "MKT" ||
-		document.getElementById("optionS").value == "LMT"
-		? document.getElementById("trgprice").classList.add("d-none")
-		: document.getElementById("trgprice").classList.remove("d-none");
-	document.getElementById("optionS").value == "MKT" ||
-		document.getElementById("optionS").value == "LMT"
-		? (document.getElementById("trgprice").value = 0)
-		: null;
-	document.getElementById("optionS").value == "MKT"
-		? (document.getElementById("priceB").value = 0)
-		: null;
-}
-//change Price idk where
-function exitB() {
-	let value = {
-		uid: localStorage.getItem("uid"),
-		actid: localStorage.getItem("actid"),
-		exch: document.getElementById("exch").innerHTML,
-		tsym: document.getElementById("tsym").innerHTML,
-		qty: document.getElementById("qtyB").value,
-		prc: document.getElementById("priceB") ? document.getElementById("priceB").value : '0',
-		prd:
-			document.getElementById("prdtype").innerHTML == "MIS"
-				? "I"
-				: document.getElementById("exch").innerHTML == "NFO"
-					? "M"
-					: "C",
-		trgprc: document.getElementById("trgprice") ? document.getElementById("trgprice").value : '0',
-		trantype: document.getElementById("qtyB").classList.contains("red")
-			? "S"
-			: "B",
-		prctyp: document.getElementById("optionS") ? document.getElementById("optionS").value : "MKT",
-		ret: "DAY",
-	};
-	all(value, "PlaceOrder");
-}
-//exit button in position popup
-let timeOut = null;
-function buttons(button) {
-	let buttons = document.getElementsByClassName("buttons")[0];
-	buttons.classList.remove("d-none");
-	buttons.style.top = `${button.getBoundingClientRect().top + window.scrollY + 5
-		}px`;
-	buttons.style.left = `${button.getBoundingClientRect().left + window.scrollX + 20
-		}px`;
-	buttons.setAttribute("id", button.id);
-	clearTimeout(timeOut);
-	timeOut = setTimeout(function () {
-		document.getElementsByClassName("buttons")[0].classList.add("d-none");
-	}, 3000);
-}
-// show buttons onmouseover dashboard option chain elements
-async function buy() {
-	let bvalue = {
-		uid: localStorage.getItem("uid"),
-		actid: localStorage.getItem("actid"),
-		exch: "NFO",
-		tsym: document.getElementById("btsym").innerHTML,
-		qty: document.getElementById("bqty").value,
-		prc: document.getElementById("bprice").value,
-		prd: document.getElementById("bprdt").value == "MIS" ? "I" : "M",
-		trgprc: document.getElementById("bprice").value,
-		trantype: "B",
-		prctyp: document.getElementById("bptype").value,
-		ret: "DAY",
-	};
-	await all(bvalue, "PlaceOrder");
-}
-// buy button in dashboard
-async function sell() {
-	let svalue = {
-		uid: localStorage.getItem("uid"),
-		actid: localStorage.getItem("actid"),
-		exch: "NFO",
-		tsym: document.getElementById("stsym").innerHTML,
-		qty: document.getElementById("sqty").value,
-		prc: document.getElementById("sprice").value,
-		prd: document.getElementById("sprdt").value == "MIS" ? "I" : "M",
-		trgprc: document.getElementById("sprice").value,
-		trantype: "S",
-		prctyp: document.getElementById("sptype").value,
-		ret: "DAY",
-	};
-	await all(svalue, "PlaceOrder");
-}
-// sell button in dashboard
-async function cancel(cancelB) {
-	let row = cancelB.parentNode.parentNode;
-	let Oid = row.children[8].innerHTML;
-	let cValues = {
-		norenordno: Oid,
-		uid: localStorage.getItem("uid"),
-	};
-	await all(cValues, "CancelOrder");
-	window.location.reload();
-}
-// cancel in open orders
-async function indices() {
-
-	await chart("nf", "26000", "NSE");
-	await chart("bnf", "26009", "NSE");
-	await chart("vix", "26017", "NSE");
-	await chart("sensex", "1", "BSE");
-	sendMessageToSocket(
-		`{"t":"t","k":"NSE|26000#NSE|26009#NSE|26017#NSE|26011#NSE|26008#NSE|26062#NSE|26047#NSE|26030#NSE|26025#NSE|26029#NSE|26021#NSE|26023#NSE|26004"}`
-	);
-	sendMessageToSocket(`{"t":"t","k":"BSE|1"}`);
-}
-// indices
-async function b(buyButton) {
-	let token = await buyButton.parentElement.id;
-	let getsc = {
-		uid: localStorage.getItem("uid"),
-		exch: "NFO",
-		token: token,
-	};
-	let sc = await all(getsc, "GetSecurityInfo");
-	if (document.title == 'Dashboard') {
-		document.getElementById("btsym").innerHTML = sc.tsym;
-		document.getElementById("bqty").setAttribute("step", sc.ls);
-		document.getElementById("bqty").setAttribute("value", sc.ls);
-		document.getElementById("bqty").setAttribute("min", sc.ls);
-		document.getElementById("bprice").value = 0;
-		document.getElementById("bptype").value = "MKT";
-		document.getElementById("bptype").removeAttribute("disabled");
-		document.getElementById("bprdt").removeAttribute("disabled");
-		document.getElementById("bqty").removeAttribute("disabled");
-		document.getElementById("bbutton").removeAttribute("disabled");
-		chart("bchart", sc.token, "NFO");
-		getMarginB();
-	}
-}
-//set buy chart div, buy div
-async function s(sellButton) {
-	let token = sellButton.parentElement.id;
-	let getsc = {
-		uid: localStorage.getItem("uid"),
-		exch: "NFO",
-		token: token,
-	};
-	let sc = await all(getsc, "GetSecurityInfo");
-	if (document.title == 'Dashboard') {
-		document.getElementById("stsym").innerHTML = sc.tsym;
-		document.getElementById("sqty").setAttribute("step", sc.ls);
-		document.getElementById("sqty").setAttribute("value", sc.ls);
-		document.getElementById("sprice").value = 0;
-		document.getElementById("sptype").value = "MKT";
-		document.getElementById("sptype").removeAttribute("disabled");
-		document.getElementById("sprdt").removeAttribute("disabled");
-		document.getElementById("sqty").removeAttribute("disabled");
-		document.getElementById("sbutton").removeAttribute("disabled");
-		chart("schart", sc.token, "NFO");
-		sendMessageToSocket(`{ "t": "t", "k": "NFO|${sc.token}" }`);
-		getMarginS();
-	}
-}
-//set sell chart div, sell div
-function changeValue() {
-	let x = document.getElementById("sptype");
-	if (!x.disabled) {
-		if (x.value == "MKT") {
-			document.getElementById("sprice").toggleAttribute("disabled");
-			document.getElementById("sprice").value = 0;
-			getMarginS();
-		} else {
-			document.getElementById("sprice").toggleAttribute("disabled");
-			getMarginS();
-		}
-	}
-	let y = document.getElementById("bptype");
-	if (!y.disabled) {
-		if (y.value == "MKT") {
-			document.getElementById("bprice").toggleAttribute("disabled");
-			document.getElementById("bprice").value = 0;
-			getMarginB();
-		} else {
-			document.getElementById("bprice").toggleAttribute("disabled");
-			getMarginB();
-		}
-	}
-}
-// disable price on mkt
-async function getMarginB() {
-	let mV = {
-		uid: localStorage.getItem("uid"),
-		actid: localStorage.getItem("actid"),
-		exch: "NFO",
-		tsym: btsym.innerHTML,
-		qty: document.getElementById("bqty").value,
-		prc: document.getElementById("bprice").value,
-		prd: document.getElementById("bprdt").value == "MIS" ? "I" : "M",
-		trantype: "B",
-		prctyp: document.getElementById("bptype").value,
-		rorgqty: "0",
-		rorgprc: "0",
-	};
-	let marg = await all(mV, "GetOrderMargin");
-	document.getElementById("breq").innerHTML = marg.marginused;
-	marg.remarks == "Order Success"
-		? document.getElementById("breq").setAttribute("class", "green")
-		: document.getElementById("breq").setAttribute("class", "red");
-}
-// get Req Margin
-async function getMarginS() {
-	let mV = {
-		uid: localStorage.getItem("uid"),
-		actid: localStorage.getItem("actid"),
-		exch: "NFO",
-		tsym: stsym.innerHTML,
-		qty: document.getElementById("sqty").value,
-		prc: document.getElementById("sprice").value,
-		prd: document.getElementById("sprdt").value == "MIS" ? "I" : "M",
-		trantype: "S",
-		prctyp: document.getElementById("sptype").value,
-		rorgqty: "0",
-		rorgprc: "0",
-	};
-	let marg = await all(mV, "GetOrderMargin");
-	document.getElementById("sreq").innerHTML = marg.marginused;
-	marg.remarks == "Order Success"
-		? document.getElementById("sreq").setAttribute("class", "green")
-		: document.getElementById("sreq").setAttribute("class", "red");
-}
-// get Req Margin
 let distribution = document.title == 'Option Chain' || document.title == 'Strategy Builder' || document.title == 'Positions' ? gaussian(0, 1) : null;
 // declaring iv variable factor
 function volFind(row) {
@@ -2738,86 +3038,6 @@ function closeAlert() {
 	document.getElementById("alert").classList.add("d-none");
 }
 //close alert button
-async function addLeg() {
-	let table = document.getElementById('stratBody');
-	let row = document.createElement('tr');
-	let expiry = document.getElementById('exp').value.split(" ", 1);
-	row.innerHTML = `<td>
-		<input type="checkbox" checked name="boxes">
-		</td>`;
-
-	row.innerHTML += `
-			<td>
-			<label class="toggle">
-				<input type="checkbox" name="bs" onchange="changeStrike(this)">
-					<span class="labels" data-on="B" data-off="S"></span>
-			</label>
-</td> `;
-	row.innerHTML += `
-		<td>
-		${expiry}
-</td> `;
-	row.innerHTML += `
-		<td>
-		<div class="input-group mb-3">
-			<input type="number" class="form-control" value="${document.getElementById('strikeP').innerHTML}"
-				step="${document.getElementById('diff').innerHTML}" onchange="changeStrike(this)" name="strike">
-		</div>
-</td> `;
-	row.innerHTML += `
-		<td>
-		<label class="toggle">
-			<input type="checkbox" name="cepe" onchange="changeStrike(this)">
-				<span class="labels" data-on="CE" data-off="PE"></span>
-		</label>
-</td> `;
-	row.innerHTML += `
-		<td>
-		<div class="input-group mb-3">
-			<input type="number" class="form-control" value='${document.getElementById('ls').innerHTML}'
-			min='${document.getElementById('ls').innerHTML}' step='${document.getElementById('ls').innerHTML}' name="qty">
-		</div>
-</td> `;
-	let scriptN = document.getElementById('name').innerHTML;
-	let scriptName = scriptN.slice(-4) == '-EQ ' ? scriptN.substring(0, scriptN.length - 4) : scriptN;
-	scriptName = scriptN.slice(-2) == 'F ' ? scriptN.substring(0, scriptN.length - 9) : scriptN;
-	let svalues = {
-		uid: localStorage.getItem("uid"),
-		stext: scriptName + ' ' + expiry + ' ' + document.getElementById('strikeP').innerHTML + ' PE',
-		exch: "NFO",
-	};
-	let scripts = await all(svalues, "SearchScrip");
-	row.innerHTML += `
-		<td id="${scripts.values[0].token}"> 0 </td> `;
-	row.innerHTML += `<td>
-			<select class="form-control" name="NM">
-				<option>NRML</option>
-				<option>MIS</option>
-			</select>
-	</td> `;
-	row.innerHTML += `<td> Delta
-	</td> `;
-	row.innerHTML += `<td> theta
-	</td> `;
-	row.innerHTML += `<td> gamma
-	</td> `;
-	row.innerHTML += `<td> vega
-	</td> `;
-	row.innerHTML += `<td> 50
-	</td> `;
-	row.innerHTML += `
-		<td>
-		<span class="badge bg-secondary strat-badge"
-			onclick="this.parentElement.parentElement.remove()">DEL</span>
-</td> `;
-	sendMessageToSocket(`{ "t": "t", "k": "NFO|${scripts.values[0].token}" } `);
-	row.classList.add('strat-inner');
-	row.innerHTML += `<td class='d-none'>${scripts.values[0].tsym}</td> `;
-	table.appendChild(row);
-	limits();
-	basketMargins();
-}
-//add leg to strategy builder
 async function findGreek(row) {
 	let date_expiry = new Date(row.children[2].innerHTML.replaceAll('-', '/'));
 	let volt = parseFloat(row.children[12].innerHTML) >= 0 ? parseFloat(row.children[12].innerHTML) / 100 : 50;
@@ -2887,202 +3107,6 @@ async function findGreek(row) {
 		put_rho = (-1 * fv_strike * delta_t * distribution.cdf(-1 * d2)) / 100;
 }
 //find iv in oi table
-async function changeStrike(strikeList) {
-	let row = strikeList.parentElement.parentElement.parentElement;
-	let scriptN = document.getElementById('name').innerHTML;
-	let scriptName = scriptN.slice(-4) == '-EQ ' ? scriptN.substring(0, scriptN.length - 4) : scriptN;
-	let svalues = {
-		uid: localStorage.getItem("uid"),
-		stext: scriptName + ' ' + row.children[2].innerText + ' ' + row.querySelector('input[name="strike"]').value + (row.querySelector('input[name="cepe"]').checked ? ' CE' : ' PE'),
-		exch: "NFO",
-	};
-	let scripts = await all(svalues, "SearchScrip");
-	row.children[6].id = scripts.values[0].token;
-	row.children[12].innerHTML = 50;
-	row.children[14].innerHTML = scripts.values[0].tsym;
-	sendMessageToSocket(`{ "t": "t", "k": "NFO|${scripts.values[0].token}" } `);
-	limits();
-	basketMargins();
-}
-//strategy builder change strike or ce pe
-function tradeAll() {
-	let checkboxes = document.querySelectorAll("input[name='boxes']");
-	let rows = [];
-	for (let checkbox of checkboxes) {
-		let row = checkbox.parentElement.parentElement;
-		rows.push(row);
-	}
-	rows.sort((a, b) => {
-		return a.querySelector("input[name='qty']") - b.querySelector("input[name='qty']");
-	});
-	rows.forEach((row, i) => {
-		setTimeout(
-			function () {
-				let value = {
-					uid: localStorage.getItem("uid"),
-					actid: localStorage.getItem("actid"),
-					exch: 'NFO',
-					tsym: row.children[14].innerHTML,
-					qty: row.querySelector('input[name="qty"]').value,
-					prc: "0",
-					prd:
-						row.querySelector('select[name="NM"]').value == "MIS"
-							? "I"
-							: "M",
-					trantype: row.querySelector('input[name="bs"]').checked ? "B" : "S",
-					prctyp: "MKT",
-					ret: "DAY",
-				};
-				all(value, "PlaceOrder");
-			}, i * 200)
-	});
-}
-//trade all strategy builder
-function tradeS() {
-	let checkboxes = document.querySelectorAll("input[name='boxes']");
-	let rows = [];
-	for (let checkbox of checkboxes) {
-		if (checkbox.checked == true) {
-			let row = checkbox.parentElement.parentElement;
-			rows.push(row);
-		}
-	}
-	rows.sort((a, b) => {
-		return a.querySelector("input[name='qty']") - b.querySelector("input[name='qty']");
-	});
-	rows.forEach((row, i) => {
-		setTimeout(
-			function () {
-				let value = {
-					uid: localStorage.getItem("uid"),
-					actid: localStorage.getItem("actid"),
-					exch: 'NFO',
-					tsym: row.children[14].innerHTML,
-					qty: row.querySelector('input[name="qty"]').value,
-					prc: "0",
-					prd:
-						row.querySelector('select[name="NM"]').value == "MIS"
-							? "I"
-							: "M",
-					trantype: row.querySelector('input[name="bs"]').checked ? "B" : "S",
-					prctyp: "MKT",
-					ret: "DAY",
-				};
-				all(value, "PlaceOrder");
-			}, i * 200)
-	});
-}
-//trade selected strategy builder
-async function basketMargins() {
-	let checkboxes = document.querySelectorAll("input[name='boxes']");
-	//console.log(checkboxes);
-	let rows = [];
-	for (let checkbox of checkboxes) {
-		if (checkbox.checked == true) {
-			let row = checkbox.parentElement.parentElement;
-			rows.push(row);
-		}
-	}
-	let value;
-	let baskets = [];
-	for (let i = 0; i < rows.length; i++) {
-		const row = rows[i];
-		//console.log(row)
-		if (i == 0) {
-			value = {
-				uid: localStorage.getItem("uid"),
-				actid: localStorage.getItem("actid"),
-				exch: 'NFO',
-				tsym: row.children[14].innerHTML,
-				qty: row.querySelector('input[name="qty"]').value,
-				prc: "0",
-				prd:
-					row.querySelector('select[name="NM"]').value == "MIS"
-						? "I"
-						: "M",
-				trantype: row.querySelector('input[name="bs"]').checked ? "B" : "S",
-				prctyp: "MKT",
-			};
-		}
-		else {
-			let values = {
-				exch: 'NFO',
-				tsym: row.children[14].innerHTML,
-				qty: row.querySelector('input[name="qty"]').value,
-				prc: "0",
-				prd:
-					row.querySelector('select[name="NM"]').value == "MIS"
-						? "I"
-						: "M",
-				trantype: row.querySelector('input[name="bs"]').checked ? "B" : "S",
-				prctyp: "MKT",
-			};
-			baskets.push(values);
-		}
-	}
-	value.basketlists = baskets;
-	let margins = await all(value, 'GetBasketMargin');
-	document.getElementById('funds').innerHTML = margins.marginused;
-	document.getElementById('margin').innerHTML = margins.marginusedtrade;
-}
-//basket margin show
-async function roi() {
-	let checkboxes = document.getElementsByClassName("cb");
-	let rows = [];
-	for (let checkbox of checkboxes) {
-		let row = checkbox.parentElement.parentElement;
-		rows.push(row);
-	}
-	let value;
-	let baskets = [];
-	for (let i = 0; i < rows.length; i++) {
-		const row = rows[i];
-		if (Math.abs(row.children[5].innerHTML) != 0 && row.children[4].innerHTML == "NFO") {
-			if (i == 0) {
-				value = {
-					uid: localStorage.getItem("uid"),
-					actid: localStorage.getItem("actid"),
-					exch: row.children[4].innerHTML,
-					tsym: row.children[13].innerHTML,
-					qty: `${Math.abs(row.children[5].innerHTML)}`,
-					prc: row.children[6].innerHTML,
-					prd:
-						row.children[1].innerHTML == "MIS"
-							? "I"
-							: row.children[4].innerHTML == "NFO"
-								? "M"
-								: "C",
-					trantype: parseInt(row.children[5].innerHTML) > 0 ? "B" : "S",
-					prctyp: "LMT"
-				};
-			}
-			else {
-				let values = {
-					exch: row.children[4].innerHTML,
-					tsym: row.children[13].innerHTML,
-					qty: `${Math.abs(row.children[5].innerHTML)}`,
-					prc: row.children[6].innerHTML,
-					prd:
-						row.children[1].innerHTML == "MIS"
-							? "I"
-							: row.children[4].innerHTML == "NFO"
-								? "M"
-								: "C",
-					trantype: parseInt(row.children[5].innerHTML) > 0 ? "B" : "S",
-					prctyp: "LMT",
-				};
-				baskets.push(values);
-			}
-		}
-	}
-	if (value != undefined) {
-		value.basketlists = baskets == undefined ? null : baskets;
-		all(value, "GetBasketMargin").then(element => {
-			document.getElementById('margin').innerHTML = parseInt(element.marginusedtrade) / 2;
-		});
-	}
-}
-//roi calculator
 function changeDiv(buttons) {
 	let button = buttons.innerHTML;
 	if (button == "Table") {
@@ -3102,44 +3126,6 @@ function changeDiv(buttons) {
 	}
 }
 //change OI div
-function webhook(discordUrl) {
-	function dataURLtoFile(dataurl, filename) {
-		let arr = dataurl.split(','),
-			mime = arr[0].match(/:(.*?);/)[1],
-			bstr = atob(arr[1]),
-			n = bstr.length,
-			u8arr = new Uint8Array(n);
-		while (n--) {
-			u8arr[n] = bstr.charCodeAt(n);
-		}
-		return new File([u8arr], filename, { type: mime });
-	}
-	setInterval(() => {
-		htmlToImage.toJpeg(discordUrl.parentElement.parentElement.parentElement.parentElement)
-			.then(function (dataUrl) {
-				//let img = canvas.toDataURL("image/png");
-				let formdata1 = new FormData();
-				let file = dataURLtoFile(dataUrl, 'unknown.jpeg');
-				formdata1.append("file1", file);
-				let dated = new Date;
-				let time = {
-					content: dated.toLocaleTimeString()
-				}
-				time = JSON.stringify(time);
-				formdata1.append("payload_json", time);
-				let requestOptions = {
-					method: 'POST',
-					body: formdata1,
-				};
-				fetch(discordUrl.value, requestOptions)
-					.then(response => response.text())
-					.then(result => null)
-					.catch(error => console.log('error', error));
-			});
-	}, 60000);
-};
-//send position ss
-
 async function hedge() {
 	let posvalues = {
 		uid: localStorage.getItem("uid"),
@@ -3258,4 +3244,14 @@ async function placeOrder(pos) {
 			}
 		}
 	}
+}
+async function indices() {
+	await chart("nf", "26000", "NSE");
+	await chart("bnf", "26009", "NSE");
+	await chart("vix", "26017", "NSE");
+	await chart("sensex", "1", "BSE");
+	sendMessageToSocket(
+		`{"t":"t","k":"NSE|26000#NSE|26009#NSE|26017#NSE|26011#NSE|26008#NSE|26062#NSE|26047#NSE|26030#NSE|26025#NSE|26029#NSE|26021#NSE|26023#NSE|26004"}`
+	);
+	sendMessageToSocket(`{"t":"t","k":"BSE|1"}`);
 }
