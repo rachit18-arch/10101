@@ -859,7 +859,7 @@ function table(element) {
 	});
 	let tfoot = document.createElement('tfoot');
 	tfoot.innerHTML = `<tr>
-	   <td><button id="eSB" class="d-none" onclick="exitS()">Exit</button></td>
+	   <td><button id="eSB" class="d-none" onclick="exitS(this)">Exit</button></td>
 	   <td></td>
 	   <td></td>
 	   <td><input class="form-control" placeholder="Discord Api" onchange="webhook(this)"></td>
@@ -945,8 +945,9 @@ function show() {
 	}
 }
 // show exit button
-async function exitS() {
-	let checkboxes = document.getElementsByClassName("cb");
+async function exitS(exitB) {
+	let table = exitB.parentElement.parentElement.parentElement.parentElement
+	let checkboxes = table.getElementsByClassName("cb");
 	let rows = [];
 	for (let checkbox of checkboxes) {
 		if (checkbox.checked == true) {
@@ -1104,40 +1105,47 @@ function changePrice() {
 }
 //change Price in pos exit pop up
 function webhook(discordUrl) {
-	function dataURLtoFile(dataurl, filename) {
-		let arr = dataurl.split(','),
-			mime = arr[0].match(/:(.*?);/)[1],
-			bstr = atob(arr[1]),
-			n = bstr.length,
-			u8arr = new Uint8Array(n);
-		while (n--) {
-			u8arr[n] = bstr.charCodeAt(n);
+	let date = new Date;
+	let preSession = new Date;
+	let postSession = new Date;
+	preSession.setHours(9, 14, 0, 0);
+	postSession.setHours(15, 32, 0, 0);
+	if (date.preSession >= 9 && date <= postSession) {
+		function dataURLtoFile(dataurl, filename) {
+			let arr = dataurl.split(','),
+				mime = arr[0].match(/:(.*?);/)[1],
+				bstr = atob(arr[1]),
+				n = bstr.length,
+				u8arr = new Uint8Array(n);
+			while (n--) {
+				u8arr[n] = bstr.charCodeAt(n);
+			}
+			return new File([u8arr], filename, { type: mime });
 		}
-		return new File([u8arr], filename, { type: mime });
+		setInterval(() => {
+			htmlToImage.toJpeg(discordUrl.parentElement.parentElement.parentElement.parentElement)
+				.then(function (dataUrl) {
+					//let img = canvas.toDataURL("image/png");
+					let formdata1 = new FormData();
+					let file = dataURLtoFile(dataUrl, 'unknown.jpeg');
+					formdata1.append("file1", file);
+					let dated = new Date;
+					let time = {
+						content: dated.toLocaleTimeString()
+					}
+					time = JSON.stringify(time);
+					formdata1.append("payload_json", time);
+					let requestOptions = {
+						method: 'POST',
+						body: formdata1,
+					};
+					fetch(discordUrl.value, requestOptions)
+						.then(response => response.text())
+						.then(result => null)
+						.catch(error => console.log('error', error));
+				});
+		}, 60000);
 	}
-	setInterval(() => {
-		htmlToImage.toJpeg(discordUrl.parentElement.parentElement.parentElement.parentElement)
-			.then(function (dataUrl) {
-				//let img = canvas.toDataURL("image/png");
-				let formdata1 = new FormData();
-				let file = dataURLtoFile(dataUrl, 'unknown.jpeg');
-				formdata1.append("file1", file);
-				let dated = new Date;
-				let time = {
-					content: dated.toLocaleTimeString()
-				}
-				time = JSON.stringify(time);
-				formdata1.append("payload_json", time);
-				let requestOptions = {
-					method: 'POST',
-					body: formdata1,
-				};
-				fetch(discordUrl.value, requestOptions)
-					.then(response => response.text())
-					.then(result => null)
-					.catch(error => console.log('error', error));
-			});
-	}, 60000);
 };
 //send position ss
 async function chart(element, iT, tex) {
@@ -1455,42 +1463,18 @@ async function addLeg() {
 	let table = document.getElementById('stratBody');
 	let row = document.createElement('tr');
 	let expiry = document.getElementById('exp').value.split(" ", 1);
-	row.innerHTML = `<td>
-		<input type="checkbox" checked name="boxes">
-		</td>`;
-
-	row.innerHTML += `
-			<td>
-			<label class="toggle">
-				<input type="checkbox" name="bs" onchange="changeStrike(this)">
-					<span class="labels" data-on="B" data-off="S"></span>
-			</label>
-</td> `;
-	row.innerHTML += `
-		<td>
-		${expiry}
-</td> `;
-	row.innerHTML += `
-		<td>
-		<div class="input-group mb-3">
-			<input type="number" class="form-control" value="${document.getElementById('strikeP').innerHTML}"
-				step="${document.getElementById('diff').innerHTML}" onchange="changeStrike(this)" name="strike">
-		</div>
-</td> `;
-	row.innerHTML += `
-		<td>
-		<label class="toggle">
+	row.insertCell(0).innerHTML = `<input type="checkbox" checked name="boxes">`;
+	row.insertCell(1).innerHTML =
+		`<label class="toggle"><input type="checkbox" name="bs" onchange="changeStrike(this)"><span class="labels" data-on="B" data-off="S"></span></label>`;
+	row.insertCell(2).innerHTML = expiry;
+	row.insertCell(3).innerHTML = `<input type="number" class="form-control" value="${document.getElementById('strikeP').innerHTML}"
+				step="${document.getElementById('diff').innerHTML}" onchange="changeStrike(this)" name="strike">`;
+	row.insertCell(4).innerHTML = `<label class="toggle">
 			<input type="checkbox" name="cepe" onchange="changeStrike(this)">
 				<span class="labels" data-on="CE" data-off="PE"></span>
-		</label>
-</td> `;
-	row.innerHTML += `
-		<td>
-		<div class="input-group mb-3">
-			<input type="number" class="form-control" value='${document.getElementById('ls').innerHTML}'
-			min='${document.getElementById('ls').innerHTML}' step='${document.getElementById('ls').innerHTML}' name="qty">
-		</div>
-</td> `;
+		</label>`;
+	row.insertCell(5).innerHTML = `<input type="number" class="form-control" value='${document.getElementById('ls').innerHTML}'
+			min='${document.getElementById('ls').innerHTML}' step='${document.getElementById('ls').innerHTML}' name="qty">`;
 	let scriptN = document.getElementById('name').innerHTML;
 	let scriptName = scriptN.slice(-4) == '-EQ ' ? scriptN.substring(0, scriptN.length - 4) : scriptN;
 	scriptName = scriptN.slice(-2) == 'F ' ? scriptN.substring(0, scriptN.length - 9) : scriptN;
@@ -1500,32 +1484,23 @@ async function addLeg() {
 		exch: "NFO",
 	};
 	let scripts = await all(svalues, "SearchScrip");
-	row.innerHTML += `
-		<td id="${scripts.values[0].token}"> 0 </td> `;
-	row.innerHTML += `<td>
-			<select class="form-control" name="NM">
+	row.insertCell(6).id = scripts.values[0].token;
+	row.insertCell(7).innerHTML = `<select class="form-control" name="NM">
 				<option>NRML</option>
 				<option>MIS</option>
-			</select>
-	</td> `;
-	row.innerHTML += `<td> Delta
-	</td> `;
-	row.innerHTML += `<td> theta
-	</td> `;
-	row.innerHTML += `<td> gamma
-	</td> `;
-	row.innerHTML += `<td> vega
-	</td> `;
-	row.innerHTML += `<td> 50
-	</td> `;
-	row.innerHTML += `
-		<td>
-		<span class="badge bg-secondary strat-badge"
-			onclick="this.parentElement.parentElement.remove()">DEL</span>
-</td> `;
+			</select>`;
+	row.insertCell(8).innerHTML = `Delta`;
+	row.insertCell(9).innerHTML = `Theta`;
+	row.insertCell(10).innerHTML = `Gamma`;
+	row.insertCell(11).innerHTML = `Vega`;
+	row.insertCell(12).innerHTML = `50`;
+	row.insertCell(13).innerHTML += `<span class="badge bg-secondary strat-badge"
+			onclick="this.parentElement.parentElement.remove()">DEL</span>`;
 	sendMessageToSocket(`{ "t": "t", "k": "NFO|${scripts.values[0].token}" } `);
 	row.classList.add('strat-inner');
-	row.innerHTML += `<td class='d-none'>${scripts.values[0].tsym}</td> `;
+	let cell14 = row.insertCell(14)
+	cell14.innerHTML = scripts.values[0].tsym;
+	cell14.classList.add('d-none');
 	table.appendChild(row);
 	limits();
 	basketMargins();
@@ -2300,11 +2275,11 @@ async function optionSort(oFOV) {
 		};
 		let ocV = await all(ocvalues, "GetOptionChain");
 
-		let num = ocV.values[0].tsym.match(/\d+/g);
-		let num1 = ocV.values[1].tsym.match(/\d+/g);
-		let diff = num1[2] - num[2];
+		let num = parseInt(ocV.values[0].strprc);
+		let num1 = parseInt(ocV.values[1].strprc);
+		let diff = Math.abs(num1 - num);
 		document.getElementById('diff').innerHTML = diff;
-		document.getElementById('strikeP').innerHTML = num[2];
+		document.getElementById('strikeP').innerHTML = num;
 		document.getElementById('ls').innerHTML = ocV.values[0].ls;
 		document.getElementById('stratBody').innerHTML = null;
 		addLeg();
@@ -3245,6 +3220,7 @@ async function placeOrder(pos) {
 		}
 	}
 }
+//hedge
 async function indices() {
 	await chart("nf", "26000", "NSE");
 	await chart("bnf", "26009", "NSE");
@@ -3254,4 +3230,6 @@ async function indices() {
 		`{"t":"t","k":"NSE|26000#NSE|26009#NSE|26017#NSE|26011#NSE|26008#NSE|26062#NSE|26047#NSE|26030#NSE|26025#NSE|26029#NSE|26021#NSE|26023#NSE|26004"}`
 	);
 	sendMessageToSocket(`{"t":"t","k":"BSE|1"}`);
+}
+//indices
 }
