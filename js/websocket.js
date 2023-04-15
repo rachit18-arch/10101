@@ -117,6 +117,14 @@ worker.port.addEventListener("message", function (msg) {
             }
         }
     }
+    if (document.title === "Adjustment") {
+        if (result.lp) {
+            let row = document.getElementById(`${result.tk}`).parentElement;
+            if (row.children.length > 4) {
+                calcIV(row)
+            }
+        }
+    }
     if (document.title === "Holdings") {
         if (result.lp) {
             let row = document.getElementById(`${result.tk}`).parentElement;
