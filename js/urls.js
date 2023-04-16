@@ -35,6 +35,8 @@ if ("susertoken" in localStorage && getCookie("loggedIn")) {
 		window.onload = indices;
 	} else if (document.title === "Hedge") {
 		window.onload = hedge;
+	} else if (document.title === "Adjustment") {
+		window.onload = adjustment;
 	}
 } else {
 	alert("Not Logged In");
@@ -859,7 +861,7 @@ function table(element) {
 	});
 	let tfoot = document.createElement('tfoot');
 	tfoot.innerHTML = `<tr>
-	   <td><button id="eSB" class="d-none" onclick="exitS()">Exit</button></td>
+	   <td><button id="eSB" class="d-none" onclick="exitS(this)">Exit</button></td>
 	   <td></td>
 	   <td></td>
 	   <td><input class="form-control" placeholder="Discord Api" onchange="webhook(this)"></td>
@@ -912,9 +914,15 @@ function hideTables(posTables) {
 	let tables = document.querySelectorAll('table');
 	tables.forEach(element => {
 		element.classList.add('d-none');
+		if (document.title === "Adjustment") {
+			element.nextElementSibling ? element.nextElementSibling.classList.add('d-none') : null;
+		}
 	});
 	let table = posTables.nextElementSibling;
 	table.classList.remove('d-none');
+	if (document.title === "Adjustment") {
+		table.nextElementSibling ? table.nextElementSibling.classList.remove('d-none') : null;
+	}
 }
 //hide Other Tables in Positions
 function checkAll(boxes) {
@@ -945,8 +953,9 @@ function show() {
 	}
 }
 // show exit button
-async function exitS() {
-	let checkboxes = document.getElementsByClassName("cb");
+async function exitS(exitB) {
+	let table = exitB.parentElement.parentElement.parentElement.parentElement
+	let checkboxes = table.getElementsByClassName("cb");
 	let rows = [];
 	for (let checkbox of checkboxes) {
 		if (checkbox.checked == true) {
@@ -1104,40 +1113,47 @@ function changePrice() {
 }
 //change Price in pos exit pop up
 function webhook(discordUrl) {
-	function dataURLtoFile(dataurl, filename) {
-		let arr = dataurl.split(','),
-			mime = arr[0].match(/:(.*?);/)[1],
-			bstr = atob(arr[1]),
-			n = bstr.length,
-			u8arr = new Uint8Array(n);
-		while (n--) {
-			u8arr[n] = bstr.charCodeAt(n);
+	let date = new Date;
+	let preSession = new Date;
+	let postSession = new Date;
+	preSession.setHours(9, 14, 0, 0);
+	postSession.setHours(15, 32, 0, 0);
+	if (date.preSession >= 9 && date <= postSession) {
+		function dataURLtoFile(dataurl, filename) {
+			let arr = dataurl.split(','),
+				mime = arr[0].match(/:(.*?);/)[1],
+				bstr = atob(arr[1]),
+				n = bstr.length,
+				u8arr = new Uint8Array(n);
+			while (n--) {
+				u8arr[n] = bstr.charCodeAt(n);
+			}
+			return new File([u8arr], filename, { type: mime });
 		}
-		return new File([u8arr], filename, { type: mime });
+		setInterval(() => {
+			htmlToImage.toJpeg(discordUrl.parentElement.parentElement.parentElement.parentElement)
+				.then(function (dataUrl) {
+					//let img = canvas.toDataURL("image/png");
+					let formdata1 = new FormData();
+					let file = dataURLtoFile(dataUrl, 'unknown.jpeg');
+					formdata1.append("file1", file);
+					let dated = new Date;
+					let time = {
+						content: dated.toLocaleTimeString()
+					}
+					time = JSON.stringify(time);
+					formdata1.append("payload_json", time);
+					let requestOptions = {
+						method: 'POST',
+						body: formdata1,
+					};
+					fetch(discordUrl.value, requestOptions)
+						.then(response => response.text())
+						.then(result => null)
+						.catch(error => console.log('error', error));
+				});
+		}, 60000);
 	}
-	setInterval(() => {
-		htmlToImage.toJpeg(discordUrl.parentElement.parentElement.parentElement.parentElement)
-			.then(function (dataUrl) {
-				//let img = canvas.toDataURL("image/png");
-				let formdata1 = new FormData();
-				let file = dataURLtoFile(dataUrl, 'unknown.jpeg');
-				formdata1.append("file1", file);
-				let dated = new Date;
-				let time = {
-					content: dated.toLocaleTimeString()
-				}
-				time = JSON.stringify(time);
-				formdata1.append("payload_json", time);
-				let requestOptions = {
-					method: 'POST',
-					body: formdata1,
-				};
-				fetch(discordUrl.value, requestOptions)
-					.then(response => response.text())
-					.then(result => null)
-					.catch(error => console.log('error', error));
-			});
-	}, 60000);
 };
 //send position ss
 async function chart(element, iT, tex) {
@@ -1455,42 +1471,18 @@ async function addLeg() {
 	let table = document.getElementById('stratBody');
 	let row = document.createElement('tr');
 	let expiry = document.getElementById('exp').value.split(" ", 1);
-	row.innerHTML = `<td>
-		<input type="checkbox" checked name="boxes">
-		</td>`;
-
-	row.innerHTML += `
-			<td>
-			<label class="toggle">
-				<input type="checkbox" name="bs" onchange="changeStrike(this)">
-					<span class="labels" data-on="B" data-off="S"></span>
-			</label>
-</td> `;
-	row.innerHTML += `
-		<td>
-		${expiry}
-</td> `;
-	row.innerHTML += `
-		<td>
-		<div class="input-group mb-3">
-			<input type="number" class="form-control" value="${document.getElementById('strikeP').innerHTML}"
-				step="${document.getElementById('diff').innerHTML}" onchange="changeStrike(this)" name="strike">
-		</div>
-</td> `;
-	row.innerHTML += `
-		<td>
-		<label class="toggle">
+	row.insertCell(0).innerHTML = `<input type="checkbox" checked name="boxes">`;
+	row.insertCell(1).innerHTML =
+		`<label class="toggle"><input type="checkbox" name="bs" onchange="changeStrike(this)"><span class="labels" data-on="B" data-off="S"></span></label>`;
+	row.insertCell(2).innerHTML = expiry;
+	row.insertCell(3).innerHTML = `<label><input type="number" class="form-control" value="${document.getElementById('strikeP').innerHTML}"
+				step="${document.getElementById('diff').innerHTML}" onchange="changeStrike(this)" name="strike"></label>`;
+	row.insertCell(4).innerHTML = `<label class="toggle">
 			<input type="checkbox" name="cepe" onchange="changeStrike(this)">
 				<span class="labels" data-on="CE" data-off="PE"></span>
-		</label>
-</td> `;
-	row.innerHTML += `
-		<td>
-		<div class="input-group mb-3">
-			<input type="number" class="form-control" value='${document.getElementById('ls').innerHTML}'
-			min='${document.getElementById('ls').innerHTML}' step='${document.getElementById('ls').innerHTML}' name="qty">
-		</div>
-</td> `;
+		</label>`;
+	row.insertCell(5).innerHTML = `<input type="number" class="form-control" value='${document.getElementById('ls').innerHTML}'
+			min='${document.getElementById('ls').innerHTML}' step='${document.getElementById('ls').innerHTML}' name="qty">`;
 	let scriptN = document.getElementById('name').innerHTML;
 	let scriptName = scriptN.slice(-4) == '-EQ ' ? scriptN.substring(0, scriptN.length - 4) : scriptN;
 	scriptName = scriptN.slice(-2) == 'F ' ? scriptN.substring(0, scriptN.length - 9) : scriptN;
@@ -1500,32 +1492,23 @@ async function addLeg() {
 		exch: "NFO",
 	};
 	let scripts = await all(svalues, "SearchScrip");
-	row.innerHTML += `
-		<td id="${scripts.values[0].token}"> 0 </td> `;
-	row.innerHTML += `<td>
-			<select class="form-control" name="NM">
+	row.insertCell(6).id = scripts.values[0].token;
+	row.insertCell(7).innerHTML = `<select class="form-control" name="NM">
 				<option>NRML</option>
 				<option>MIS</option>
-			</select>
-	</td> `;
-	row.innerHTML += `<td> Delta
-	</td> `;
-	row.innerHTML += `<td> theta
-	</td> `;
-	row.innerHTML += `<td> gamma
-	</td> `;
-	row.innerHTML += `<td> vega
-	</td> `;
-	row.innerHTML += `<td> 50
-	</td> `;
-	row.innerHTML += `
-		<td>
-		<span class="badge bg-secondary strat-badge"
-			onclick="this.parentElement.parentElement.remove()">DEL</span>
-</td> `;
+			</select>`;
+	row.insertCell(8).innerHTML = `Delta`;
+	row.insertCell(9).innerHTML = `Theta`;
+	row.insertCell(10).innerHTML = `Gamma`;
+	row.insertCell(11).innerHTML = `Vega`;
+	row.insertCell(12).innerHTML = `50`;
+	row.insertCell(13).innerHTML += `<span class="badge bg-secondary strat-badge"
+			onclick="this.parentElement.parentElement.remove()">DEL</span>`;
 	sendMessageToSocket(`{ "t": "t", "k": "NFO|${scripts.values[0].token}" } `);
 	row.classList.add('strat-inner');
-	row.innerHTML += `<td class='d-none'>${scripts.values[0].tsym}</td> `;
+	let cell14 = row.insertCell(14)
+	cell14.innerHTML = scripts.values[0].tsym;
+	cell14.classList.add('d-none');
 	table.appendChild(row);
 	limits();
 	basketMargins();
@@ -1914,7 +1897,7 @@ async function options() {
 
 }
 //oc
-let distribution = document.title == 'Option Chain' || document.title == 'Strategy Builder' || document.title == 'Positions' ? gaussian(0, 1) : null;
+let distribution = document.title == 'Option Chain' || document.title == 'Strategy Builder' || document.title == 'Positions' || document.title == 'Adjustment' ? gaussian(0, 1) : null;
 // declaring iv variable factor
 function volFind(row) {
 	let date_expiry = new Date(document.getElementById("exp").value.slice(0, 11).replaceAll('-', '/'));
@@ -2300,11 +2283,11 @@ async function optionSort(oFOV) {
 		};
 		let ocV = await all(ocvalues, "GetOptionChain");
 
-		let num = ocV.values[0].tsym.match(/\d+/g);
-		let num1 = ocV.values[1].tsym.match(/\d+/g);
-		let diff = num1[2] - num[2];
+		let num = parseInt(ocV.values[0].strprc);
+		let num1 = parseInt(ocV.values[1].strprc);
+		let diff = Math.abs(num1 - num);
 		document.getElementById('diff').innerHTML = diff;
-		document.getElementById('strikeP').innerHTML = num[2];
+		document.getElementById('strikeP').innerHTML = num;
 		document.getElementById('ls').innerHTML = ocV.values[0].ls;
 		document.getElementById('stratBody').innerHTML = null;
 		addLeg();
@@ -3245,6 +3228,7 @@ async function placeOrder(pos) {
 		}
 	}
 }
+//hedge
 async function indices() {
 	await chart("nf", "26000", "NSE");
 	await chart("bnf", "26009", "NSE");
@@ -3255,3 +3239,545 @@ async function indices() {
 	);
 	sendMessageToSocket(`{"t":"t","k":"BSE|1"}`);
 }
+//indices
+async function adjustment() {
+	let posvalues = {
+		uid: localStorage.getItem("uid"),
+		actid: localStorage.getItem("actid"),
+	};
+	let pos = await all(posvalues, "PositionBook");
+	if (pos.stat == "Not_Ok") {
+		document.getElementById("NSEHeader").classList.add("d-none");
+		document.getElementById("noP").classList.remove("d-none");
+	} else {
+		let fnoScirpts = [
+			{ value: '26009', name: 'BANKNIFTY' },
+			{ value: '26000', name: 'NIFTY' },
+			{ value: '26037', name: 'FINNIFTY' },
+			{ value: '7', name: 'AARTIIND' },
+			{ value: '13', name: 'ABB' },
+			{ value: '17903', name: 'ABBOTINDIA' },
+			{ value: '21614', name: 'ABCAPITAL' },
+			{ value: '30108', name: 'ABFRL' },
+			{ value: '22', name: 'ACC' },
+			{ value: '25', name: 'ADANIENT' },
+			{ value: '15083', name: 'ADANIPORTS' },
+			{ value: '11703', name: 'ALKEM' },
+			{ value: '100', name: 'AMARAJABAT' },
+			{ value: '1270', name: 'AMBUJACEM' },
+			{ value: '157', name: 'APOLLOHOSP' },
+			{ value: '163', name: 'APOLLOTYRE' },
+			{ value: '212', name: 'ASHOKLEY' },
+			{ value: '236', name: 'ASIANPAINT' },
+			{ value: '14418', name: 'ASTRAL' },
+			{ value: '263', name: 'ATUL' },
+			{ value: '21238', name: 'AUBANK' },
+			{ value: '275', name: 'AUROPHARMA' },
+			{ value: '5900', name: 'AXISBANK' },
+			{ value: '16669', name: 'BAJAJ - AUTO' },
+			{ value: '16675', name: 'BAJAJFINSV' },
+			{ value: '317', name: 'BAJFINANCE' },
+			{ value: '335', name: 'BALKRISIND' },
+			{ value: '341', name: 'BALRAMCHIN' },
+			{ value: '2263', name: 'BANDHANBNK' },
+			{ value: '4668', name: 'BANKBARODA' },
+			{ value: '371', name: 'BATAINDIA' },
+			{ value: '383', name: 'BEL' },
+			{ value: '404', name: 'BERGEPAINT' },
+			{ value: '422', name: 'BHARATFORG' },
+			{ value: '10604', name: 'BHARTIARTL' },
+			{ value: '438', name: 'BHEL' },
+			{ value: '11373', name: 'BIOCON' },
+			{ value: '2181', name: 'BOSCHLTD' },
+			{ value: '526', name: 'BPCL' },
+			{ value: '547', name: 'BRITANNIA' },
+			{ value: '6994', name: 'BSOFT' },
+			{ value: '10794', name: 'CANBK' },
+			{ value: '583', name: 'CANFINHOME' },
+			{ value: '637', name: 'CHAMBLFERT' },
+			{ value: '685', name: 'CHOLAFIN' },
+			{ value: '694', name: 'CIPLA' },
+			{ value: '20374', name: 'COALINDIA' },
+			{ value: '11543', name: 'COFORGE' },
+			{ value: '15141', name: 'COLPAL' },
+			{ value: '4749', name: 'CONCOR' },
+			{ value: '739', name: 'COROMANDEL' },
+			{ value: '17094', name: 'CROMPTON' },
+			{ value: '5701', name: 'CUB' },
+			{ value: '1901', name: 'CUMMINSIND' },
+			{ value: '772', name: 'DABUR' },
+			{ value: '8075', name: 'DALBHARAT' },
+			{ value: '19943', name: 'DEEPAKNTR' },
+			{ value: '15044', name: 'DELTACORP' },
+			{ value: '10940', name: 'DIVISLAB' },
+			{ value: '21690', name: 'DIXON' },
+			{ value: '14732', name: 'DLF' },
+			{ value: '881', name: 'DRREDDY' },
+			{ value: '910', name: 'EICHERMOT' },
+			{ value: '958', name: 'ESCORTS' },
+			{ value: '676', name: 'EXIDEIND' },
+			{ value: '1023', name: 'FEDERALBNK' },
+			{ value: '14304', name: 'FSL' },
+			{ value: '4717', name: 'GAIL' },
+			{ value: '7406', name: 'GLENMARK' },
+			{ value: '13528', name: 'GMRINFRA' },
+			{ value: '1174', name: 'GNFC' },
+			{ value: '10099', name: 'GODREJCP' },
+			{ value: '17875', name: 'GODREJPROP' },
+			{ value: '11872', name: 'GRANULES' },
+			{ value: '1232', name: 'GRASIM' },
+			{ value: '13197', name: 'GSPL' },
+			{ value: '10599', name: 'GUJGASLTD' },
+			{ value: '2303', name: 'HAL' },
+			{ value: '9819', name: 'HAVELLS' },
+			{ value: '7229', name: 'HCLTECH' },
+			{ value: '1330', name: 'HDFC' },
+			{ value: '4244', name: 'HDFCAMC' },
+			{ value: '1333', name: 'HDFCBANK' },
+			{ value: '467', name: 'HDFCLIFE' },
+			{ value: '1348', name: 'HEROMOTOCO' },
+			{ value: '1363', name: 'HINDALCO' },
+			{ value: '17939', name: 'HINDCOPPER' },
+			{ value: '1406', name: 'HINDPETRO' },
+			{ value: '1394', name: 'HINDUNILVR' },
+			{ value: '3417', name: 'HONAUT' },
+			{ value: '30125', name: 'IBULHSGFIN' },
+			{ value: '4963', name: 'ICICIBANK' },
+			{ value: '21770', name: 'ICICIGI' },
+			{ value: '18652', name: 'ICICIPRULI' },
+			{ value: '14366', name: 'IDEA' },
+			{ value: '11957', name: 'IDFC' },
+			{ value: '11184', name: 'IDFCFIRSTB' },
+			{ value: '220', name: 'IEX' },
+			{ value: '11262', name: 'IGL' },
+			{ value: '1512', name: 'INDHOTEL' },
+			{ value: '1515', name: 'INDIACEM' },
+			{ value: '10726', name: 'INDIAMART' },
+			{ value: '11195', name: 'INDIGO' },
+			{ value: '5258', name: 'INDUSINDBK' },
+			{ value: '29135', name: 'INDUSTOWER' },
+			{ value: '1594', name: 'INFY' },
+			{ value: '5926', name: 'INTELLECT' },
+			{ value: '1624', name: 'IOC' },
+			{ value: '1633', name: 'IPCALAB' },
+			{ value: '13611', name: 'IRCTC' },
+			{ value: '1660', name: 'ITC' },
+			{ value: '6733', name: 'JINDALSTEL' },
+			{ value: '13270', name: 'JKCEMENT' },
+			{ value: '11723', name: 'JSWSTEEL' },
+			{ value: '18096', name: 'JUBLFOOD' },
+			{ value: '1922', name: 'KOTAKBANK' },
+			{ value: '24948', name: 'L & TFH' },
+			{ value: '11654', name: 'LALPATHLAB' },
+			{ value: '19234', name: 'LAURUSLABS' },
+			{ value: '1997', name: 'LICHSGFIN' },
+			{ value: '11483', name: 'LT' },
+			{ value: '17818', name: 'LTI' },
+			{ value: '18564', name: 'LTTS' },
+			{ value: '10440', name: 'LUPIN' },
+			{ value: '2031', name: 'M & M' },
+			{ value: '13285', name: 'M & MFIN' },
+			{ value: '19061', name: 'MANAPPURAM' },
+			{ value: '4067', name: 'MARICO' },
+			{ value: '10999', name: 'MARUTI' },
+			{ value: '10447', name: 'MCDOWELL - N' },
+			{ value: '31181', name: 'MCX' },
+			{ value: '9581', name: 'METROPOLIS' },
+			{ value: '2142', name: 'MFSL' },
+			{ value: '17534', name: 'MGL' },
+			{ value: '14356', name: 'MINDTREE' },
+			{ value: '4204', name: 'MOTHERSON' },
+			{ value: '4503', name: 'MPHASIS' },
+			{ value: '2277', name: 'MRF' },
+			{ value: '23650', name: 'MUTHOOTFIN' },
+			{ value: '6364', name: 'NATIONALUM' },
+			{ value: '13751', name: 'NAUKRI' },
+			{ value: '14672', name: 'NAVINFLUOR' },
+			{ value: '17963', name: 'NESTLEIND' },
+			{ value: '15332', name: 'NMDC' },
+			{ value: '11630', name: 'NTPC' },
+			{ value: '20242', name: 'OBEROIRLTY' },
+			{ value: '10738', name: 'OFSS' },
+			{ value: '2475', name: 'ONGC' },
+			{ value: '14413', name: 'PAGEIND' },
+			{ value: '2412', name: 'PEL' },
+			{ value: '18365', name: 'PERSISTENT' },
+			{ value: '11351', name: 'PETRONET' },
+			{ value: '14299', name: 'PFC' },
+			{ value: '2664', name: 'PIDILITIND' },
+			{ value: '24184', name: 'PIIND' },
+			{ value: '10666', name: 'PNB' },
+			{ value: '9590', name: 'POLYCAB' },
+			{ value: '14977', name: 'POWERGRID' },
+			{ value: '13147', name: 'PVR' },
+			{ value: '15337', name: 'RAIN' },
+			{ value: '2043', name: 'RAMCOCEM' },
+			{ value: '18391', name: 'RBLBANK' },
+			{ value: '15355', name: 'RECLTD' },
+			{ value: '2885', name: 'RELIANCE' },
+			{ value: '2963', name: 'SAIL' },
+			{ value: '17971', name: 'SBICARD' },
+			{ value: '21808', name: 'SBILIFE' },
+			{ value: '3045', name: 'SBIN' },
+			{ value: '3103', name: 'SHREECEM' },
+			{ value: '3150', name: 'SIEMENS' },
+			{ value: '3273', name: 'SRF' },
+			{ value: '4306', name: 'SRTRANSFIN' },
+			{ value: '3351', name: 'SUNPHARMA' },
+			{ value: '13404', name: 'SUNTV' },
+			{ value: '10243', name: 'SYNGENE' },
+			{ value: '3405', name: 'TATACHEM' },
+			{ value: '3721', name: 'TATACOMM' },
+			{ value: '3432', name: 'TATACONSUM' },
+			{ value: '3456', name: 'TATAMOTORS' },
+			{ value: '3426', name: 'TATAPOWER' },
+			{ value: '3499', name: 'TATASTEEL' },
+			{ value: '11536', name: 'TCS' },
+			{ value: '13538', name: 'TECHM' },
+			{ value: '3506', name: 'TITAN' },
+			{ value: '3518', name: 'TORNTPHARM' },
+			{ value: '13786', name: 'TORNTPOWER' },
+			{ value: '1964', name: 'TRENT' },
+			{ value: '8479', name: 'TVSMOTOR' },
+			{ value: '16713', name: 'UBL' },
+			{ value: '11532', name: 'ULTRACEMCO' },
+			{ value: '11287', name: 'UPL' },
+			{ value: '3063', name: 'VEDL' },
+			{ value: '3718', name: 'VOLTAS' },
+			{ value: '18011', name: 'WHIRLPOOL' },
+			{ value: '3787', name: 'WIPRO' },
+			{ value: '3812', name: 'ZEEL' },
+			{ value: '7929', name: 'ZYDUSLIFE' }
+		]
+		let data1 = [];
+		pos.forEach((element) => {
+			if (element.exch == "NSE" || element.exch == "BSE" || element.exch == "MCX") {
+				null;
+			}
+		});
+		for (let i = 0; i < fnoScirpts.length; i++) {
+			let arr = pos.filter(function (element) {
+				return element.exch == "NFO" && element.dname.split(" ")[0] == fnoScirpts[i].name;
+			})
+			//console.log(arrR)
+			arr.length > 0 ? data1.push([fnoScirpts[i].value, fnoScirpts[i].name, arr]) : null;
+		};
+		data1.forEach(async (element) => {
+			let openPrice = {
+				uid: localStorage.getItem("uid"),
+				token: element[0],
+				exch: "NSE"
+			}
+			let target = await all(openPrice, "GetQuotes");
+			let ocvalues = {
+				uid: localStorage.getItem("uid"),
+				exch: element[2][0].exch,
+				tsym: element[2][0].tsym,
+				cnt: '2',
+				strprc: target.lp,
+			};
+			let ocV = await all(ocvalues, "GetOptionChain");
+			let oFO = {
+				uid: localStorage.getItem("uid"),
+				exch: "NSE",
+				token: element[0],
+			};
+			let oFOV = await all(oFO, "GetLinkedScrips");
+			let ocE = await oFOV.opt_exp.sort(expSort);
+			let num = parseInt(ocV.values[0].strprc);
+			let num1 = parseInt(ocV.values[1].strprc);
+			let gap = Math.abs(num1 - num);
+			let tabContent = document.getElementsByClassName('tab-content')[0];
+			let div = document.createElement('div');
+			let infoDiv = document.createElement('div');
+			infoDiv.setAttribute('onclick', 'hideTables(this)');
+			infoDiv.setAttribute('class', 'order-head')
+			let nameSpan = document.createElement('span');
+			nameSpan.innerHTML = element[1] + ` `;
+			let token = document.createElement('span');
+			token.id = element[0];
+			let strikeP = document.createElement('span');
+			strikeP.innerHTML = ` ` + num + ` `;
+			let ls = document.createElement('span');
+			ls.innerHTML = ` ` + ocV.values[0].ls + ` `;
+			let diff = document.createElement('span');
+			diff.innerHTML = ` ` + gap + ` `;
+			let expInput = document.createElement('select');
+			expInput.classList.add('input-group', 'form-control');
+			expInput.innerHTML = "";
+			ocE.forEach((element) => {
+				let option = document.createElement("option");
+				option.innerHTML = `${element.exd} ${element.tsym}`;
+				expInput.appendChild(option);
+			});
+			let table = document.createElement("TABLE");
+			table.classList.add('table', 'table-striped', 'position-table', 'd-none')
+			let thead = table.createTHead();
+			let tbody = document.createElement('tbody');
+			let noP = document.querySelector('#noP');
+			console.log(thead);
+			let tHeadRow = thead.insertRow(0);
+			tHeadRow.insertCell(0).innerHTML = `0`;
+			tHeadRow.insertCell(1).innerHTML = `B/S`;
+			tHeadRow.insertCell(2).innerHTML = `Expiry`;
+			tHeadRow.insertCell(3).innerHTML = `Strike`;
+			tHeadRow.insertCell(4).innerHTML = `CE/PE`;
+			tHeadRow.insertCell(5).innerHTML = `QTY`;
+			tHeadRow.insertCell(6).innerHTML = `Entry Price`;
+			tHeadRow.insertCell(7).innerHTML = `N/M`;
+			tHeadRow.insertCell(8).innerHTML = `IV`;
+			//tHeadRow.insertCell(7).innerHTML = `N/M`;
+			tabContent.insertBefore(div, noP);
+			table.appendChild(tbody);
+			infoDiv.appendChild(nameSpan);
+			infoDiv.appendChild(token);
+			infoDiv.appendChild(strikeP);
+			infoDiv.appendChild(ls);
+			infoDiv.appendChild(diff);
+			infoDiv.appendChild(expInput);
+			div.appendChild(infoDiv);
+			div.appendChild(table);
+			let buttonsRow = document.createElement('div');
+			buttonsRow.classList.add('d-none');
+			buttonsRow.classList.add('row');
+			buttonsRow.innerHTML = `<div class="col-md-3">
+			   <div class="strat-button">
+				  <button class="crypt-button-green-full" onclick="tradeAdjAll(this)">Trade
+					 All</button>
+			   </div>
+			</div>
+			<div class="col-md-3">
+			   <div class="strat-button">
+				  <button class="crypt-button-green-full" onclick="tradeAdjS(this)">Trade
+					 Selected</button>
+			   </div>
+			</div>
+			<div class="col-md-3">
+			   <div class="strat-button">
+				  <button class="crypt-button-green-full" onclick="addAdjLeg(this)" id="add">Add</button>
+			   </div>
+			</div>
+			<div class="col-md-3">
+			   <div class="strat-button">
+				  <button class="crypt-button-green-full" onclick="adjGraph(this)">PayOff</button>
+			   </div>
+			</div>`;
+			div.appendChild(buttonsRow);
+			addPos(element, tbody);
+			sendMessageToSocket(
+				`{"t":"t","k":"NSE|${element[0]}"}`
+			);
+		});
+	}
+}
+//
+async function addPos(posList, tbody) {
+	for (let index = 0; index < posList[2].length; index++) {
+		const element = posList[2][index];
+		let row = tbody.insertRow();
+		row.insertCell(0).innerHTML = ``;
+		row.insertCell(1).innerHTML = element.netqty >= 0
+			? `<label class="toggle"><input type="checkbox" name="bs" checked disabled><span class="labels" data-on="B" data-off="S"></span></label>`
+			: `<label class="toggle"><input type="checkbox" name="bs" disabled><span class="labels" data-on="B" data-off="S"></span></label>`
+		row.insertCell(2).innerHTML = element.dname.split(" ")[1];
+		row.insertCell(3).innerHTML = `<label><input name="strike" value="${parseInt(element.dname.split(" ")[2])}" class="form-control" disabled></label>`;
+		row.insertCell(4).innerHTML = element.dname.split(" ")[3] == 'CE'
+			? `<label class="toggle"><input type="checkbox" name="cepe" checked disabled><span class="labels" data-on="CE" data-off="PE"></span></label>`
+			: `<label class="toggle"><input type="checkbox" name="cepe" disabled><span class="labels" data-on="CE" data-off="PE"></span></label>`
+			;
+		row.insertCell(5).innerHTML = `<input name="qty" value="${Math.abs(element.netqty)}" class="form-control" disabled>`
+		row.insertCell(6).innerHTML =
+			element.daybuyqty == "0" && element.daysellqty == "0"
+				? element.upldprc
+				: element.netavgprc;
+		row.insertCell(7).innerHTML = `<select class="form-control" name="NM" disabled>
+		<option>${element.prd == "M" || element.prd == "C" ? "NRML" : "MIS"}</option>
+	</select>`;
+		row.insertCell(8).innerHTML = 50;
+		let cell9 = row.insertCell(9);
+		cell9.innerHTML = element.tsym;
+		cell9.classList.add('d-none');
+		let cell10 = row.insertCell(10);
+		setInterval(async () => {
+			let quotesValues = {
+				uid: localStorage.getItem("uid"),
+				exch: element.exch,
+				token: element.token
+			}
+			let quote = await all(quotesValues, "GetQuotes");
+			cell10.innerHTML = quote.lp;
+			calcIV(row);
+		}, 60000);
+		let quotesValues = {
+			uid: localStorage.getItem("uid"),
+			exch: element.exch,
+			token: element.token
+		}
+		let quote = await all(quotesValues, "GetQuotes");
+		cell10.innerHTML = quote.lp;
+		calcIV(row);
+	}
+}
+async function addAdjLeg(addButton) {
+	let table = addButton.parentElement.parentElement.parentElement.previousElementSibling;
+	let scriptName = table.previousElementSibling.children[0].innerHTML;
+	let strike = table.previousElementSibling.children[2].innerHTML;
+	let ls = parseInt(table.previousElementSibling.children[3].innerHTML);
+	let diff = parseInt(table.previousElementSibling.children[4].innerHTML);
+	let expiry = table.previousElementSibling.children[5].value.split(" ", 1);
+	let row = table.children[1].insertRow();
+	row.insertCell(0).innerHTML = `<td>
+	<input type="checkbox" checked name="boxes">
+	</td>`;
+	//row.querySelector('input[name="bs"]').checked ? "B" : "S"
+	row.insertCell(1).innerHTML =
+		`<label class="toggle"><input type="checkbox" name="bs" onchange="changeAdjStrike(this)"><span class="labels" data-on="B" data-off="S"></span></label>`
+	let svalues = {
+		uid: localStorage.getItem("uid"),
+		stext: scriptName + ' ' + expiry + ' ' + strike + ' PE',
+		exch: "NFO",
+	};
+	let scripts = await all(svalues, "SearchScrip");
+	let element = scripts.values[0];
+	row.insertCell(2).innerHTML = element.dname.split(" ")[1];
+	row.insertCell(3).innerHTML = `<label><input type="number" name="strike" onchange="changeAdjStrike(this)" value="${parseInt(element.dname.split(" ")[2])}" step='${diff}' class="form-control"></label>`;
+	row.insertCell(4).innerHTML = `<label class="toggle"><input type="checkbox" onchange="changeAdjStrike(this)" name="cepe"><span class="labels" data-on="CE" data-off="PE"></span></label>`
+		;
+	row.insertCell(5).innerHTML = `<input type="number" class="form-control" value='${ls}'
+	min='${ls}' step='${ls}' name="qty">`
+	row.insertCell(6).id = element.token;
+	row.insertCell(7).innerHTML = `<select class="form-control" name="NM">
+	<option>NRML</option>
+	<option>MIS</option>
+</select>`;
+	row.insertCell(8).innerHTML = 50;
+	let cell9 = row.insertCell(9);
+	cell9.innerHTML = element.tsym;
+	cell9.classList.add('d-none');
+	row.insertCell(10).innerHTML += `<span class="badge bg-secondary strat-badge"
+			onclick="this.parentElement.parentElement.remove()">DEL</span>`;
+	sendMessageToSocket(`{"t": "t", "k": "NFO|${element.token}"}`);
+	calcIV(row);
+}
+async function changeAdjStrike(strikeList) {
+	let row = await strikeList.parentElement.parentElement.parentElement;
+	let scriptName = await row.parentElement.parentElement.previousElementSibling.children[0].innerHTML;
+	console.log(row, scriptName)
+	let svalues = {
+		uid: localStorage.getItem("uid"),
+		stext: scriptName + ' ' + row.children[2].innerText + ' ' + row.querySelector('input[name="strike"]').value + (row.querySelector('input[name="cepe"]').checked ? ' CE' : ' PE'),
+		exch: "NFO",
+	};
+	let scripts = await all(svalues, "SearchScrip");
+	row.children[6].id = scripts.values[0].token;
+	row.children[8].innerHTML = 50;
+	row.children[9].innerHTML = scripts.values[0].tsym;
+	sendMessageToSocket(`{ "t": "t", "k": "NFO|${scripts.values[0].token}" } `);
+	calcIV(row);
+	//limits();
+	//basketMargins();
+}
+function calcIV(row) {
+	let date_expiry = new Date(row.children[2].innerHTML.replaceAll('-', '/'));
+	let volt = parseFloat(row.children[8].innerHTML) >= 0 ? parseFloat(row.children[8].innerHTML) / 100 : 50;
+	if (row.children[8].innerHTML == 'NaN' || row.children[8].innerHTML == 'INFINITY') {
+		volt = 0.5;
+	}
+	date_expiry.setHours(15, 30, 0, 0)
+	let date_now = new Date();
+	let int_rate = 0;
+	let seconds = Math.floor((date_expiry - date_now) / 1000),
+		minutes = seconds / 60,
+		hours = minutes / 60,
+		delta_t = hours / 24 / 365.0;
+	let spot = parseFloat(row.parentElement.parentElement.previousElementSibling.children[1].innerHTML);
+	let strike = parseInt(row.children[3].children[0].children[0].value);
+	let callPrice = row.children[0].innerHTML == '' ? parseFloat(row.children[10].innerHTML) : parseFloat(row.children[6].innerHTML);
+	let d1 =
+		(Math.log(spot / strike) + (int_rate + Math.pow(volt, 2) / 2) * delta_t) /
+		(volt * Math.sqrt(delta_t)),
+		d2 =
+			(Math.log(spot / strike) + (int_rate - Math.pow(volt, 2) / 2) * delta_t) /
+			(volt * Math.sqrt(delta_t));
+	let fv_strike = strike * Math.exp(-1 * int_rate * delta_t);
+	//For calculating CDF and PDF using gaussian library
+	//Premium Price
+	let call_premium = row.children[4].children[0].children[0].checked == "TRUE" ?
+		spot * distribution.cdf(d1) - fv_strike * distribution.cdf(d2)
+		:
+		fv_strike * distribution.cdf(-1 * d2) - spot * distribution.cdf(-1 * d1);
+	//Option greeks
+	let vega = spot * distribution.pdf(d1) * Math.sqrt(delta_t);
+	volt = (-(call_premium - callPrice) / vega) + volt;
+	row.children[8].innerHTML = (volt * 100).toFixed(2);
+}
+function tradeAdjAll(button) {
+	let table = button.parentElement.parentElement.parentElement.previousElementSibling;
+	let checkboxes = table.querySelectorAll("input[name='boxes']");
+	let rows = [];
+	for (let checkbox of checkboxes) {
+		let row = checkbox.parentElement.parentElement;
+		rows.push(row);
+	}
+	rows.sort((a, b) => {
+		return a.querySelector("input[name='qty']") - b.querySelector("input[name='qty']");
+	});
+	rows.forEach((row, i) => {
+		setTimeout(
+			function () {
+				let value = {
+					uid: localStorage.getItem("uid"),
+					actid: localStorage.getItem("actid"),
+					exch: 'NFO',
+					tsym: row.children[9].innerHTML,
+					qty: row.querySelector('input[name="qty"]').value,
+					prc: "0",
+					prd:
+						row.querySelector('select[name="NM"]').value == "MIS"
+							? "I"
+							: "M",
+					trantype: row.querySelector('input[name="bs"]').checked ? "B" : "S",
+					prctyp: "MKT",
+					ret: "DAY",
+				};
+				all(value, "PlaceOrder");
+			}, i * 200)
+	});
+}
+//trade all adjustment builder
+function tradeAdjS(button) {
+	let table = button.parentElement.parentElement.parentElement.previousElementSibling;
+	let checkboxes = table.querySelectorAll("input[name='boxes']");
+	let rows = [];
+	for (let checkbox of checkboxes) {
+		if (checkbox.checked == true) {
+			let row = checkbox.parentElement.parentElement;
+			rows.push(row);
+		}
+	}
+	rows.sort((a, b) => {
+		return a.querySelector("input[name='qty']") - b.querySelector("input[name='qty']");
+	});
+	rows.forEach((row, i) => {
+		setTimeout(
+			function () {
+				let value = {
+					uid: localStorage.getItem("uid"),
+					actid: localStorage.getItem("actid"),
+					exch: 'NFO',
+					tsym: row.children[9].innerHTML,
+					qty: row.querySelector('input[name="qty"]').value,
+					prc: "0",
+					prd:
+						row.querySelector('select[name="NM"]').value == "MIS"
+							? "I"
+							: "M",
+					trantype: row.querySelector('input[name="bs"]').checked ? "B" : "S",
+					prctyp: "MKT",
+					ret: "DAY",
+				};
+				all(value, "PlaceOrder");
+			}, i * 200)
+	});
+}
+//trade selected adjustment builder
