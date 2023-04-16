@@ -3503,7 +3503,7 @@ async function adjustment() {
 			let diff = document.createElement('span');
 			diff.innerHTML = ` ` + gap + ` `;
 			let expInput = document.createElement('select');
-			expInput.classList.add('input-group', 'form-control');
+			//expInput.classList.add('input-group', 'form-control');
 			expInput.innerHTML = "";
 			ocE.forEach((element) => {
 				let option = document.createElement("option");
@@ -3526,7 +3526,8 @@ async function adjustment() {
 			tHeadRow.insertCell(6).innerHTML = `Entry Price`;
 			tHeadRow.insertCell(7).innerHTML = `N/M`;
 			tHeadRow.insertCell(8).innerHTML = `IV`;
-			//tHeadRow.insertCell(7).innerHTML = `N/M`;
+			tHeadRow.insertCell(9).classList.add('d-none');
+			tHeadRow.insertCell(10).innerHTML = `Del`;
 			tabContent.insertBefore(div, noP);
 			table.appendChild(tbody);
 			infoDiv.appendChild(nameSpan);
@@ -3570,7 +3571,7 @@ async function adjustment() {
 		});
 	}
 }
-//
+//adjustment
 async function addPos(posList, tbody) {
 	for (let index = 0; index < posList[2].length; index++) {
 		const element = posList[2][index];
@@ -3618,6 +3619,7 @@ async function addPos(posList, tbody) {
 		calcIV(row);
 	}
 }
+//
 async function addAdjLeg(addButton) {
 	let table = addButton.parentElement.parentElement.parentElement.previousElementSibling;
 	let scriptName = table.previousElementSibling.children[0].innerHTML;

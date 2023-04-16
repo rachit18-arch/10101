@@ -282,24 +282,67 @@
       <div class="container-fluid">
          <div class="row" style="display: flex; justify-content: center;">
             <div class="col-md-3 chart-name">
-               <select id="posList" class="input-group form-control hedge-input" onchange="selPos(this)"></select>
             </div>
          </div>
          <div id="tableDiv" class="hedge-text">
-            <span id="type"></span>&nbsp;
-            <span id="dname"></span>&nbsp;
-            <span id="qty"></span>&nbsp;
-            <span id="avgPrice"></span>&nbsp;
-            <span class="ltp"></span>&nbsp;
-            <span id="strike"></span>&nbsp;
-            <span id="tsym"></span>
+            <div class="row">
+               <div class="col-md-4">
+                  <div class="row">
+                     <div class="col-md-4">
+                        <label>Sell Position -</label>
+                     </div>
+                     <div class="col-md-8"><select id="posList" class="form-control input-group"
+                           onchange="selPos(this)"></select></div>
+                  </div>
+               </div>
+               <div class="col-md-4">
+                  <label>Symbol -</label>
+                  <span id="dname"></span>&nbsp;
+               </div>
+               <div class="col-md-4">
+                  <label>Price -</label>
+                  <span id="avgPrice"></span>&nbsp;
+               </div>
+               <div class="col-md-4">
+                  <label>LTP -</label>
+                  <span class="ltp"></span>&nbsp;
+               </div>
+               <div class="col-md-4">
+                  <label>Strike -</label>
+                  <span id="strike"></span>&nbsp;
+               </div>
+               <div class="col-md-4">
+                  <label>QTY -</label>
+                  <span id="qty"></span>&nbsp;
+               </div>
+               <div class="col-md-4">
+                  <label>Type -</label>
+                  <span id="type"></span>&nbsp;
+               </div>
+               <div class="col-md-4 d-none">
+                  <label>Trading Symbol -</label>
+                  <span id="tsym"></span>
+               </div>
+               <div class="col-md-4">
+                  <label>Buy Symbol -</label>
+                  <span id="btsym"></span>&nbsp;
+               </div>
+               <div class="col-md-4">
+                  <label>Buy LTP -</label>
+                  <span class="bdtoken"></span>
+               </div>
+            </div>
          </div>
-         <div>
-            <span id="btsym" class="hedge-text"></span>&nbsp;
-            <span class="bdtoken"></span>
-            <input placeholder="Buy Price" id="buyAbove" class="form-control" type="number" step="0.05" min="0.05">
-            <input placeholder="Sell Price" id="sellBelow" class="form-control" type="number" step="0.05" min="0.05">
-            <button onclick="orderTimer()" class="crypt-button-green-full">Start</button>
+         <div class="row my-5">
+            <div class="col-md-4">
+               <input placeholder="Buy Price" id="buyAbove" class="form-control" type="number" step="0.05" min="0.05">
+            </div>
+            <div class="col-md-4">
+               <input placeholder="Sell Price" id="sellBelow" class="form-control" type="number" step="0.05" min="0.05">
+            </div>
+            <div class="col-md-4">
+               <button onclick="orderTimer()" class="crypt-button-green-full hedge-btn">Start</button>
+            </div>
          </div>
       </div>
    </section>
@@ -315,6 +358,7 @@
       </audio>
    </div>
    <!-- alert -->
+
    <!-- js -->
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
    <script src="js/main.js"></script>

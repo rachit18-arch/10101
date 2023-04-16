@@ -1008,16 +1008,24 @@ input[type=number] {
 .oi-main-head {
     margin-bottom: 20px;
 }
+
 .hedge-input {
     color: white !important;
 }
-.hedge-text span 
-{
+
+.hedge-text span {
     color: white !important;
     font-size: 20px;
 }
-.hedge-text
-{
+
+.hedge-text {
     color: white !important;
     font-size: 20px;
+}
+
+.hedge-btn {
+    width: 50%;
+    margin: auto;
+    padding: 4px;
+    border: none;
 }
