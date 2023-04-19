@@ -1118,19 +1118,20 @@ function webhook(discordUrl) {
 	let postSession = new Date;
 	preSession.setHours(9, 14, 0, 0);
 	postSession.setHours(15, 32, 0, 0);
-	if (date.preSession >= 9 && date <= postSession) {
-		function dataURLtoFile(dataurl, filename) {
-			let arr = dataurl.split(','),
-				mime = arr[0].match(/:(.*?);/)[1],
-				bstr = atob(arr[1]),
-				n = bstr.length,
-				u8arr = new Uint8Array(n);
-			while (n--) {
-				u8arr[n] = bstr.charCodeAt(n);
+	setInterval(() => {
+		if (date >= preSession && date <= postSession) {
+			console.log(date, preSession)
+			function dataURLtoFile(dataurl, filename) {
+				let arr = dataurl.split(','),
+					mime = arr[0].match(/:(.*?);/)[1],
+					bstr = atob(arr[1]),
+					n = bstr.length,
+					u8arr = new Uint8Array(n);
+				while (n--) {
+					u8arr[n] = bstr.charCodeAt(n);
+				}
+				return new File([u8arr], filename, { type: mime });
 			}
-			return new File([u8arr], filename, { type: mime });
-		}
-		setInterval(() => {
 			htmlToImage.toJpeg(discordUrl.parentElement.parentElement.parentElement.parentElement)
 				.then(function (dataUrl) {
 					//let img = canvas.toDataURL("image/png");
@@ -1152,8 +1153,8 @@ function webhook(discordUrl) {
 						.then(result => null)
 						.catch(error => console.log('error', error));
 				});
-		}, 60000);
-	}
+		}
+	}, 60000);
 };
 //send position ss
 async function chart(element, iT, tex) {
