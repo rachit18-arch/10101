@@ -184,9 +184,9 @@ async function stratGraph() {
                         threshold: 0,
                     }],
                     title: {
-                        text: chartDiv,
+                        text: 'PayOff Graph',
                         style: {
-                            color: '#000',
+                            color: 'white',
                             font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
                         }
                     },
@@ -233,7 +233,7 @@ async function stratGraph() {
                         }],
                         labels: {
                             style: {
-                                color: '#000',
+                                color: 'white',
                                 font: '11px Trebuchet MS, Verdana, sans-serif'
                             }
                         },
@@ -241,7 +241,7 @@ async function stratGraph() {
                             allowDecimals: false,
                             text: 'Amount',
                             style: {
-                                color: '#000',
+                                color: 'white',
                                 fontWeight: 'bold',
                                 fontSize: '12px',
                                 fontFamily: 'Trebuchet MS, Verdana, sans-serif'
@@ -490,9 +490,9 @@ async function posGraph(posGB) {
                         threshold: 0,
                     }],
                     title: {
-                        text: chartDiv,
+                        text: 'PayOff Graph',
                         style: {
-                            color: '#000',
+                            color: 'white',
                             font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
                         }
                     },
@@ -539,7 +539,7 @@ async function posGraph(posGB) {
                         }],
                         labels: {
                             style: {
-                                color: '#000',
+                                color: 'white',
                                 font: '11px Trebuchet MS, Verdana, sans-serif'
                             }
                         },
@@ -547,7 +547,7 @@ async function posGraph(posGB) {
                             allowDecimals: false,
                             text: 'Amount',
                             style: {
-                                color: '#000',
+                                color: 'white',
                                 fontWeight: 'bold',
                                 fontSize: '12px',
                                 fontFamily: 'Trebuchet MS, Verdana, sans-serif'
@@ -759,9 +759,9 @@ async function adjGraph(posGB) {
                         threshold: 0,
                     }],
                     title: {
-                        text: chartDiv,
+                        text: 'PayOff Graph',
                         style: {
-                            color: '#000',
+                            color: 'white',
                             font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
                         }
                     },
@@ -808,7 +808,7 @@ async function adjGraph(posGB) {
                         }],
                         labels: {
                             style: {
-                                color: '#000',
+                                color: 'whie',
                                 font: '11px Trebuchet MS, Verdana, sans-serif'
                             }
                         },
@@ -816,7 +816,7 @@ async function adjGraph(posGB) {
                             allowDecimals: false,
                             text: 'Amount',
                             style: {
-                                color: '#000',
+                                color: 'white',
                                 fontWeight: 'bold',
                                 fontSize: '12px',
                                 fontFamily: 'Trebuchet MS, Verdana, sans-serif'
