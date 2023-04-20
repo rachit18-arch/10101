@@ -3171,7 +3171,7 @@ async function selPos(s) {
 					} else {
 						document.getElementsByClassName('bdtoken')[0].id = ocV.values[5].token;
 						document.getElementById('btsym').innerHTML = ocV.values[5].tsym;
-						sendMessageToSocket(`{"t":"t","k":"${ocV.values[2].exch}|${ocV.values[2].token}"}`);
+						sendMessageToSocket(`{"t":"t","k":"${ocV.values[5].exch}|${ocV.values[5].token}"}`);
 					}
 				});
 				sendMessageToSocket(`{"t":"t","k":"${element.exch}|${element.token}"}`);
