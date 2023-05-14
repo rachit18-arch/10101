@@ -256,8 +256,11 @@ async function pos() {
 				secondsVisible: true,
 			},
 			layout: {
-				textColor: "#ffffff",
-				backgroundColor: "#000000"//"rgba(120, 123, 134, 1)", //, rgba(93, 96, 107, 1)
+				background: {
+					type: 'solid',
+					color: '#000000',
+				},
+				textColor: 'rgba(255, 255, 255, 1)',
 			},
 			rightPriceScale: {
 				scaleMargins: {
@@ -268,12 +271,10 @@ async function pos() {
 			},
 			grid: {
 				vertLines: {
-					color: "rgba(120, 123, 134, 1)",
-					visible: false,
+					color: "rgba(120, 123, 134, 0)",
 				},
 				horzLines: {
-					color: "rgba(120, 123, 134, 1)",
-					visible: false,
+					color: "rgba(120, 123, 134, 0)",
 				},
 			},
 			crosshair: {
@@ -518,7 +519,7 @@ async function pos() {
 			]
 			let data1 = [];
 			pos.forEach((element) => {
-				if (element.exch == "NSE" || element.exch == "BSE" || element.exch == "MCX") {
+				if (element.exch == "NSE" || element.exch == "BSE" || element.exch == "MCX" || element.exch == "CDS" || element.exch == "BCD") {
 					let row = posbody.insertRow(-1);
 					row.classList.add("posTr");
 					element.netqty == 0 ? row.classList.add('fade-pos') : row.classList.remove('fade-pos');
@@ -555,7 +556,6 @@ async function pos() {
 						a += (parseFloat(element.daysellavgprc) - parseFloat(element.daybuyavgprc)) * parseInt(element.daysellqty);
 					}
 					else if (parseInt(element.daysellqty) > 0 && parseInt(element.daysellqty) > parseInt(element.daybuyqty)) {
-						console.log('here')
 						a = (parseFloat(element.daysellavgprc) - parseFloat(element.upldprc)) * parseInt(element.cfbuyqty);
 						a += (parseFloat(element.daysellavgprc) - parseFloat(element.daybuyavgprc)) * parseInt(element.daybuyqty);
 					}
@@ -691,19 +691,19 @@ async function pos() {
 						ab();
 						const renderOHLC = (d) => {
 							let coloredValues = document.createElement("span");
-							coloredValues.innerHTML = d + " ";
+							coloredValues.innerHTML = d.value + " ";
 							legend.appendChild(coloredValues);
 						};
 						chart.subscribeCrosshairMove((param) => {
 							legend.innerHTML = "";
-							param.seriesPrices.forEach((ele) => {
+							param.seriesData.forEach((ele) => {
 								renderOHLC(ele);
 							});
 						});
 						let legend = document.getElementById("lengends");
 						legend.className = "three-line-tooltip";
 						legend.style.display = "block";
-						legend.style.color = "black";
+						legend.style.color = "white";
 						legend.style.position = "absolute";
 						legend.style.font = "20px";
 						legend.style.left = `${chartDiv.getBoundingClientRect().left + window.scrollX + 20
@@ -1222,8 +1222,10 @@ async function chart(element, iT, tex) {
 				secondsVisible: true,
 			},
 			layout: {
-				textColor: "#ffffff",
-				backgroundColor: "#000000", //"rgba(120, 123, 134, 1)", rgba(93, 96, 107, 1)
+				background: {
+					type: "solid",
+					color: "rgba(120, 123, 134, 1)",// rgba(93, 96, 107, 1),
+				}
 			},
 			rightPriceScale: {
 				scaleMargins: {
@@ -1233,12 +1235,10 @@ async function chart(element, iT, tex) {
 			},
 			grid: {
 				vertLines: {
-					color: "rgba(120, 123, 134, 1)",
-					visible: false,
+					color: "rgba(120, 123, 134, 0)",
 				},
 				horzLines: {
-					color: "rgba(120, 123, 134, 1)",
-					visible: false,
+					color: "rgba(120, 123, 134, 0)",
 				},
 			},
 			crosshair: {
@@ -1254,7 +1254,6 @@ async function chart(element, iT, tex) {
 		const chartDiv = document.getElementById(`${element}`);
 		chartDiv.innerHTML = "";
 		const chart = LightweightCharts.createChart(chartDiv, chartProperties1);
-
 		let p1M = await reversePrice(c1M);
 		let p5M = await reversePrice(c5M);
 		let p15M = await reversePrice(c15M);
@@ -1272,14 +1271,14 @@ async function chart(element, iT, tex) {
 				}">${open}</span> H<span class="${open > close ? "red" : "green"
 				}">${high}</span> L<span class="${open > close ? "red" : "green"
 				}">${low}</span> C<span class="${open > close ? "red" : "green"
-				}">${close}</span> <span>OI ${vol}</span> </p>`;
+				}">${close}</span> <span>OI ${vol.value}</span> </p>`;
 			legend.children[1].innerHTML = coloredValues;
 		};
 		let ohlcValues = null;
 		let volValues = null;
 		chart.subscribeCrosshairMove((param) => {
-			ohlcValues = param.seriesPrices.get(priceSeries);
-			volValues = param.seriesPrices.get(volSeries);
+			ohlcValues = param.seriesData.get(priceSeries);
+			volValues = param.seriesData.get(volSeries);
 			ohlcValues ? renderOHLC(ohlcValues, volValues) : null;
 		});
 		let legend = chartDiv.nextElementSibling;
@@ -1359,11 +1358,11 @@ async function chart(element, iT, tex) {
 			}
 			priceSeries = chart.addCandlestickSeries({
 				upColor: "#FFFFFF",
-				downColor: "#4dd0e1",
-				borderDownColor: "#4dd0e1",
-				borderUpColor: "#FFFFFF",
-				wickDownColor: "#4dd0e1",
-				wickUpColor: "#4dd0e1",
+				downColor: "#000000",
+				borderDownColor: "#000000",
+				borderUpColor: "#000000",
+				wickDownColor: "#000000",
+				wickUpColor: "#000000",
 			});
 			volSeries = chart.addLineSeries({
 				color: "black",
@@ -1902,7 +1901,7 @@ let distribution = document.title == 'Option Chain' || document.title == 'Strate
 // declaring iv variable factor
 function volFind(row) {
 	let date_expiry = new Date(document.getElementById("exp").value.slice(0, 11).replaceAll('-', '/'));
-	let volt = parseFloat(row.children[15].innerHTML) >= 0 ? parseFloat(row.children[15].innerHTML) / 100 : 50;
+	let volt = parseFloat(row.children[15].innerHTML) > 0 ? parseFloat(row.children[15].innerHTML) / 100 : 0.5;
 	date_expiry.setHours(15, 30, 0, 0)
 	let date_now = new Date();
 	let int_rate = 0;
@@ -3024,7 +3023,7 @@ function closeAlert() {
 //close alert button
 async function findGreek(row) {
 	let date_expiry = new Date(row.children[2].innerHTML.replaceAll('-', '/'));
-	let volt = parseFloat(row.children[12].innerHTML) >= 0 ? parseFloat(row.children[12].innerHTML) / 100 : 50;
+	let volt = parseFloat(row.children[12].innerHTML) > 0 ? parseFloat(row.children[12].innerHTML) / 100 : 0.5;
 	if (row.children[12].innerHTML == 'NaN' || row.children[12].innerHTML == 'INFINITY') {
 		volt = 0.5;
 	}
@@ -3516,7 +3515,6 @@ async function adjustment() {
 			let thead = table.createTHead();
 			let tbody = document.createElement('tbody');
 			let noP = document.querySelector('#noP');
-			console.log(thead);
 			let tHeadRow = thead.insertRow(0);
 			tHeadRow.insertCell(0).innerHTML = `0`;
 			tHeadRow.insertCell(1).innerHTML = `B/S`;
@@ -3665,7 +3663,6 @@ async function addAdjLeg(addButton) {
 async function changeAdjStrike(strikeList) {
 	let row = await strikeList.parentElement.parentElement.parentElement;
 	let scriptName = await row.parentElement.parentElement.previousElementSibling.children[0].innerHTML;
-	console.log(row, scriptName)
 	let svalues = {
 		uid: localStorage.getItem("uid"),
 		stext: scriptName + ' ' + row.children[2].innerText + ' ' + row.querySelector('input[name="strike"]').value + (row.querySelector('input[name="cepe"]').checked ? ' CE' : ' PE'),
@@ -3682,7 +3679,7 @@ async function changeAdjStrike(strikeList) {
 }
 function calcIV(row) {
 	let date_expiry = new Date(row.children[2].innerHTML.replaceAll('-', '/'));
-	let volt = parseFloat(row.children[8].innerHTML) >= 0 ? parseFloat(row.children[8].innerHTML) / 100 : 50;
+	let volt = parseFloat(row.children[8].innerHTML) > 0 ? parseFloat(row.children[8].innerHTML) / 100 : 0.5;
 	if (row.children[8].innerHTML == 'NaN' || row.children[8].innerHTML == 'INFINITY') {
 		volt = 0.5;
 	}
