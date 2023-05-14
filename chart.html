@@ -13,7 +13,7 @@
    <!-- AnyChart UI -->
    <link rel="stylesheet" href="https://cdn.anychart.com/releases/v8/css/anychart-ui.min.css" />
    <link rel="stylesheet" href="https://cdn.anychart.com/releases/v8/fonts/css/anychart-font.min.css">
-   <title>Indices</title>
+   <title>Chart</title>
 </head>
 
 <body class="crypt-dark">
@@ -158,113 +158,217 @@
          <button onclick="removeSelected()" type="button" class="btn btn-primary">Remove Selected</button>
       </div>
       <div class="row">
+         <datalist id="dlist">
+            <option value="26009">BANKNIFTY</option>
+            <option value="26000">NIFTY</option>
+            <option value="26037">FINNIFTY</option>
+            <option value="7">AARTIIND</option>
+            <option value="13">ABB</option>
+            <option value="17903">ABBOTINDIA</option>
+            <option value="21614">ABCAPITAL</option>
+            <option value="30108">ABFRL</option>
+            <option value="22">ACC</option>
+            <option value="25">ADANIENT</option>
+            <option value="15083">ADANIPORTS</option>
+            <option value="11703">ALKEM</option>
+            <option value="100">AMARAJABAT</option>
+            <option value="1270">AMBUJACEM</option>
+            <option value="157">APOLLOHOSP</option>
+            <option value="163">APOLLOTYRE</option>
+            <option value="212">ASHOKLEY</option>
+            <option value="236">ASIANPAINT</option>
+            <option value="14418">ASTRAL</option>
+            <option value="263">ATUL</option>
+            <option value="21238">AUBANK</option>
+            <option value="275">AUROPHARMA</option>
+            <option value="5900">AXISBANK</option>
+            <option value="16669">BAJAJ-AUTO</option>
+            <option value="16675">BAJAJFINSV</option>
+            <option value="317">BAJFINANCE</option>
+            <option value="335">BALKRISIND</option>
+            <option value="341">BALRAMCHIN</option>
+            <option value="2263">BANDHANBNK</option>
+            <option value="4668">BANKBARODA</option>
+            <option value="371">BATAINDIA</option>
+            <option value="383">BEL</option>
+            <option value="404">BERGEPAINT</option>
+            <option value="422">BHARATFORG</option>
+            <option value="10604">BHARTIARTL</option>
+            <option value="438">BHEL</option>
+            <option value="11373">BIOCON</option>
+            <option value="2181">BOSCHLTD</option>
+            <option value="526">BPCL</option>
+            <option value="547">BRITANNIA</option>
+            <option value="6994">BSOFT</option>
+            <option value="10794">CANBK</option>
+            <option value="583">CANFINHOME</option>
+            <option value="637">CHAMBLFERT</option>
+            <option value="685">CHOLAFIN</option>
+            <option value="694">CIPLA</option>
+            <option value="20374">COALINDIA</option>
+            <option value="11543">COFORGE</option>
+            <option value="15141">COLPAL</option>
+            <option value="4749">CONCOR</option>
+            <option value="739">COROMANDEL</option>
+            <option value="17094">CROMPTON</option>
+            <option value="5701">CUB</option>
+            <option value="1901">CUMMINSIND</option>
+            <option value="772">DABUR</option>
+            <option value="8075">DALBHARAT</option>
+            <option value="19943">DEEPAKNTR</option>
+            <option value="15044">DELTACORP</option>
+            <option value="10940">DIVISLAB</option>
+            <option value="21690">DIXON</option>
+            <option value="14732">DLF</option>
+            <option value="881">DRREDDY</option>
+            <option value="910">EICHERMOT</option>
+            <option value="958">ESCORTS</option>
+            <option value="676">EXIDEIND</option>
+            <option value="1023">FEDERALBNK</option>
+            <option value="14304">FSL</option>
+            <option value="4717">GAIL</option>
+            <option value="7406">GLENMARK</option>
+            <option value="13528">GMRINFRA</option>
+            <option value="1174">GNFC</option>
+            <option value="10099">GODREJCP</option>
+            <option value="17875">GODREJPROP</option>
+            <option value="11872">GRANULES</option>
+            <option value="1232">GRASIM</option>
+            <option value="13197">GSPL</option>
+            <option value="10599">GUJGASLTD</option>
+            <option value="2303">HAL</option>
+            <option value="9819">HAVELLS</option>
+            <option value="7229">HCLTECH</option>
+            <option value="1330">HDFC</option>
+            <option value="4244">HDFCAMC</option>
+            <option value="1333">HDFCBANK</option>
+            <option value="467">HDFCLIFE</option>
+            <option value="1348">HEROMOTOCO</option>
+            <option value="1363">HINDALCO</option>
+            <option value="17939">HINDCOPPER</option>
+            <option value="1406">HINDPETRO</option>
+            <option value="1394">HINDUNILVR</option>
+            <option value="3417">HONAUT</option>
+            <option value="30125">IBULHSGFIN</option>
+            <option value="4963">ICICIBANK</option>
+            <option value="21770">ICICIGI</option>
+            <option value="18652">ICICIPRULI</option>
+            <option value="14366">IDEA</option>
+            <option value="11957">IDFC</option>
+            <option value="11184">IDFCFIRSTB</option>
+            <option value="220">IEX</option>
+            <option value="11262">IGL</option>
+            <option value="1512">INDHOTEL</option>
+            <option value="1515">INDIACEM</option>
+            <option value="10726">INDIAMART</option>
+            <option value="11195">INDIGO</option>
+            <option value="5258">INDUSINDBK</option>
+            <option value="29135">INDUSTOWER</option>
+            <option value="1594">INFY</option>
+            <option value="5926">INTELLECT</option>
+            <option value="1624">IOC</option>
+            <option value="1633">IPCALAB</option>
+            <option value="13611">IRCTC</option>
+            <option value="1660">ITC</option>
+            <option value="6733">JINDALSTEL</option>
+            <option value="13270">JKCEMENT</option>
+            <option value="11723">JSWSTEEL</option>
+            <option value="18096">JUBLFOOD</option>
+            <option value="1922">KOTAKBANK</option>
+            <option value="24948">L&amp;TFH</option>
+            <option value="11654">LALPATHLAB</option>
+            <option value="19234">LAURUSLABS</option>
+            <option value="1997">LICHSGFIN</option>
+            <option value="11483">LT</option>
+            <option value="17818">LTI</option>
+            <option value="18564">LTTS</option>
+            <option value="10440">LUPIN</option>
+            <option value="2031">M&amp;M</option>
+            <option value="13285">M&amp;MFIN</option>
+            <option value="19061">MANAPPURAM</option>
+            <option value="4067">MARICO</option>
+            <option value="10999">MARUTI</option>
+            <option value="10447">MCDOWELL-N</option>
+            <option value="31181">MCX</option>
+            <option value="9581">METROPOLIS</option>
+            <option value="2142">MFSL</option>
+            <option value="17534">MGL</option>
+            <option value="14356">MINDTREE</option>
+            <option value="4204">MOTHERSON</option>
+            <option value="4503">MPHASIS</option>
+            <option value="2277">MRF</option>
+            <option value="23650">MUTHOOTFIN</option>
+            <option value="6364">NATIONALUM</option>
+            <option value="13751">NAUKRI</option>
+            <option value="14672">NAVINFLUOR</option>
+            <option value="17963">NESTLEIND</option>
+            <option value="15332">NMDC</option>
+            <option value="11630">NTPC</option>
+            <option value="20242">OBEROIRLTY</option>
+            <option value="10738">OFSS</option>
+            <option value="2475">ONGC</option>
+            <option value="14413">PAGEIND</option>
+            <option value="2412">PEL</option>
+            <option value="18365">PERSISTENT</option>
+            <option value="11351">PETRONET</option>
+            <option value="14299">PFC</option>
+            <option value="2664">PIDILITIND</option>
+            <option value="24184">PIIND</option>
+            <option value="10666">PNB</option>
+            <option value="9590">POLYCAB</option>
+            <option value="14977">POWERGRID</option>
+            <option value="13147">PVR</option>
+            <option value="15337">RAIN</option>
+            <option value="2043">RAMCOCEM</option>
+            <option value="18391">RBLBANK</option>
+            <option value="15355">RECLTD</option>
+            <option value="2885">RELIANCE</option>
+            <option value="2963">SAIL</option>
+            <option value="17971">SBICARD</option>
+            <option value="21808">SBILIFE</option>
+            <option value="3045">SBIN</option>
+            <option value="3103">SHREECEM</option>
+            <option value="3150">SIEMENS</option>
+            <option value="3273">SRF</option>
+            <option value="4306">SRTRANSFIN</option>
+            <option value="3351">SUNPHARMA</option>
+            <option value="13404">SUNTV</option>
+            <option value="10243">SYNGENE</option>
+            <option value="3405">TATACHEM</option>
+            <option value="3721">TATACOMM</option>
+            <option value="3432">TATACONSUM</option>
+            <option value="3456">TATAMOTORS</option>
+            <option value="3426">TATAPOWER</option>
+            <option value="3499">TATASTEEL</option>
+            <option value="11536">TCS</option>
+            <option value="13538">TECHM</option>
+            <option value="3506">TITAN</option>
+            <option value="3518">TORNTPHARM</option>
+            <option value="13786">TORNTPOWER</option>
+            <option value="1964">TRENT</option>
+            <option value="8479">TVSMOTOR</option>
+            <option value="16713">UBL</option>
+            <option value="11532">ULTRACEMCO</option>
+            <option value="11287">UPL</option>
+            <option value="3063">VEDL</option>
+            <option value="3718">VOLTAS</option>
+            <option value="18011">WHIRLPOOL</option>
+            <option value="3787">WIPRO</option>
+            <option value="3812">ZEEL</option>
+            <option value="7929">ZYDUSLIFE</option>
+         </datalist>
          <div class="col-md-6">
-            <div id="chart-container" style="height: 500px; width: 400px;"></div>
+            <input type="search" oninput="anycharting(this,'chart-container','NSE')" list="dlist">
+            <div id="chart-container" style="height: 500px; width: 650px;"></div>
          </div>
          <div class="col-md-6">
-            <div id="chart-container2" style="height: 500px; width: 400px;"></div>
-         </div>
-      </div>
-   </section>
-   <section class="space">
-      <div class="container">
-         <div class="row">
-            <div class="col-md-6">
-               <div class="indices-chart-size">
-                  <!-- Vix <span id="26017"></span> -->
-                  <div class="chart" id="vix"></div>
-                  <div class="legend"></div>
-                  <div class="switcher"></div>
-                  <div class="rTb"></div>
-               </div>
-            </div>
-            <div class="col-md-6">
-               <div class="indices-chart-size">
-                  <!-- Nifty <span id="26000"></span> -->
-                  <div class="chart" id="nf"></div>
-                  <div class="legend"></div>
-                  <div class="switcher"></div>
-                  <div class="rTb"></div>
-               </div>
-            </div>
-            <div class="col-md-6">
-               <div class="indices-chart-size">
-                  <!-- Bank Nifty <span id='26009'></span> -->
-                  <div class="chart" id="bnf"></div>
-                  <div class="legend"></div>
-                  <div class="switcher"></div>
-                  <div class="rTb"></div>
-               </div>
-            </div>
-            <div class="col-md-6">
-               <div class="indices-chart-size">
-                  <!-- Bank Nifty <span id='26009'></span> -->
-                  <div class="chart" id="sensex"></div>
-                  <div class="legend"></div>
-                  <div class="switcher"></div>
-                  <div class="rTb"></div>
-               </div>
-            </div>
+            <input type="search" oninput="anycharting(this,'chart-container2','NSE')" list="dlist">
+            <div id="chart-container2" style="height: 500px; width: 650px;"></div>
          </div>
       </div>
    </section>
    <!-- charts -->
-   <section class="container-fluid space">
-      <div class="container">
-         <div class="row">
-            <div class="col-md-3">
-               <div class="limit-amounts">
-                  IT <span id="26008"></span>
-               </div>
-            </div>
-            <div class="col-md-3">
-               <div class="limit-amounts">
-                  MIDCAP 150 <span id="26011"></span>
-               </div>
-            </div>
-            <div class="col-md-3">
-               <div class="limit-amounts">
-                  SMALL CAP 250 <span id="26062"></span>
-               </div>
-            </div>
-            <div class="col-md-3">
-               <div class="limit-amounts">
-                  NIFTY 500 <span id="26004"></span>
-               </div>
-            </div>
-            <div class="col-md-3">
-               <div class="limit-amounts">
-                  PRIVATE BANK <span id="26047"></span>
-               </div>
-            </div>
-            <div class="col-md-3">
-               <div class="limit-amounts">
-                  METAL <span id="26030"></span>
-               </div>
-            </div>
-            <div class="col-md-3">
-               <div class="limit-amounts">
-                  PSU BANK <span id="26025"></span>
-               </div>
-            </div>
-            <div class="col-md-3">
-               <div class="limit-amounts">
-                  AUTO <span id="26029"></span>
-               </div>
-            </div>
-            <div class="col-md-3">
-               <div class="limit-amounts">
-                  FMCG <span id="26021"></span>
-               </div>
-            </div>
-            <div class="col-md-3">
-               <div class="limit-amounts">
-                  PHARMA <span id="26023"></span>
-               </div>
-            </div>
-         </div>
-      </div>
-   </section>
+
    <!-- alert -->
    <div class="d-none noti-set mn-noti" id="alert">
       <span class="fas fa-exclamation-circle"></span>

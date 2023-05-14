@@ -1,4 +1,18 @@
-async function anycharting(element, iT, tex) {
+async function anycharting(search, element, tex) {
+    element.innerHTML = '';
+    let val = search.value;
+    let opts = document.getElementById('dlist').childNodes;
+    console.log(val)
+    let scriptName;
+    let iT;
+    for (var i = 0; i < opts.length; i++) {
+        if (opts[i].value === val) {
+            // An item was selected from the list!
+            // yourCallbackHere()
+            iT = opts[i].value;
+            scriptName = opts[i].innerHTML;
+        }
+    }
     let timeValues = {
         uid: localStorage.getItem("uid"),
         exch: `${tex}`,
@@ -17,7 +31,7 @@ async function anycharting(element, iT, tex) {
     let mapping = table.mapAs({ 'time': 'time', 'open': 'into', 'high': 'inth', 'low': 'intl', 'close': 'intc' });
     let plot = chart.plot(0);
     let series = chart.plot(0).candlestick(mapping);
-    series.name("ABB")
+    series.name(scriptName)
     series.legendItem().iconType('rising-falling');
     series.fallingFill("Black");
     series.fallingStroke("Black");
@@ -230,5 +244,5 @@ function mergeTickToBar(result, currentBar, table) {
     }
     table.addData([currentBar]);
 }
-anycharting("chart-container", "13", "NSE");
-anycharting("chart-container2", "26009", "NSE");
+// anycharting("chart-container", "13", "NSE");
+// anycharting("chart-container2", "26009", "NSE");
