@@ -913,9 +913,13 @@ function table(element) {
 function hideTables(posTables) {
 	let tables = document.querySelectorAll('table');
 	tables.forEach(element => {
-		element.classList.add('d-none');
-		if (document.title === "Adjustment") {
-			element.nextElementSibling ? element.nextElementSibling.classList.add('d-none') : null;
+		if (element.parentElement.classList.contains('tv-lightweight-charts')) {
+			return;
+		} else {
+			element.classList.add('d-none');
+			if (document.title === "Adjustment") {
+				element.nextElementSibling ? element.nextElementSibling.classList.add('d-none') : null;
+			}
 		}
 	});
 	let table = posTables.nextElementSibling;
@@ -1214,9 +1218,11 @@ async function chart(element, iT, tex) {
 		let button = switcherElement.nextElementSibling;
 		button.innerHTML = "";
 	} else {
+		const chartDiv = document.getElementById(`${element}`);
+		chartDiv.innerHTML = "";
 		const chartProperties1 = {
-			width: 750,
-			height: 290,
+			width: chartDiv.innerWidth,
+			height: chartDiv.innerHeight,
 			timeScale: {
 				timeVisible: true,
 				secondsVisible: true,
@@ -1251,8 +1257,6 @@ async function chart(element, iT, tex) {
 				},
 			},
 		};
-		const chartDiv = document.getElementById(`${element}`);
-		chartDiv.innerHTML = "";
 		const chart = LightweightCharts.createChart(chartDiv, chartProperties1);
 		let p1M = await reversePrice(c1M);
 		let p5M = await reversePrice(c5M);
@@ -1413,12 +1417,9 @@ async function chart(element, iT, tex) {
 		/// button
 		let button = switcherElement.nextElementSibling;
 		button.style.left =
-			chartDiv.getBoundingClientRect().left + window.scrollX + 500 + "px";
+			chartDiv.getBoundingClientRect().right + window.scrollX + -100 + "px";
 		button.style.top =
-			chartDiv.getBoundingClientRect().top + window.scrollY + 230 + "px";
-		button.style.color = "#4c525e";
-		button.innerHTML =
-			'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M6.5 1.5l5 5.5-5 5.5M3 4l2.5 3L3 10"></path></svg>';
+			chartDiv.getBoundingClientRect().bottom + window.scrollY + -65 + "px";
 		let timeScale = chart.timeScale();
 		timeScale.subscribeVisibleTimeRangeChange(function () {
 			let buttonVisible = timeScale.scrollPosition() < 0;
@@ -1438,34 +1439,35 @@ async function chart(element, iT, tex) {
 		//
 		worker.port.addEventListener("message", function (msg) {
 			let result = msg.data;
-			if (result.tk == iT) {
-				if (result.lp == undefined) {
-					null;
-				} else {
-					mergeTickToBar(result);
-					// && new Date().getMilliseconds() > 500
-					if (new Date().getSeconds() == 0) {
-						// move to next bar
-						currentIndex++;
-						let timestamp = Math.round(Date.now() / 1000);
-						currentBar = {
-							open: null,
-							high: null,
-							low: null,
-							close: null,
-							time: timestamp + 19800,
-						};
-						currentVol = {
-							value: null,
-							time: timestamp + 19800,
-						};
-					}
-					//candleSeries.update({ time: Math.round(Date.now() / 1000) + 19800, value: result.lp });
+			if (result.tk == iT && result.lp != undefined) {
+				mergeTickToBar(result);
+				let currentTime = new Date;
+				let currentTimeBar = new Date(currentBar.time);
+				if (currentTimeBar.getMinutes() != currentTime.getMinutes()) {
+					// move to next bar
+					currentIndex++;
+					let timestamp = Math.round(Date.now() / 1000);
+					currentBar = {
+						open: null,
+						high: null,
+						low: null,
+						close: null,
+						time: timestamp + 19800,
+					};
+					currentVol = {
+						value: null,
+						time: timestamp + 19800,
+					};
 				}
+				//candleSeries.update({ time: Math.round(Date.now() / 1000) + 19800, value: result.lp });
 			}
-		});
-	}
+			else {
+				null;
+			}
+		})
+	};
 }
+
 //chart with multiple tf
 async function addLeg() {
 	let table = document.getElementById('stratBody');
@@ -3143,7 +3145,6 @@ async function selPos(s) {
 	} else {
 		pos.forEach((element) => {
 			if (element.dname.slice(0, -1) == dname && element.netqty != 0) {
-				let div = document.getElementById('tableDiv');
 				document.getElementById('type').innerHTML =
 					element.prd == "M" || element.prd == "C" ? "NRML" : "MIS";
 				document.getElementById('dname').innerHTML = element.dname;
@@ -3166,10 +3167,14 @@ async function selPos(s) {
 					if (element.dname.split(" ")[3] == 'CE') {
 						document.getElementsByClassName('bdtoken')[0].id = ocV.values[2].token;
 						document.getElementById('btsym').innerHTML = ocV.values[2].tsym;
+						chart('sellChart', element.tsym, 'NFO');
+						chart('hedgeChart', ocV.values[2].token, 'NFO');
 						sendMessageToSocket(`{"t":"t","k":"${ocV.values[2].exch}|${ocV.values[2].token}"}`);
 					} else {
 						document.getElementsByClassName('bdtoken')[0].id = ocV.values[5].token;
 						document.getElementById('btsym').innerHTML = ocV.values[5].tsym;
+						chart('sellChart', element.tsym, 'NFO');
+						chart('hedgeChart', ocV.values[5].token, 'NFO');
 						sendMessageToSocket(`{"t":"t","k":"${ocV.values[5].exch}|${ocV.values[5].token}"}`);
 					}
 				});
