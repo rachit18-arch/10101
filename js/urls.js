@@ -3159,13 +3159,13 @@ async function selPos(s) {
 					if (element.dname.split(" ")[3] == 'CE') {
 						document.getElementsByClassName('bdtoken')[0].id = ocV.values[2].token;
 						document.getElementById('btsym').innerHTML = ocV.values[2].tsym;
-						chart('sellChart', element.tsym, 'NFO');
+						chart('sellChart', element.tokem, 'NFO');
 						chart('hedgeChart', ocV.values[2].token, 'NFO');
 						sendMessageToSocket(`{"t":"t","k":"${ocV.values[2].exch}|${ocV.values[2].token}"}`);
 					} else {
 						document.getElementsByClassName('bdtoken')[0].id = ocV.values[5].token;
 						document.getElementById('btsym').innerHTML = ocV.values[5].tsym;
-						chart('sellChart', element.tsym, 'NFO');
+						chart('sellChart', element.token, 'NFO');
 						chart('hedgeChart', ocV.values[5].token, 'NFO');
 						sendMessageToSocket(`{"t":"t","k":"${ocV.values[5].exch}|${ocV.values[5].token}"}`);
 					}
