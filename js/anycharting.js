@@ -2,7 +2,6 @@ async function anycharting(search, element, tex) {
     element.innerHTML = '';
     let val = search.value;
     let opts = document.getElementById('dlist').childNodes;
-    console.log(val)
     let scriptName;
     let iT;
     for (var i = 0; i < opts.length; i++) {
@@ -121,15 +120,16 @@ async function anycharting(search, element, tex) {
             + ("00" + currentDate.getHours()).slice(-2) + ":"
             + ("00" + currentDate.getMinutes()).slice(-2)
             + ":" + ("00" + currentDate.getSeconds()).slice(-2)
-            }`, into: null, inth: null, intl: null, intc: null
+            }`
+        , into: null, inth: null, intl: null, intc: null
     };
     sendMessageToSocket(`{"t":"t","k":"${tex}|${iT}}`);
     worker.port.addEventListener("message", function (msg) {
         let result = msg.data;
         if (result.tk == iT && result.lp != undefined) {
             let currentTime = new Date;
-            let currentTimeBar = new Date(currentBar.time);
-            if (currentTimeBar.getMinutes() != currentTime.getMinutes()) {
+            let currentTimeBar = currentBar.time.split(':');
+            if (currentTimeBar[1] != currentTime.getMinutes()) {
                 currentTime = ("00" + currentTime.getDate()).slice(-2)
                     + "-" + ("00" + (currentTime.getMonth() + 1)).slice(-2)
                     + "-" + currentTime.getFullYear() + " "
@@ -224,7 +224,6 @@ function changeAnnotationsDesign() {
 }
 
 function mergeTickToBar(result, currentBar, table) {
-    console.log(currentBar)
     let currentTime = new Date;
     let currentTimeBar = new Date(currentBar.time);
     if (currentTimeBar.getMinutes() != currentTime.getMinutes()) {

@@ -34,7 +34,6 @@ worker.port.addEventListener("message", function (msg) {
                 if (outerElement.children.length > 4) {
                     let prvClo = (100 / (100 + parseFloat(result.pc)) * parseFloat(result.lp)),
                         chg = result.lp - prvClo;
-                    //console.log(prvClo);
                     document.getElementById(`${result.tk}`)
                         ? document.getElementById(`${result.tk}`).innerHTML = result.lp
                         : null;

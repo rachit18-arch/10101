@@ -1442,8 +1442,8 @@ async function chart(element, iT, tex) {
 			if (result.tk == iT && result.lp != undefined) {
 				mergeTickToBar(result);
 				let currentTime = new Date;
-				let currentTimeBar = new Date(currentBar.time);
-				if (currentTimeBar.getMinutes() != currentTime.getMinutes()) {
+				let currentTimeBar = new Date(((currentBar.time) - 19800) * 1000);
+				if (currentTime.getMinutes() != currentTimeBar.getMinutes()) {
 					// move to next bar
 					currentIndex++;
 					let timestamp = Math.round(Date.now() / 1000);
@@ -1604,7 +1604,6 @@ function tradeS() {
 //trade selected strategy builder
 async function basketMargins() {
 	let checkboxes = document.querySelectorAll("input[name='boxes']");
-	//console.log(checkboxes);
 	let rows = [];
 	for (let checkbox of checkboxes) {
 		if (checkbox.checked == true) {
@@ -1616,7 +1615,6 @@ async function basketMargins() {
 	let baskets = [];
 	for (let i = 0; i < rows.length; i++) {
 		const row = rows[i];
-		//console.log(row)
 		if (i == 0) {
 			value = {
 				uid: localStorage.getItem("uid"),
@@ -1774,7 +1772,6 @@ async function hold() {
 					parseInt(element.children[1].innerHTML) *
 					parseFloat(element.children[10].innerHTML);
 			}
-			//console.log(current)
 			net = current - parseFloat(document.getElementById("total").innerHTML);
 			document.getElementById("current").innerHTML = current.toFixed(2);
 			document.getElementById("day").innerHTML = dayt.toFixed(2);
@@ -1995,7 +1992,6 @@ async function oiUpdate() {
 	let time = new Date();
 	if (time.getHours() > 16 && time.getHours() < 9) {
 		clearInterval(intervalS);
-		//console.log(intervalS)
 	}
 	// if (document.title === "Option Chain") {
 	// 	let cePrv = 0;
@@ -2275,7 +2271,6 @@ async function optionSort(oFOV) {
 			stext: scriptName + ' ' + document.getElementById('exp').value.split(" ", 1),
 		};
 		let scripts = await all(svalues, "SearchScrip");
-		//console.log(scripts);
 		let ocvalues = {
 			uid: localStorage.getItem("uid"),
 			exch: "NFO",
@@ -2489,7 +2484,6 @@ async function optionSort(oFOV) {
 										decayArrayPE.push(a)
 									} else {
 										pE.value = pE.value + parseInt(elem.intc);
-										//console.log(pE.value)
 									}
 								}
 							})
@@ -2511,7 +2505,6 @@ async function optionSort(oFOV) {
 							: td.children[12].setAttribute("class", "red");
 					}
 					sendMessageToSocket(`{"t":"t","k":"NFO|${element.token}"}`);
-					// console.log(pePrv, cePrv)
 				});
 
 				document.querySelector(`table#tableOI thead`).innerHTML = '';
@@ -2780,7 +2773,6 @@ async function changeExp() {
 					: td.children[12].setAttribute("class", "red");
 			}
 			sendMessageToSocket(`{"t":"t","k":"NFO|${element.token}"}`);
-			// console.log(pePrv, cePrv)
 		});
 
 		document.querySelector(`table#tableOI thead`).innerHTML = '';
