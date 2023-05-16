@@ -63,6 +63,9 @@ function logout() {
 // hide top header
 let hide = document.querySelector('#hd');
 let tpheader = document.querySelector('#tpheader');
+let mt = document.querySelector('.mt')
 hide.addEventListener('click', () =>{
 	tpheader.classList.toggle("whide");
+	hide.classList.toggle("mt");
+
 })

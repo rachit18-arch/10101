@@ -1035,8 +1035,10 @@ input[type=number] {
     left: 50%;
     z-index: 111111;
 }
-
-
+.mt
+{
+    margin-top: -40px;;
+}
 .whide
 {
     display: none;
