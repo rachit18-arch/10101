@@ -16,7 +16,7 @@ Table Of contents
 body {
     background: #f9faff;
     overflow-x: hidden;
-    margin-top: 60px;
+    /* margin-top: 60px; */
     font-size: 13px;
 }
 
@@ -278,7 +278,7 @@ body.crypt-dark .crypt-boxed-area {
 
 .crypt-header {
     background: #fff;
-    position: fixed;
+    /* position: fixed; */
     top: 0;
     left: 0;
     width: 100%;
@@ -426,7 +426,7 @@ body.crypt-dark .crypt-boxed-area {
 .crypt-dark .crypt-header {
     box-shadow: none;
     background: #242e3e;
-    position: fixed;
+    /* position: fixed; */
     top: 0;
     left: 0;
     width: 100%;

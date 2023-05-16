@@ -65,4 +65,5 @@ let hide = document.querySelector('#hd');
 let tpheader = document.querySelector('#tpheader');
 hide.addEventListener('click', () =>{
 	tpheader.classList.toggle("whide");
+	// hide.classList.toggle("hdspace");
 })
