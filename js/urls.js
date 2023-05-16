@@ -1223,7 +1223,7 @@ async function chart(element, iT, tex) {
 			},
 			layout: {
 				textColor: "#ffffff",
-				backgroundColor: "#000000", //"rgba(120, 123, 134, 1)", rgba(93, 96, 107, 1)
+				backgroundColor: "#010101", //"rgba(120, 123, 134, 1)", rgba(93, 96, 107, 1)
 			},
 			rightPriceScale: {
 				scaleMargins: {
