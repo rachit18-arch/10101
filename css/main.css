@@ -503,7 +503,7 @@ td {
 }
 
 /* chart */
-.dot {
+/* .dot {
     height: 25px;
     width: 25px;
     background-color: #bbb;
@@ -514,7 +514,7 @@ td {
     z-index: 1000;
     top: 14px;
     left: 40px;
-}
+} */
 
 .atm {
     background: #243e68 !important;
@@ -1029,18 +1029,20 @@ input[type=number] {
     padding: 4px;
     border: none;
 }
+
 #hd {
     position: absolute;
     top: 45px;
     left: 50%;
     z-index: 111111;
 }
-.mt
-{
-    margin-top: -40px;;
+
+.mt {
+    margin-top: -40px;
+    ;
 }
-.whide
-{
+
+.whide {
     display: none;
 }
 

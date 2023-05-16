@@ -4,15 +4,15 @@ let completed = 0;
 worker.port.addEventListener("message", function (msg) {
     let result = msg.data;
     let a = msg.data.s;
-    document.getElementsByClassName("dot")[0].style.backgroundColor =
-        "#55ad82";
+    document.getElementById('navButton').style.backgroundColor =
+        "#D1FFBD";
     if (a == 'OK' && a != undefined) {
         let actid = localStorage.getItem('actid');
         sendMessageToSocket(`{"t:o""k:${actid}"}`);
     }
     if (result == 'WS Disconnected') {
-        document.getElementsByClassName("dot")[0].style.backgroundColor =
-            "#eb6a61";
+        document.getElementById("navButton").style.backgroundColor =
+            "#FCD299";
         setTimeout(() => {
             location.reload();
         }, 3000);
