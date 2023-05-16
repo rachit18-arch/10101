@@ -1029,3 +1029,17 @@ input[type=number] {
     padding: 4px;
     border: none;
 }
+#hd {
+    position: absolute;
+    top: 45px;
+    left: 50%;
+    z-index: 111111;
+}
+.whide
+{
+    display: none;
+}
+
+#hd img {
+    width: 6%;
+}

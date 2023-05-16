@@ -60,3 +60,9 @@ function logout() {
 	localStorage.clear();
 	window.location.replace('login.html');
 }
+
+let hide = document.querySelector('#hd');
+let tpheader = document.querySelector('#tpheader');
+hide.addEventListener('click', () =>{
+	tpheader.classList.toggle("whide");
+})
