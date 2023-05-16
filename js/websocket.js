@@ -22,142 +22,142 @@ worker.port.addEventListener("message", function (msg) {
         document.getElementById(`${result.tk}`)
             ? (document.getElementById(`${result.tk}`).innerHTML = result.lp)
             : null;
-    } if (document.title === "Option Chain") {
+    }
+    if (document.title === "Option Chain") {
         if (result.lp) {
-            let row = document.getElementById(`${result.tk}`)
+            let outerElement = document.getElementById(`${result.tk}`)
                 ? document.getElementById(`${result.tk}`).parentElement
                 : null;
-            if (row == null) {
+            if (outerElement == null) {
                 //sendMessageToSocket(`{"t":"u","k":"${result.e}|${result.tk}"}`);
             } else {
-                if (row.children.length > 4) {
+                if (outerElement.children.length > 4) {
                     let prvClo = (100 / (100 + parseFloat(result.pc)) * parseFloat(result.lp)),
                         chg = result.lp - prvClo;
-                    //console.log(prvClo);
                     document.getElementById(`${result.tk}`)
                         ? document.getElementById(`${result.tk}`).innerHTML = result.lp
                         : null;
                     parseFloat(result.pc) < 0 ? document.getElementById(`${result.tk}`).setAttribute('class', 'red') : document.getElementById(`${result.tk}`).setAttribute('class', 'green')
                     let straddle =
-                        parseFloat(row.children[6].innerHTML) +
-                        parseFloat(row.children[8].innerHTML);
-                    row.children[16].innerHTML = straddle.toFixed(2);
+                        parseFloat(outerElement.children[6].innerHTML) +
+                        parseFloat(outerElement.children[8].innerHTML);
+                    outerElement.children[16].innerHTML = straddle.toFixed(2);
                     if (result.oi) {
-                        if (result.tk == row.children[6].id) {
-                            row.children[3].innerHTML = result.oi;
-                            row.children[2].innerHTML = result.oi - row.children[4].innerHTML;
-                            row.children[5].innerHTML = prvClo.toFixed(2);
-                            parseInt(row.children[2].innerHTML) >= 0
-                                ? row.children[2].setAttribute("class", "green")
-                                : row.children[2].setAttribute("class", "red");
-                            volFind(row);
+                        if (result.tk == outerElement.children[6].id) {
+                            outerElement.children[3].innerHTML = result.oi;
+                            outerElement.children[2].innerHTML = result.oi - outerElement.children[4].innerHTML;
+                            outerElement.children[5].innerHTML = prvClo.toFixed(2);
+                            parseInt(outerElement.children[2].innerHTML) >= 0
+                                ? outerElement.children[2].setAttribute("class", "green")
+                                : outerElement.children[2].setAttribute("class", "red");
+                            volFind(outerElement);
                         } else {
-                            row.children[11].innerHTML = result.oi;
-                            row.children[12].innerHTML =
-                                result.oi - row.children[10].innerHTML;
-                            row.children[9].innerHTML = prvClo.toFixed(2);
-                            parseInt(row.children[11].innerHTML) >= 0
-                                ? row.children[11].setAttribute("class", "green")
-                                : row.children[11].setAttribute("class", "red");
+                            outerElement.children[11].innerHTML = result.oi;
+                            outerElement.children[12].innerHTML =
+                                result.oi - outerElement.children[10].innerHTML;
+                            outerElement.children[9].innerHTML = prvClo.toFixed(2);
+                            parseInt(outerElement.children[11].innerHTML) >= 0
+                                ? outerElement.children[11].setAttribute("class", "green")
+                                : outerElement.children[11].setAttribute("class", "red");
                         }
                     }
-                    result.lp > row.children[6].innerHTML ? (cp = 0) : (cp = 1);
+                    result.lp > outerElement.children[6].innerHTML ? (cp = 0) : (cp = 1);
                     let pcr =
-                        parseFloat(row.children[11].innerHTML) /
-                        parseFloat(row.children[3].innerHTML);
-                    row.children[17].innerHTML = pcr.toFixed(2);
+                        parseFloat(outerElement.children[11].innerHTML) /
+                        parseFloat(outerElement.children[3].innerHTML);
+                    outerElement.children[17].innerHTML = pcr.toFixed(2);
                 }
             }
         }
     }
     if (document.title === "Strategy Builder") {
-        let row = document.getElementById(`${result.tk}`)
+        let outerElement = document.getElementById(`${result.tk}`)
             ? document.getElementById(`${result.tk}`).parentElement
             : null;
-        if (row == null) {
+        if (outerElement == null) {
             sendMessageToSocket(`{"t":"u","k":"${result.e}|${result.tk}"}`);
         } else {
-            if (row.children.length > 4) {
-                findGreek(row)
+            if (outerElement.children.length > 4) {
+                findGreek(outerElement)
             }
         }
     }
     if (document.title === "Positions") {
         if (result.lp) {
-            let row = document.getElementById(`${result.tk}`).parentElement;
-            if (row.children.length > 4) {
-                if (row.parentElement.id == 'posBody') {
-                    row.children[8].innerHTML = (
-                        (parseFloat(row.children[7].innerHTML) -
-                            parseFloat(row.children[6].innerHTML)) *
-                        parseFloat(row.children[5].innerHTML)
+            let outerElement = document.getElementById(`${result.tk}`).parentElement;
+            if (outerElement.children.length > 4) {
+                if (outerElement.parentElement.id == 'posBody') {
+                    outerElement.children[8].innerHTML = (
+                        (parseFloat(outerElement.children[7].innerHTML) -
+                            parseFloat(outerElement.children[6].innerHTML)) *
+                        parseFloat(outerElement.children[5].innerHTML)
                     ).toFixed(2);
-                    parseFloat(row.children[8].innerHTML) >= 0
-                        ? row.children[8].setAttribute("class", "green")
-                        : row.children[8].setAttribute("class", "red");
-                    row.children[10].innerHTML = ((parseFloat(row.children[7].innerHTML) / parseFloat(row.children[6].innerHTML) * 100) - 100).toFixed(2) + " %";
+                    parseFloat(outerElement.children[8].innerHTML) >= 0
+                        ? outerElement.children[8].setAttribute("class", "green")
+                        : outerElement.children[8].setAttribute("class", "red");
+                    outerElement.children[10].innerHTML = ((parseFloat(outerElement.children[7].innerHTML) / parseFloat(outerElement.children[6].innerHTML) * 100) - 100).toFixed(2) + " %";
                 } else {
-                    row.children[7].innerHTML = (
-                        (parseFloat(row.children[6].innerHTML) -
-                            parseFloat(row.children[5].innerHTML)) *
-                        parseFloat(row.children[4].innerHTML)
+                    outerElement.children[7].innerHTML = (
+                        (parseFloat(outerElement.children[6].innerHTML) -
+                            parseFloat(outerElement.children[5].innerHTML)) *
+                        parseFloat(outerElement.children[4].innerHTML)
                     ).toFixed(2);
-                    parseFloat(row.children[7].innerHTML) >= 0
-                        ? row.children[7].setAttribute("class", "green")
-                        : row.children[7].setAttribute("class", "red");
-                    row.children[9].innerHTML = ((parseFloat(row.children[6].innerHTML) / parseFloat(row.children[5].innerHTML) * 100) - 100).toFixed(2) + " %";
-                    result.oi ? PosIV(row) : null;
+                    parseFloat(outerElement.children[7].innerHTML) >= 0
+                        ? outerElement.children[7].setAttribute("class", "green")
+                        : outerElement.children[7].setAttribute("class", "red");
+                    outerElement.children[9].innerHTML = ((parseFloat(outerElement.children[6].innerHTML) / parseFloat(outerElement.children[5].innerHTML) * 100) - 100).toFixed(2) + " %";
+                    result.oi ? PosIV(outerElement) : null;
                 }
             }
         }
         if (result.t == "df") {
-            let row = document.getElementById(`${result.tk}`).parentElement;
-            if (row.children.length > 4) {
-                result.bp1 && result.sp1 ? row.children[12].innerHTML = (result.sp1 - result.bp1).toFixed(2) : null;
+            let outerElement = document.getElementById(`${result.tk}`).parentElement;
+            if (outerElement.children.length > 4) {
+                result.bp1 && result.sp1 ? outerElement.children[12].innerHTML = (result.sp1 - result.bp1).toFixed(2) : null;
             }
         }
     }
     if (document.title === "Adjustment") {
         if (result.lp) {
-            let row = document.getElementById(`${result.tk}`).parentElement;
-            if (row.children.length > 4) {
-                calcIV(row)
+            let outerElement = document.getElementById(`${result.tk}`).parentElement;
+            if (outerElement.children.length > 6) {
+                calcIV(outerElement)
             }
         }
     }
     if (document.title === "Holdings") {
         if (result.lp) {
-            let row = document.getElementById(`${result.tk}`).parentElement;
-            let qty = parseFloat(row.children[1].innerHTML);
-            let aprc = parseFloat(row.children[2].innerHTML);
+            let outerElement = document.getElementById(`${result.tk}`).parentElement;
+            let qty = parseFloat(outerElement.children[1].innerHTML);
+            let aprc = parseFloat(outerElement.children[2].innerHTML);
             let ltp = parseFloat(result.lp);
-            row.children[4].innerHTML = (qty * ltp).toFixed(2);
-            let pl = (row.children[5].innerHTML = (qty * (ltp - aprc)).toFixed(2));
+            outerElement.children[4].innerHTML = (qty * ltp).toFixed(2);
+            let pl = (outerElement.children[5].innerHTML = (qty * (ltp - aprc)).toFixed(2));
             pl > 0
-                ? row.children[5].setAttribute("class", "green")
-                : row.children[5].setAttribute("class", "red");
+                ? outerElement.children[5].setAttribute("class", "green")
+                : outerElement.children[5].setAttribute("class", "red");
             if (result.c) {
-                let cell10 = row.insertCell(10);
+                let cell10 = outerElement.insertCell(10);
                 cell10.setAttribute("class", "d-none");
                 cell10.innerHTML = result.c;
             }
-            row.children[6].innerHTML = (
+            outerElement.children[6].innerHTML = (
                 qty *
-                parseFloat(row.children[10].innerHTML) *
+                parseFloat(outerElement.children[10].innerHTML) *
                 (parseFloat(result.pc) / 100)
             ).toFixed(2);
-            row.children[6].innerHTML > 0
-                ? row.children[6].setAttribute("class", "green")
-                : row.children[6].setAttribute("class", "red");
-            row.children[7].innerHTML = `${((pl / (qty * aprc)) * 100).toFixed(2)} %`;
+            outerElement.children[6].innerHTML > 0
+                ? outerElement.children[6].setAttribute("class", "green")
+                : outerElement.children[6].setAttribute("class", "red");
+            outerElement.children[7].innerHTML = `${((pl / (qty * aprc)) * 100).toFixed(2)} %`;
             ((pl / (qty * aprc)) * 100).toFixed(2) > 0
-                ? row.children[7].setAttribute("class", "green")
-                : row.children[7].setAttribute("class", "red");
+                ? outerElement.children[7].setAttribute("class", "green")
+                : outerElement.children[7].setAttribute("class", "red");
             if (result.pc) {
-                row.children[8].innerHTML = `${result.pc} %`;
+                outerElement.children[8].innerHTML = `${result.pc} %`;
                 result.pc > 0
-                    ? row.children[8].setAttribute("class", "green")
-                    : row.children[8].setAttribute("class", "red");
+                    ? outerElement.children[8].setAttribute("class", "green")
+                    : outerElement.children[8].setAttribute("class", "red");
             }
             current += qty * ltp;
         }

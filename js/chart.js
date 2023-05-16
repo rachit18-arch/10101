@@ -297,7 +297,6 @@ function PosIV(row) {
         fv_strike * distribution.cdf(-1 * d2) - spot * distribution.cdf(-1 * d1);
     //Option greeks
     let vega = spot * distribution.pdf(d1) * Math.sqrt(delta_t);
-    console.log(d2, fv_strike, call_premium, vega)
     volt = (-(call_premium - callPrice) / vega) + volt;
     row.children[10].innerHTML = (volt * 100).toFixed(2);
 }

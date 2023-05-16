@@ -344,6 +344,32 @@
                <button onclick="orderTimer()" class="crypt-button-green-full hedge-btn">Start</button>
             </div>
          </div>
+         <div class="row">
+            <div class="col-md-6">
+               <div class="chart" id="sellChart" style="width: 600px; height: 300px;"></div>
+               <div class="legend"></div>
+               <div class="switcher"></div>
+               <div class="rTb"
+                  style="color: rgb(0, 0, 0); display: block; background: rgb(250, 250, 250); display: none;">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14">
+                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"
+                        d="M6.5 1.5l5 5.5-5 5.5M3 4l2.5 3L3 10"></path>
+                  </svg>
+               </div>
+            </div>
+            <div class="col-md-6">
+               <div class="chart" id="hedgeChart" style="width: 600px; height: 300px;"></div>
+               <div class="legend"></div>
+               <div class="switcher"></div>
+               <div class="rTb"
+                  style="color: rgb(0, 0, 0); display: block; background: rgb(250, 250, 250); display: none;">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14">
+                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"
+                        d="M6.5 1.5l5 5.5-5 5.5M3 4l2.5 3L3 10"></path>
+                  </svg>
+               </div>
+            </div>
+         </div>
       </div>
    </section>
    <!-- alert -->
@@ -360,6 +386,7 @@
    <!-- alert -->
 
    <!-- js -->
+   <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
    <script src="js/main.js"></script>
    <script type="text/javascript" src="js/gaussian.js"></script>
