@@ -1042,4 +1042,7 @@ input[type=number] {
 
 #hd img {
     width: 6%;
+    background: white;
+    border-radius: 50%;
+    padding: 5px 5px;
 }
