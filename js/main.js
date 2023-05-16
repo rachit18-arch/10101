@@ -67,5 +67,4 @@ let mt = document.querySelector('.mt')
 hide.addEventListener('click', () =>{
 	tpheader.classList.toggle("whide");
 	hide.classList.toggle("mt");
-
 })
