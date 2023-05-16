@@ -3783,3 +3783,9 @@ function tradeAdjS(button) {
 	});
 }
 //trade selected adjustment builder
+function hideNav(button) {
+	let navbar = button.nextElementSibling;
+	navbar.classList.toggle("whide");
+	button.classList.toggle("mt");
+}
+// hide navBar
