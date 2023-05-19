@@ -123,7 +123,7 @@ async function anycharting(search, element, tex) {
             }`
         , into: null, inth: null, intl: null, intc: null
     };
-    sendMessageToSocket(`{"t":"t","k":"${tex}|${iT}}`);
+    sendMessageToSocket(`{"t":"t","k":"${tex}|${iT}"}`);
     worker.port.addEventListener("message", function (msg) {
         let result = msg.data;
         if (result.tk == iT && result.lp != undefined) {
