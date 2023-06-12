@@ -2214,44 +2214,6 @@ async function oiUpdate() {
 	// 	}, 10000)
 	// }
 }
-const chartProperties = {
-	width: 632,
-	height: 500,
-	timeScale: {
-		timeVisible: true,
-		secondsVisible: true,
-	},
-	layout: {
-		textColor: "#ffffff",
-		backgroundColor: "#000000"//"rgba(120, 123, 134, 1)", //, rgba(93, 96, 107, 1)
-	},
-	rightPriceScale: {
-		scaleMargins: {
-			top: 0.3,
-			bottom: 0.25,
-		},
-		//mode: LightweightCharts.PriceScaleMode.Percentage,
-	},
-	grid: {
-		vertLines: {
-			color: "rgba(120, 123, 134, 1)",
-			visible: false,
-		},
-		horzLines: {
-			color: "rgba(120, 123, 134, 1)",
-			visible: false,
-		},
-	},
-	crosshair: {
-		//	mode: LightweightCharts.CrosshairMode.Normal,
-		vertLine: {
-			color: "#fff",
-		},
-		horzLine: {
-			color: "#fff",
-		},
-	},
-};
 async function optionSort(oFOV) {
 	document.getElementById("search").value = "";
 	let ocE = await oFOV.opt_exp.sort(expSort);
@@ -2389,6 +2351,46 @@ async function optionSort(oFOV) {
 				chartDiv.innerHTML = "";
 				const chartDiv1 = document.getElementById(`straddle`);
 				chartDiv1.innerHTML = "";
+				const chartProperties = {
+					width: 632,
+					height: 500,
+					timeScale: {
+						timeVisible: true,
+						secondsVisible: true,
+					},
+					layout: {
+						textColor: "#000000",
+						background: {
+							type: "solid",
+							color: "white",// rgba(93, 96, 107, 1),
+						},
+						lineColor: 'black',
+					},
+					rightPriceScale: {
+						scaleMargins: {
+							top: 0.3,
+							bottom: 0.25,
+						},
+						borderColor: 'black',
+					},
+					grid: {
+						vertLines: {
+							color: "rgba(120, 123, 134, 0)",
+						},
+						horzLines: {
+							color: "rgba(120, 123, 134, 0)",
+						},
+					},
+					crosshair: {
+						mode: LightweightCharts.CrosshairMode.Normal,
+						vertLine: {
+							color: "#000",
+						},
+						horzLine: {
+							color: "#000",
+						},
+					},
+				};
 				const chart = LightweightCharts.createChart(chartDiv, chartProperties);
 				const chart1 = LightweightCharts.createChart(chartDiv1, chartProperties);
 				await ocV.values.forEach(async (element) => {
@@ -2659,6 +2661,46 @@ async function changeExp() {
 		chartDiv.innerHTML = "";
 		const chartDiv1 = document.getElementById(`straddle`);
 		chartDiv1.innerHTML = "";
+		const chartProperties = {
+			width: 632,
+			height: 500,
+			timeScale: {
+				timeVisible: true,
+				secondsVisible: true,
+			},
+			layout: {
+				textColor: "#000000",
+				background: {
+					type: "solid",
+					color: "white",// rgba(93, 96, 107, 1),
+				},
+				lineColor: 'black',
+			},
+			rightPriceScale: {
+				scaleMargins: {
+					top: 0.3,
+					bottom: 0.25,
+				},
+				borderColor: 'black',
+			},
+			grid: {
+				vertLines: {
+					color: "rgba(120, 123, 134, 0)",
+				},
+				horzLines: {
+					color: "rgba(120, 123, 134, 0)",
+				},
+			},
+			crosshair: {
+				mode: LightweightCharts.CrosshairMode.Normal,
+				vertLine: {
+					color: "#000",
+				},
+				horzLine: {
+					color: "#000",
+				},
+			},
+		};
 		const chart = LightweightCharts.createChart(chartDiv, chartProperties);
 		const chart1 = LightweightCharts.createChart(chartDiv1, chartProperties);
 		await ocV.values.forEach(async (element) => {
