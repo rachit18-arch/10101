@@ -2007,9 +2007,6 @@ async function oiUpdate() {
 	// 		exch: "NSE"
 	// 	}
 	// 	//save data in table foot ce pe
-	// 	//https://www.prefabstructures.co.in/multi-story-building.html
-	// 	//,https://www.bnalprefabs.com/contact-us/
-	// 	//,https://multidecor.in/contact-us/
 	// 	let target = await all(openPrice, "GetQuotes");
 	// 	target = target.o ? parseFloat(target.o) : parseFloat(target.lp);
 	// 	var closest = ocV.values.reduce(function (prev, curr) {
