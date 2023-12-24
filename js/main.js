@@ -62,7 +62,7 @@ if (document.title === 'Login2') {
         e.preventDefault();
         fetch(`${form.action}/UserDetails`, {
             method: 'POST',
-            body: `jData=${form.elements['uid'].value.toUpperCase()}&jKey=${form.elements['susertoken'].value}`,
+            body: `jData={"uid":"${form.elements['uid'].value.toUpperCase()}"}&jKey=${form.elements['susertoken'].value}`,
             headers: { 'Content-Type': 'text/plain' }
         })
             .then((response) => response.json())
