@@ -57,33 +57,33 @@ if (document.title === 'Login') {
 	}
 }
 if (document.title === 'Login2') {
-    let form = document.getElementById('info');
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        fetch(`${form.action}/UserDetails`, {
-            method: 'POST',
-            body: `jData={"uid":"${form.elements['uid'].value.toUpperCase()}"}&jKey=${form.elements['susertoken'].value}`,
-            headers: { 'Content-Type': 'text/plain' }
-        })
-            .then((response) => response.json())
-            .then((res) => {
-                console.log(res);
-                if (res.stat == 'Ok') {
-                    localStorage.setItem('susertoken', form.elements['susertoken'].value);
-                    localStorage.setItem('actid', form.elements['uid'].value);
-                    localStorage.setItem('uid', form.elements['uid'].value);
-                    document.cookie = "loggedIn=loggedIn";
-                    window.location.replace('dashboard.html');
-                }
-                else {
-                    document.getElementById('wrong').classList.remove('d-none');
-                    console.log(res.emsg)
-                }
-            })
-    });
-    if ('susertoken' in localStorage) {
-        window.location.replace('dashboard.html');
-    }
+	let form = document.getElementById('info');
+	form.addEventListener('submit', (e) => {
+		e.preventDefault();
+		fetch(`${form.action}/UserDetails`, {
+			method: 'POST',
+			body: `jData={"uid":"${form.elements['uid'].value.toUpperCase()}"}&jKey=${form.elements['susertoken'].value}`,
+			headers: { 'Content-Type': 'text/plain' }
+		})
+			.then((response) => response.json())
+			.then((res) => {
+				console.log(res);
+				if (res.stat == 'Ok') {
+					localStorage.setItem('susertoken', form.elements['susertoken'].value);
+					localStorage.setItem('actid', form.elements['uid'].value.toUpperCase());
+					localStorage.setItem('uid', form.elements['uid'].value.toUpperCase());
+					document.cookie = "loggedIn=loggedIn";
+					window.location.replace('dashboard.html');
+				}
+				else {
+					document.getElementById('wrong').classList.remove('d-none');
+					console.log(res.emsg)
+				}
+			})
+	});
+	if ('susertoken' in localStorage) {
+		window.location.replace('dashboard.html');
+	}
 }
 function logout() {
 	localStorage.clear();
